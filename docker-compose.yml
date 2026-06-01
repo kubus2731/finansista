@@ -4,8 +4,8 @@ services:
     container_name: pb_finansista_db
     environment:
       - ORACLE_PASSWORD=f1nans1sta
-      - APP_USER=c##admin_pb
-      - APP_PASSWORD=paw1ewjav1e
+      - APP_USER=admin_pb
+      - APP_USER_PASSWORD=paw1ewjav1e
     ports:
       - "1521:1521"
     volumes:
