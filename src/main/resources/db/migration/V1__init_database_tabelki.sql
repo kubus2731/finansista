@@ -16,7 +16,7 @@ CREATE TABLE users(
     name VARCHAR2(50) NOT NULL,
     surname VARCHAR2(50) NOT NULL,
     email VARCHAR2(50) NOT NULL UNIQUE,
-    phone_number VARCHAR2(50) NOT NULL,
+    phone_number VARCHAR2(50) NOT NULL UNIQUE,
     password VARCHAR2(255) NOT NULL,
     id_r NUMBER(15) NOT NULL,
     id_d NUMBER(15) NOT NULL,
