@@ -41,7 +41,7 @@ public class Request {
     private RequestStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_rt", nullable = false)
+    @JoinColumn(name = "id_rt", nullable = true)
     private RequestTemplate template;
 
     @ManyToOne(fetch = FetchType.LAZY)
