@@ -54,7 +54,7 @@ CREATE TABLE requests(
     amount NUMBER(15,2) NOT NULL,
     id_u NUMBER(15) NOT NULL,
     id_rs NUMBER(15) NOT NULL,
-    id_rt NUMBER(15) NOT NULL,
+    id_rt NUMBER(15),
     id_d NUMBER(15) NOT NULL,
     id_cc NUMBER(15) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
