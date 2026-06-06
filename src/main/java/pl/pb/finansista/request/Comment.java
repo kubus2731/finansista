@@ -1,10 +1,11 @@
-package pl.pb.finansista.model;
+package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.pb.finansista.user.User;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package pl.pb.finansista.model;
+package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;

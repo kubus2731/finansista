@@ -1,4 +1,4 @@
-package pl.pb.finansista.model;
+package pl.pb.finansista.reference;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package pl.pb.finansista.model;
+package pl.pb.finansista.reference;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -6,18 +6,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "department")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Role {
+public class Department {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_r")
+    @Column(name = "id_d")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(name = "d_name", nullable = false, unique = true, length = 200)
     private String name;
 
 }
