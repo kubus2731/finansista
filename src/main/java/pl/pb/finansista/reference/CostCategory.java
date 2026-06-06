@@ -1,25 +1,28 @@
 package pl.pb.finansista.reference;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pl.pb.finansista.common.BaseEntity;
 
 @Entity
 @Table(name = "cost_category")
 @Getter
-@Setter
-@NoArgsConstructor
-public class CostCategory {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_cc")
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class CostCategory extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 50)
     private String name;
 
     @Lob
     private String description;
+
+    public CostCategory(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }

@@ -1,39 +1,33 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pl.pb.finansista.common.BaseTimeAuditedEntity;
 import pl.pb.finansista.user.User;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "comments")
 @Getter
-@Setter
-@NoArgsConstructor
-public class Comment {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_c")
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Comment extends BaseTimeAuditedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_req", nullable = false)
+    @JoinColumn(name = "request_id", nullable = false)
     private Request request;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_u", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Lob
     @Column(nullable = false)
     private String content;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    public Comment(Request request, User user, String content) {
+        this.request = request;
+        this.user = user;
+        this.content = content;
+    }
 }

@@ -1,36 +1,30 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
+import pl.pb.finansista.common.BaseTimeAuditedEntity;
 
 @Entity
 @Table(name = "attachments")
 @Getter
-@Setter
-@NoArgsConstructor
-public class Attachment {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_a")
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Attachment extends BaseTimeAuditedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_req", nullable = false)
+    @JoinColumn(name = "request_id", nullable = false)
     private Request request;
 
-    @Column(name = "file_name", nullable = false, length = 255)
+    @Column(name = "file_name", nullable = false)
     private String fileName;
 
     @Column(name = "file_url", nullable = false, length = 500)
     private String fileUrl;
 
-    @CreationTimestamp
-    @Column(name = "uploaded_at", updatable = false)
-    private LocalDateTime uploadedAt;
+    public Attachment(Request request, String fileName, String fileUrl) {
+        this.request = request;
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
+    }
 }

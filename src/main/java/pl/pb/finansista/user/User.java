@@ -1,53 +1,47 @@
 package pl.pb.finansista.user;
 
+import lombok.AccessLevel;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pl.pb.finansista.common.BaseTimeAuditedEntity;
 import pl.pb.finansista.reference.Department;
 
 @Entity
 @Table(name = "users")
 @Getter
-@Setter
-@NoArgsConstructor
-public class User{
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_u")
-    private Long id;
-
-    @NotBlank(message = "Imię nie może być puste")
-    @Size(min = 2, max=50, message = "Imię musi mieć od 2 do 50 znaków")
-    @Column(name = "name", nullable = false, length = 50)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class User extends BaseTimeAuditedEntity {
+    @Column(nullable = false, length = 50)
     private String name;
 
-    @NotBlank(message = "Nazwisko nie może być puste")
-    @Size(min = 2, max=50, message = "Nazwisko musi mieć od 2 do 50 znaków")
-    @Column(name = "surname", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String surname;
 
-    @NotBlank(message = "E-mail jest wymagany!")
-    @Email(message = "Podaj poprawny format e-mail")
-    @Column(name = "email", nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @NotBlank(message = "Numer telefonu jest wymagany")
-    @Pattern(regexp = "^\\\\+?[0-9]{9,15}$", message = "Nieprawidłowy format numeru telefonu")
-    @Column(name = "phone_number",nullable = false, unique = true, length = 50)
-    private String phone;
+    @Column(nullable = false, unique = true, length = 15)
+    private String phoneNumber;
 
-    @NotBlank(message = "Hasło jest wymagane!")
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_r", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_d", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
+
+    public User(String name, String surname, String email, String phoneNumber, String password, Role role, Department department) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
+        this.role = role;
+        this.department = department;
+    }
 }

@@ -1,23 +1,23 @@
 package pl.pb.finansista.reference;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pl.pb.finansista.common.BaseEntity;
 
 @Entity
 @Table(name = "department")
 @Getter
-@Setter
-@NoArgsConstructor
-public class Department {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Department extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_d")
-    private Long id;
-
-    @Column(name = "d_name", nullable = false, unique = true, length = 200)
+    @Column(nullable = false, unique = true, length = 200)
     private String name;
 
+    public Department(String name) {
+        this.name = name;
+    }
 }

@@ -1,10 +1,10 @@
 package pl.pb.finansista.activity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.user.User;

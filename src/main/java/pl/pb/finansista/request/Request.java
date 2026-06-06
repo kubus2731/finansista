@@ -1,65 +1,59 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pl.pb.finansista.common.BaseTimeAuditedEntity;
 import pl.pb.finansista.reference.CostCategory;
 import pl.pb.finansista.reference.Department;
 import pl.pb.finansista.user.User;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "requests")
 @Getter
-@Setter
-@NoArgsConstructor
-public class Request {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_req")
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Request extends BaseTimeAuditedEntity {
 
     @Column(nullable = false, length = 100)
     private String title;
 
     @Lob
-    @Column(name = "description")
     private String description;
 
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_u", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_rs", nullable = false)
+    @JoinColumn(name = "request_status_id", nullable = false)
     private RequestStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_rt", nullable = true)
+    @JoinColumn(name = "template_id")
     private RequestTemplate template;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_d", nullable = false)
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_cc", nullable = false)
+    @JoinColumn(name = "cost_category_id", nullable = false)
     private CostCategory costCategory;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory) {
+        this.title = title;
+        this.description = description;
+        this.amount = amount;
+        this.user = user;
+        this.status = status;
+        this.template = template;
+        this.department = department;
+        this.costCategory = costCategory;
+    }
 }

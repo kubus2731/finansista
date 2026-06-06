@@ -1,22 +1,23 @@
 package pl.pb.finansista.request;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import pl.pb.finansista.common.BaseEntity;
 
 @Entity
 @Table(name = "request_status")
 @Getter
-@Setter
-@NoArgsConstructor
-public class RequestStatus {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_rs")
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class RequestStatus extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 50)
     private String name;
+
+    public RequestStatus(String name) {
+        this.name = name;
+    }
 }
