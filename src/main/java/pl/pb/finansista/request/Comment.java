@@ -22,7 +22,7 @@ public class Comment extends BaseTimeAuditedEntity {
     private User user;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String content;
 
     public Comment(Request request, User user, String content) {
