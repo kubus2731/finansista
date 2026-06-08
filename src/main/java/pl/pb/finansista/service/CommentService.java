@@ -2,10 +2,8 @@ package pl.pb.finansista.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import pl.pb.finansista.model.*;
 import pl.pb.finansista.repository.*;
-import pl.pb.finansista.request.Comment;
-import pl.pb.finansista.request.Request;
-import pl.pb.finansista.user.User;
 
 @Service
 @RequiredArgsConstructor
