@@ -5,7 +5,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
+import jakarta.persistence.Convert;
+import org.hibernate.type.NumericBooleanConverter;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +27,7 @@ public class RequestTemplate {
     @Lob
     private String description;
 
+    @Convert(converter = NumericBooleanConverter.class)
     @Column(nullable = false)
     private boolean active = true;
 
