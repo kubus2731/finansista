@@ -39,7 +39,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 "An unexpected error occurred.");
         pd.setTitle("Internal Server Error");
         pd.setProperty("code", codeFor(ex));
-        pd.setProperty("traceId", MDC.get("traceId"));
+        pd.setProperty("traceId", getTraceId());
 
         return ResponseEntity.internalServerError().body(pd);
     }
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         var pd = ProblemDetail.forStatusAndDetail(ex.getHttpStatus(), ex.getMessage());
         pd.setTitle("Business Rule Violation");
         pd.setProperty("code", codeFor(ex));
-        pd.setProperty("traceId", MDC.get("traceId"));
+        pd.setProperty("traceId", getTraceId());
 
         return ResponseEntity.status(ex.getHttpStatus()).body(pd);
     }
