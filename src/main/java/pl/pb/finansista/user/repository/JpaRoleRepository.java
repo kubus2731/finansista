@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 import pl.pb.finansista.user.Role;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 class JpaRoleRepository implements RoleRepository {
@@ -12,6 +13,11 @@ class JpaRoleRepository implements RoleRepository {
 
     public JpaRoleRepository(SpringDataJpaRoleRepository repository) {
         this.repository = repository;
+    }
+
+    @Override
+    public Optional<Role> findById(UUID id) {
+        return repository.findById(id);
     }
 
     @Override

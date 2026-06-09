@@ -29,4 +29,9 @@ class JpaUserRepository implements UserRepository {
     public User save(User user) {
         return repository.save(user);
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return repository.existsByEmail(email);
+    }
 }
