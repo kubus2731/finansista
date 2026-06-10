@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer" class="pb-footer mt-auto py-4">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+        <span class="text-muted">
+            &copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span>
+            JakubandJakub &ndash; Aplikacja do wniosków finansowych
+        </span>
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link px-2 link-success" th:href="@{/accessibility}">Deklaracja dostępności</a>
+            </li>
+        </ul>
+    </div>
+</footer>
+
+</body>
+</html>

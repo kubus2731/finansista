@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
+<head>
+    <title th:fragment="title">Deklaracja dostępności &ndash; Finansista PB</title>
+</head>
+<body>
+<section th:fragment="content">
+
+    <article class="col-lg-9 mx-auto">
+        <h1 class="h3 mb-4">Deklaracja dostępności</h1>
+
+        <p>
+            <strong>Politechnika Białostocka</strong> zobowiązuje się zapewnić dostępność
+            cyfrową aplikacji „Finansista &ndash; aplikacja do wniosków finansowych"
+            zgodnie z ustawą z dnia 4 kwietnia 2019 r. o dostępności cyfrowej stron
+            internetowych i aplikacji mobilnych podmiotów publicznych.
+        </p>
+        <ul>
+            <li>Data publikacji aplikacji: <strong>[data publikacji]</strong></li>
+            <li>Data ostatniej istotnej aktualizacji: <strong>[data aktualizacji]</strong></li>
+        </ul>
+
+        <h2 class="h5 mt-4">Status pod względem zgodności</h2>
+        <p>
+            Aplikacja jest <strong>częściowo zgodna</strong> z wytycznymi WCAG 2.1 na
+            poziomie AA z powodu niezgodności wymienionych poniżej.
+        </p>
+        <p class="mb-1">Treści lub funkcje niedostępne:</p>
+        <ul>
+            <li>[np. brak alternatywnych opisów dla części załączników dodawanych przez użytkowników],</li>
+            <li>[np. niektóre komunikaty walidacji nie są jeszcze ogłaszane przez czytniki ekranu].</li>
+        </ul>
+
+        <h2 class="h5 mt-4">Przygotowanie deklaracji</h2>
+        <ul>
+            <li>Data sporządzenia deklaracji: <strong>[data sporządzenia]</strong></li>
+            <li>Metoda przygotowania: deklarację sporządzono na podstawie
+                <strong>samooceny</strong> przeprowadzonej przez zespół projektowy.</li>
+        </ul>
+
+        <h2 class="h5 mt-4">Informacje zwrotne i dane kontaktowe</h2>
+        <p>
+            W przypadku problemów z dostępnością prosimy o kontakt. Osobą odpowiedzialną
+            jest <strong>[imię i nazwisko]</strong>.
+        </p>
+        <ul>
+            <li>E-mail: <a class="link-success" th:href="'mailto:[adres@pb.edu.pl]'">[adres@pb.edu.pl]</a></li>
+            <li>Telefon: <strong>[numer telefonu]</strong></li>
+        </ul>
+        <p>
+            Tą samą drogą można składać wnioski o udostępnienie informacji niedostępnej
+            oraz żądania zapewnienia dostępności.
+        </p>
+
+        <h2 class="h5 mt-4">Procedura wnioskowo-skargowa</h2>
+        <p>
+            Każdy ma prawo wystąpić z żądaniem zapewnienia dostępności cyfrowej aplikacji
+            lub jej elementu. Żądanie powinno zawierać dane kontaktowe osoby występującej,
+            wskazanie elementu, którego dotyczy, oraz preferowaną formę kontaktu. Podmiot
+            publiczny realizuje żądanie niezwłocznie, nie później niż w ciągu
+            <strong>7 dni</strong>; jeżeli nie jest to możliwe &ndash; w ciągu
+            <strong>2 miesięcy</strong>. W przypadku odmowy wnoszący może złożyć skargę,
+            a także powiadomić <strong>Rzecznika Praw Obywatelskich</strong>.
+        </p>
+
+        <h2 class="h5 mt-4">Udogodnienia i obsługa klawiaturą</h2>
+        <ul>
+            <li>Na początku każdej strony dostępny jest odnośnik „Przejdź do treści".</li>
+            <li>Elementy interaktywne mają widoczny obrys fokusu przy nawigacji klawiaturą
+                (klawisz <kbd>Tab</kbd>).</li>
+            <li>Serwis można obsługiwać standardowymi skrótami przeglądarki
+                (np. powiększanie <kbd>Ctrl</kbd> + <kbd>+</kbd>).</li>
+        </ul>
+
+        <h2 class="h5 mt-4">Dostępność architektoniczna</h2>
+        <p>[Opis dostępności architektonicznej budynku jednostki PB lub odnośnik do
+            ogólnouczelnianej deklaracji dostępności.]</p>
+    </article>
+
+</section>
+</body>
+</html>
