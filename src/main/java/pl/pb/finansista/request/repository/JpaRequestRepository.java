@@ -1,9 +1,12 @@
 package pl.pb.finansista.request.repository;
+
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.Request;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
+
 @Repository
 class JpaRequestRepository implements RequestRepository {
 
@@ -19,7 +22,7 @@ class JpaRequestRepository implements RequestRepository {
     }
 
     @Override
-    public List<Request> findAll(org.springframework.data.jpa.domain.Specification<Request> spec) {
+    public List<Request> findAll(Specification<Request> spec) {
         return repository.findAll(spec);
     }
 
