@@ -9,6 +9,8 @@ public interface UserRepository {
 
     Optional<User> findById(Long id);
 
+    Optional<User> findByExternalId(UUID externalId);
+
     Optional<User> findByEmail(String email);
 
     User save(User user);

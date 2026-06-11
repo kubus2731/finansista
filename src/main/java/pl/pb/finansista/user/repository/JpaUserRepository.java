@@ -16,6 +16,11 @@ class JpaUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByExternalId(UUID externalId) {
+        return repository.findByExternalId(externalId);
+    }
+
+    @Override
     public Optional<User> findById(Long id) {
         return repository.findById(id);
     }

@@ -17,6 +17,11 @@ class JpaRequestRepository implements RequestRepository {
     }
 
     @Override
+    public Optional<Request> findByExternalId(UUID externalId) {
+        return repository.findByExternalId(externalId);
+    }
+
+    @Override
     public Optional<Request> findById(Long id) {
         return repository.findById(id);
     }
