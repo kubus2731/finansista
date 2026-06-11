@@ -4,14 +4,18 @@ import lombok.AccessLevel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pl.pb.finansista.common.BaseTimeAuditedEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import pl.pb.finansista.common.ModificationAuditedEntity;
 import pl.pb.finansista.reference.Department;
+
+import java.util.Collection;
 
 @Entity
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseTimeAuditedEntity {
+public class User extends ModificationAuditedEntity {
     @Column(nullable = false, length = 50)
     private String name;
 

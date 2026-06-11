@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pl.pb.finansista.common.BaseTimeAuditedEntity;
+import pl.pb.finansista.common.ModificationAuditedEntity;
 import pl.pb.finansista.reference.CostCategory;
 import pl.pb.finansista.reference.Department;
 import pl.pb.finansista.user.User;
@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @Table(name = "requests")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Request extends BaseTimeAuditedEntity {
+public class Request extends ModificationAuditedEntity {
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -35,7 +35,7 @@ public class Request extends BaseTimeAuditedEntity {
     private RequestStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "template_id")
+    @JoinColumn(name = "request_template_id")
     private RequestTemplate template;
 
     @ManyToOne(fetch = FetchType.LAZY)

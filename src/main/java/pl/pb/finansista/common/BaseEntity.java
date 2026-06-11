@@ -22,10 +22,6 @@ public abstract class BaseEntity implements Serializable {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Version
-    @Column(nullable = false)
-    private Long version = 0L;
-
     @Override
     public final boolean equals(Object obj) {
         if (this == obj) return true;
