@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Comment;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.CommentRepository;
@@ -22,16 +25,16 @@ public class AddCommentUseCase {
     @Transactional
     public Comment execute(AddCommentCommand command) {
         Request request = requestRepository.findByExternalId(command.requestExternalId())
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> RequestNotFoundException.withExternalId(command.requestExternalId()));
 
         User actor = userRepository.findByEmail(command.userEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> UserNotFoundException.withEmail(command.userEmail()));
 
         boolean isAdminOrDean = command.userAuthorities().stream()
                 .anyMatch(a -> a.equals("ROLE_ADMIN") || a.equals("ROLE_DEAN_OFFICE"));
 
         if (!isAdminOrDean && !request.getUser().getEmail().equals(command.userEmail())) {
-            throw new UnauthorizedRequestAccessException("You do not have permission to comment on this request");
+            throw UnauthorizedRequestAccessException.forAction("comment on");
         }
 
         Comment comment = new Comment(request, actor, command.content());

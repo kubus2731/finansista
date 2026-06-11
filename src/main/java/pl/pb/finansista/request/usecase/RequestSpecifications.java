@@ -1,6 +1,10 @@
 package pl.pb.finansista.request.usecase;
 
 import org.springframework.data.jpa.domain.Specification;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
+import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 
 import java.util.List;

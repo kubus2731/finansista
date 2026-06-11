@@ -3,6 +3,9 @@ package pl.pb.finansista.request.usecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.request.ActivityLog;
@@ -25,20 +28,20 @@ public class ChangeRequestStatusUseCase {
     @Transactional
     public void execute(ChangeRequestStatusCommand command) {
         Request request = requestRepository.findByExternalId(command.externalId())
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> RequestNotFoundException.withExternalId(command.externalId()));
 
         User actor = userRepository.findByEmail(command.userEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> UserNotFoundException.withEmail(command.userEmail()));
 
         RequestStatus newStatus = requestStatusRepository.findByName(command.newStatusName())
-                .orElseThrow(() -> new IllegalArgumentException("Status not found: " + command.newStatusName()));
+                .orElseThrow(() -> InvalidRequestStateException.withStatusName(command.newStatusName()));
 
         boolean isAdminOrDean = command.userAuthorities().stream()
                 .anyMatch(a -> a.equals("ROLE_ADMIN") || a.equals("ROLE_DEAN_OFFICE"));
 
         // Basic permission check
         if (!isAdminOrDean && !request.getUser().getEmail().equals(command.userEmail())) {
-            throw new UnauthorizedRequestAccessException("You do not have permission to change the status of this request");
+            throw UnauthorizedRequestAccessException.forAction("change the status of");
         }
 
         // Create Activity Log

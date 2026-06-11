@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Comment;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.CommentRepository;
@@ -21,10 +24,10 @@ public class GetCommentsUseCase {
     @Transactional(readOnly = true)
     public List<Comment> execute(GetSingleRequestQuery query) {
         Request request = requestRepository.findByExternalId(query.externalId())
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> RequestNotFoundException.withExternalId(query.externalId()));
 
         if (!query.isAdminOrDean() && !request.getUser().getEmail().equals(query.userEmail())) {
-            throw new UnauthorizedRequestAccessException("You do not have permission to view comments for this request");
+            throw UnauthorizedRequestAccessException.forAction("view comments for");
         }
 
         return commentRepository.findByRequestId(request.getId());

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.usecase.*;
 
@@ -144,7 +145,7 @@ public class RequestController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        pl.pb.finansista.request.Comment comment = addCommentUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
+        Comment comment = addCommentUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
         log.info("Successfully added comment with ID: {}", comment.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(CommentResponse.of(comment));
     }

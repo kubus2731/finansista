@@ -3,6 +3,9 @@ package pl.pb.finansista.request.usecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.RequestRepository;
@@ -18,10 +21,10 @@ public class GetSingleRequestUseCase {
     @Transactional(readOnly = true)
     public Request execute(GetSingleRequestQuery query) {
         Request request = requestRepository.findByExternalId(query.externalId())
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> RequestNotFoundException.withExternalId(query.externalId()));
 
         if (!query.isAdminOrDean() && !request.getUser().getEmail().equals(query.userEmail())) {
-            throw new UnauthorizedRequestAccessException("You do not have permission to view this request");
+            throw UnauthorizedRequestAccessException.forAction("view");
         }
 
         return request;

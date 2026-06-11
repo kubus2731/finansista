@@ -9,6 +9,8 @@ import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestTemplate;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
@@ -29,15 +31,14 @@ public class EditRequestUseCase {
     @Transactional
     public Request execute(EditRequestCommand command) {
         Request request = requestRepository.findByExternalId(command.externalId())
-                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+                .orElseThrow(() -> RequestNotFoundException.withExternalId(command.externalId()));
 
         if (!request.getUser().getEmail().equals(command.userEmail())) {
-            throw new UnauthorizedRequestAccessException("You do not have permission to edit this request");
+            throw UnauthorizedRequestAccessException.forAction("edit");
         }
 
-        String currentStatus = request.getStatus().getName();
-        if (!currentStatus.equals("DRAFT") && !currentStatus.equals("CORRECTION_REQUIRED")) {
-            throw new InvalidRequestStateException("Only requests in DRAFT or CORRECTION_REQUIRED status can be edited");
+        if (!request.getStatus().getName().equals("DRAFT") && !request.getStatus().getName().equals("CORRECTION_REQUIRED")) {
+            throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
         }
 
         Department department = departmentRepository.findById(command.departmentId())
