@@ -6,7 +6,6 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,11 +15,7 @@ import java.time.ZonedDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BaseTimeAuditedEntity extends BaseEntity {
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private ZonedDateTime createdAt;
+public class ModificationAuditedEntity extends CreationAuditedEntity {
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
