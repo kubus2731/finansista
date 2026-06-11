@@ -8,9 +8,9 @@ import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
-import pl.pb.finansista.request.ActivityLog;
+import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
-import pl.pb.finansista.request.repository.ActivityLogRepository;
+import pl.pb.finansista.request.repository.CommentRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.request.repository.RequestStatusRepository;
 import pl.pb.finansista.user.User;
@@ -22,7 +22,7 @@ public class ChangeRequestStatusUseCase {
 
     private final RequestRepository requestRepository;
     private final RequestStatusRepository requestStatusRepository;
-    private final ActivityLogRepository activityLogRepository;
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -44,19 +44,14 @@ public class ChangeRequestStatusUseCase {
             throw UnauthorizedRequestAccessException.forAction("change the status of");
         }
 
-        // Create Activity Log
-        ActivityLog log = new ActivityLog();
-        log.setRequest(request);
-        log.setUser(actor);
-        log.setOldStatus(request.getStatus());
-        log.setNewStatus(newStatus);
-        log.setDescription(command.description());
-
-        // Update Request
+        // Update Request status
         request.changeStatus(newStatus);
-
-        // Save
-        activityLogRepository.save(log);
         requestRepository.save(request);
+
+        // Save custom reason as a Comment
+        if (command.description() != null && !command.description().isBlank()) {
+            Comment comment = new Comment(request, actor, command.description());
+            commentRepository.save(comment);
+        }
     }
 }
