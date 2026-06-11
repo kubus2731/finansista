@@ -62,4 +62,14 @@ public class Request extends ExposableModificationAuditedEntity {
         this.costCategory = costCategory;
         this.fundingSource = fundingSource;
     }
+
+    public void update(String title, String description, BigDecimal amount, RequestTemplate template, Department department, CostCategory costCategory, FundingSource fundingSource) {
+        this.title = title;
+        this.description = description;
+        this.amount = amount;
+        this.template = template;
+        this.department = department;
+        this.costCategory = costCategory;
+        this.fundingSource = fundingSource;
+    }
 }
