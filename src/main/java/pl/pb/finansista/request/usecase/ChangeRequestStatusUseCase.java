@@ -28,10 +28,10 @@ public class ChangeRequestStatusUseCase {
     @Transactional
     public void execute(ChangeRequestStatusCommand command) {
         Request request = requestRepository.findByExternalId(command.externalId())
-                .orElseThrow(() -> RequestNotFoundException.withExternalId(command.externalId()));
+                .orElseThrow(RequestNotFoundException::new);
 
         User actor = userRepository.findByEmail(command.userEmail())
-                .orElseThrow(() -> UserNotFoundException.withEmail(command.userEmail()));
+                .orElseThrow(UserNotFoundException::new);
 
         RequestStatus newStatus = requestStatusRepository.findByName(command.newStatusName())
                 .orElseThrow(() -> InvalidRequestStateException.withStatusName(command.newStatusName()));

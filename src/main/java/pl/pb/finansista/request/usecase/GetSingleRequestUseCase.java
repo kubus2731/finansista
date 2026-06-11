@@ -21,7 +21,7 @@ public class GetSingleRequestUseCase {
     @Transactional(readOnly = true)
     public Request execute(GetSingleRequestQuery query) {
         Request request = requestRepository.findByExternalId(query.externalId())
-                .orElseThrow(() -> RequestNotFoundException.withExternalId(query.externalId()));
+                .orElseThrow(RequestNotFoundException::new);
 
         if (!query.isAdminOrDean() && !request.getUser().getEmail().equals(query.userEmail())) {
             throw UnauthorizedRequestAccessException.forAction("view");

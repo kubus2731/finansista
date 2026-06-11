@@ -11,6 +11,9 @@ import pl.pb.finansista.reference.repository.FundingSourceRepository;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
+import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
+import pl.pb.finansista.reference.CostCategoryNotFoundException;
+import pl.pb.finansista.reference.FundingSourceNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.request.RequestTemplate;
@@ -35,28 +38,28 @@ public class CreateRequestUseCase {
     @Transactional
     public Request execute(CreateRequestCommand command) {
         var user = userRepository.findByEmail(command.userEmail())
-                .orElseThrow(() -> new UserNotFoundException(command.userEmail()));
+                .orElseThrow(UserNotFoundException::new);
 
         var department = departmentRepository.findById(command.departmentId())
                 .orElseThrow(DepartmentNotFoundException::new);
 
         var costCategory = costCategoryRepository.findById(command.costCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Cost Category not found"));
+                .orElseThrow(CostCategoryNotFoundException::new);
 
         RequestTemplate template = null;
         if (command.templateId() != null) {
             template = requestTemplateRepository.findById(command.templateId())
-                    .orElseThrow(() -> new IllegalArgumentException("Request Template not found"));
+                    .orElseThrow(RequestTemplateNotFoundException::new);
         }
 
         FundingSource fundingSource = null;
         if (command.fundingSourceId() != null) {
             fundingSource = fundingSourceRepository.findById(command.fundingSourceId())
-                    .orElseThrow(() -> new IllegalArgumentException("Funding Source not found"));
+                    .orElseThrow(FundingSourceNotFoundException::new);
         }
 
         RequestStatus status = requestStatusRepository.findByName("DRAFT")
-                .orElseThrow(() -> new IllegalStateException("DRAFT status not found in database"));
+                .orElseThrow(() -> InvalidRequestStateException.withStatusName("DRAFT"));
 
         Request request = new Request(
                 command.title(),

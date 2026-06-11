@@ -25,10 +25,10 @@ public class AddCommentUseCase {
     @Transactional
     public Comment execute(AddCommentCommand command) {
         Request request = requestRepository.findByExternalId(command.requestExternalId())
-                .orElseThrow(() -> RequestNotFoundException.withExternalId(command.requestExternalId()));
+                .orElseThrow(RequestNotFoundException::new);
 
         User actor = userRepository.findByEmail(command.userEmail())
-                .orElseThrow(() -> UserNotFoundException.withEmail(command.userEmail()));
+                .orElseThrow(UserNotFoundException::new);
 
         boolean isAdminOrDean = command.userAuthorities().stream()
                 .anyMatch(a -> a.equals("ROLE_ADMIN") || a.equals("ROLE_DEAN_OFFICE"));

@@ -9,7 +9,11 @@ import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
+import pl.pb.finansista.reference.CostCategoryNotFoundException;
+import pl.pb.finansista.reference.FundingSourceNotFoundException;
+import pl.pb.finansista.reference.DepartmentNotFoundException;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
 import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestTemplate;
@@ -31,7 +35,7 @@ public class EditRequestUseCase {
     @Transactional
     public Request execute(EditRequestCommand command) {
         Request request = requestRepository.findByExternalId(command.externalId())
-                .orElseThrow(() -> RequestNotFoundException.withExternalId(command.externalId()));
+                .orElseThrow(RequestNotFoundException::new);
 
         if (!request.getUser().getEmail().equals(command.userEmail())) {
             throw UnauthorizedRequestAccessException.forAction("edit");
@@ -42,21 +46,21 @@ public class EditRequestUseCase {
         }
 
         Department department = departmentRepository.findById(command.departmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Department not found"));
+                .orElseThrow(DepartmentNotFoundException::new);
 
         CostCategory costCategory = costCategoryRepository.findById(command.costCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Cost Category not found"));
+                .orElseThrow(CostCategoryNotFoundException::new);
 
         FundingSource fundingSource = null;
         if (command.fundingSourceId() != null) {
             fundingSource = fundingSourceRepository.findById(command.fundingSourceId())
-                    .orElseThrow(() -> new IllegalArgumentException("Funding Source not found"));
+                    .orElseThrow(FundingSourceNotFoundException::new);
         }
 
         RequestTemplate template = null;
         if (command.templateId() != null) {
             template = requestTemplateRepository.findById(command.templateId())
-                    .orElseThrow(() -> new IllegalArgumentException("Request Template not found"));
+                    .orElseThrow(RequestTemplateNotFoundException::new);
         }
 
         request.update(

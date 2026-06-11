@@ -24,7 +24,7 @@ public class GetCommentsUseCase {
     @Transactional(readOnly = true)
     public List<Comment> execute(GetSingleRequestQuery query) {
         Request request = requestRepository.findByExternalId(query.externalId())
-                .orElseThrow(() -> RequestNotFoundException.withExternalId(query.externalId()));
+                .orElseThrow(RequestNotFoundException::new);
 
         if (!query.isAdminOrDean() && !request.getUser().getEmail().equals(query.userEmail())) {
             throw UnauthorizedRequestAccessException.forAction("view comments for");
