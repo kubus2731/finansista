@@ -1,11 +1,11 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.CommentRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.user.User;
@@ -31,7 +31,7 @@ public class AddCommentUseCase {
                 .anyMatch(a -> a.equals("ROLE_ADMIN") || a.equals("ROLE_DEAN_OFFICE"));
 
         if (!isAdminOrDean && !request.getUser().getEmail().equals(command.userEmail())) {
-            throw new AccessDeniedException("You do not have permission to comment on this request");
+            throw new UnauthorizedRequestAccessException("You do not have permission to comment on this request");
         }
 
         Comment comment = new Comment(request, actor, command.content());

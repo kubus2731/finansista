@@ -1,7 +1,6 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.reference.CostCategory;
@@ -12,6 +11,8 @@ import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestTemplate;
+import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.request.repository.RequestTemplateRepository;
 
@@ -31,12 +32,12 @@ public class EditRequestUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
         if (!request.getUser().getEmail().equals(command.userEmail())) {
-            throw new AccessDeniedException("You do not have permission to edit this request");
+            throw new UnauthorizedRequestAccessException("You do not have permission to edit this request");
         }
 
         String currentStatus = request.getStatus().getName();
         if (!currentStatus.equals("DRAFT") && !currentStatus.equals("CORRECTION_REQUIRED")) {
-            throw new IllegalStateException("Only requests in DRAFT or CORRECTION_REQUIRED status can be edited");
+            throw new InvalidRequestStateException("Only requests in DRAFT or CORRECTION_REQUIRED status can be edited");
         }
 
         Department department = departmentRepository.findById(command.departmentId())

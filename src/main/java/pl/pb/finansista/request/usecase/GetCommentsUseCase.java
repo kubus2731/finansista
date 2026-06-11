@@ -1,11 +1,11 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.CommentRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
 
@@ -24,7 +24,7 @@ public class GetCommentsUseCase {
                 .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
         if (!query.isAdminOrDean() && !request.getUser().getEmail().equals(query.userEmail())) {
-            throw new AccessDeniedException("You do not have permission to view comments for this request");
+            throw new UnauthorizedRequestAccessException("You do not have permission to view comments for this request");
         }
 
         return commentRepository.findByRequestId(request.getId());
