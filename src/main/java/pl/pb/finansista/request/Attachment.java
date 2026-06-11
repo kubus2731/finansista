@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pl.pb.finansista.common.BaseTimeAuditedEntity;
+import pl.pb.finansista.common.CreationAuditedEntity;
 
 @Entity
 @Table(name = "attachments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Attachment extends BaseTimeAuditedEntity {
+public class Attachment extends CreationAuditedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id", nullable = false)

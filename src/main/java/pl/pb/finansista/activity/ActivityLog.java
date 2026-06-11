@@ -4,45 +4,34 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
+import pl.pb.finansista.common.CreationAuditedEntity;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.user.User;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "activity_log")
 @Getter
 @Setter
 @NoArgsConstructor
-public class ActivityLog {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_al")
-    private Long id;
+public class ActivityLog extends CreationAuditedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_req", nullable = false)
+    @JoinColumn(name = "request_id", nullable = false)
     private Request request;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_u", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_old_status")
+    @JoinColumn(name = "old_status_id")
     private RequestStatus oldStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_new_status", nullable = false)
+    @JoinColumn(name = "new_status_id", nullable = false)
     private RequestStatus newStatus;
 
     @Column(length = 500)
     private String description;
-
-    @CreationTimestamp
-    @Column(name = "changed_at", updatable = false)
-    private LocalDateTime changedAt;
 }
