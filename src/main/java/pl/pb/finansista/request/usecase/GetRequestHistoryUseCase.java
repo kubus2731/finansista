@@ -5,8 +5,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Request;
-import pl.pb.finansista.request.history.ActivityLog;
-import pl.pb.finansista.request.history.repository.ActivityLogRepository;
+import pl.pb.finansista.request.ActivityLog;
+import pl.pb.finansista.request.repository.ActivityLogRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
 
 import java.util.List;

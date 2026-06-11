@@ -1,7 +1,7 @@
-package pl.pb.finansista.request.history.repository;
-import pl.pb.finansista.request.history.ActivityLog;
+package pl.pb.finansista.request.repository;
+
+import pl.pb.finansista.request.ActivityLog;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.List;
 
 public interface ActivityLogRepository {

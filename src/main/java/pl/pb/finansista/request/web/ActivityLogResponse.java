@@ -1,6 +1,6 @@
 package pl.pb.finansista.request.web;
 
-import pl.pb.finansista.request.history.ActivityLog;
+import pl.pb.finansista.request.ActivityLog;
 
 import java.time.ZonedDateTime;
 
