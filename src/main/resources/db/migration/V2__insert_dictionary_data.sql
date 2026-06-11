@@ -52,19 +52,4 @@ INSERT INTO funding_source (id, name) VALUES (2, 'Rada Uczelniana');
 INSERT INTO funding_source (id, name) VALUES (3, 'Dziekan Wydziału');
 INSERT INTO funding_source (id, name) VALUES (4, 'Sponsor Prywatny');
 
--- 7. Konta użytkowników do testów
-INSERT INTO users (id, external_id, name, surname, email, phone_number, password, role_id, department_id)
-VALUES (1, SYS_GUID(), 'Jakub', 'Matusiewicz', 'j.matusiewicz@student.pb.edu.pl', '500111222', '{noop}admin123', 1, 3);
-
-INSERT INTO users (id, external_id, name, surname, email, phone_number, password, role_id, department_id)
-VALUES (2, SYS_GUID(), 'Jakub', 'Borkowski', 'j.borkowski@student.pb.edu.pl', '500333444', '{noop}admin123', 1, 1);
-
--- Pracownik oceniający poprawność i zgodność
-INSERT INTO users (id, external_id, name, surname, email, phone_number, password, role_id, department_id)
-VALUES (3, SYS_GUID(), 'Anna', 'Zgodna', 'a.zgodna@pb.edu.pl', '857460001', '{noop}komisja123', 4, 3);
-
--- Testowy Student składający wnioski
-INSERT INTO users (id, external_id, name, surname, email, phone_number, password, role_id, department_id)
-VALUES (4, SYS_GUID(), 'Jan', 'Wnioskodawca', 'j.wnioskodawca@student.pb.edu.pl', '500999888', '{noop}student123', 2, 1);
-
 COMMIT;
