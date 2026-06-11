@@ -1,9 +1,10 @@
 package pl.pb.finansista.user.web;
 
 import pl.pb.finansista.user.User;
+import pl.pb.finansista.common.ExternalIdEncoder;
 
 public record UserResponse(
-        Long id,
+        String id,
         String name,
         String surname,
         String email,
@@ -13,7 +14,7 @@ public record UserResponse(
 ) {
     public static UserResponse of(User user) {
         return new UserResponse(
-                user.getId(),
+                ExternalIdEncoder.encode("usr", user.getExternalId()),
                 user.getName(),
                 user.getSurname(),
                 user.getEmail(),

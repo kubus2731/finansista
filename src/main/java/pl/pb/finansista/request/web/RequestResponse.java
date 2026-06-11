@@ -4,9 +4,10 @@ import pl.pb.finansista.request.Request;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import pl.pb.finansista.common.ExternalIdEncoder;
 
 public record RequestResponse(
-        Long id,
+        String id,
         String title,
         String description,
         BigDecimal amount,
@@ -20,7 +21,7 @@ public record RequestResponse(
 ) {
     public static RequestResponse of(Request request) {
         return new RequestResponse(
-                request.getId(),
+                ExternalIdEncoder.encode("req", request.getExternalId()),
                 request.getTitle(),
                 request.getDescription(),
                 request.getAmount(),
