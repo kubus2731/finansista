@@ -5,17 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.request.Request;
-import pl.pb.finansista.request.usecase.AddCommentUseCase;
-import pl.pb.finansista.request.usecase.ChangeRequestStatusUseCase;
-import pl.pb.finansista.request.usecase.CreateRequestUseCase;
-import pl.pb.finansista.request.usecase.EditRequestUseCase;
-import pl.pb.finansista.request.usecase.GetCommentsUseCase;
-import pl.pb.finansista.request.usecase.GetRequestHistoryUseCase;
-import pl.pb.finansista.request.usecase.GetRequestsUseCase;
-import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
-import pl.pb.finansista.request.usecase.GetSingleRequestUseCase;
+import pl.pb.finansista.request.usecase.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +24,7 @@ public class RequestController {
     private final GetRequestsUseCase getRequestsUseCase;
     private final GetSingleRequestUseCase getSingleRequestUseCase;
     private final EditRequestUseCase editRequestUseCase;
+    private final DeleteRequestUseCase deleteRequestUseCase;
     private final ChangeRequestStatusUseCase changeRequestStatusUseCase;
     private final GetRequestHistoryUseCase getRequestHistoryUseCase;
     private final AddCommentUseCase addCommentUseCase;
@@ -96,7 +90,7 @@ public class RequestController {
             Authentication authentication
     ) {
         List<String> authorities = authentication.getAuthorities().stream()
-                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         changeRequestStatusUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
@@ -128,7 +122,7 @@ public class RequestController {
             Authentication authentication
     ) {
         List<String> authorities = authentication.getAuthorities().stream()
-                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         pl.pb.finansista.request.Comment comment = addCommentUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
@@ -150,5 +144,19 @@ public class RequestController {
                 .collect(Collectors.toList());
                 
         return ResponseEntity.ok(comments);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRequest(
+            @PathVariable UUID id,
+            Authentication authentication
+    ) {
+        boolean isAdminOrDean = authentication.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
+
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
+        deleteRequestUseCase.execute(query);
+        
+        return ResponseEntity.noContent().build();
     }
 }

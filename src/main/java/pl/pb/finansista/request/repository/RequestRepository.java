@@ -16,4 +16,6 @@ public interface RequestRepository {
     List<Request> findAll(Specification<Request> spec);
 
     Request save(Request request);
+
+    void delete(Request request);
 }

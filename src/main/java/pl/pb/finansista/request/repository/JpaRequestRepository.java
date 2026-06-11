@@ -35,4 +35,9 @@ class JpaRequestRepository implements RequestRepository {
     public Request save(Request request) {
         return repository.save(request);
     }
+
+    @Override
+    public void delete(Request request) {
+        repository.delete(request);
+    }
 }
