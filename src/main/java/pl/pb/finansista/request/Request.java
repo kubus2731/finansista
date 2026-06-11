@@ -72,4 +72,8 @@ public class Request extends ExposableModificationAuditedEntity {
         this.costCategory = costCategory;
         this.fundingSource = fundingSource;
     }
+
+    public void changeStatus(RequestStatus newStatus) {
+        this.status = newStatus;
+    }
 }

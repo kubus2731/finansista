@@ -7,8 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.usecase.ChangeRequestStatusUseCase;
 import pl.pb.finansista.request.usecase.CreateRequestUseCase;
 import pl.pb.finansista.request.usecase.EditRequestUseCase;
+import pl.pb.finansista.request.usecase.GetRequestHistoryUseCase;
 import pl.pb.finansista.request.usecase.GetRequestsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
 import pl.pb.finansista.request.usecase.GetSingleRequestUseCase;
@@ -27,6 +29,8 @@ public class RequestController {
     private final GetRequestsUseCase getRequestsUseCase;
     private final GetSingleRequestUseCase getSingleRequestUseCase;
     private final EditRequestUseCase editRequestUseCase;
+    private final ChangeRequestStatusUseCase changeRequestStatusUseCase;
+    private final GetRequestHistoryUseCase getRequestHistoryUseCase;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -79,5 +83,36 @@ public class RequestController {
     ) {
         Request request = editRequestUseCase.execute(payload.toCommand(id, authentication.getName()));
         return ResponseEntity.ok(RequestResponse.of(request));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> changeStatus(
+            @PathVariable UUID id,
+            @Valid @RequestBody ChangeRequestStatusRequest payload,
+            Authentication authentication
+    ) {
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        changeRequestStatusUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<List<ActivityLogResponse>> getHistory(
+            @PathVariable UUID id,
+            Authentication authentication
+    ) {
+        boolean isAdminOrDean = authentication.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
+
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
+        
+        List<ActivityLogResponse> history = getRequestHistoryUseCase.execute(query).stream()
+                .map(ActivityLogResponse::of)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(history);
     }
 }

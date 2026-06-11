@@ -1,4 +1,4 @@
-package pl.pb.finansista.activity;
+package pl.pb.finansista.request.history;
 
 import jakarta.persistence.*;
 import lombok.Getter;
