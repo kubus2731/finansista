@@ -3,8 +3,8 @@
 
 -- Funkcja: czy przejście ze statusu p_old do p_new jest dozwolone (1 = tak, 0 = nie)
 CREATE OR REPLACE FUNCTION is_valid_status_transition(
-    p_old_status IN NUMBER,
-    p_new_status IN NUMBER
+    p_old_status IN RAW,
+    p_new_status IN RAW
 ) RETURN NUMBER
     DETERMINISTIC
 IS
@@ -14,11 +14,11 @@ BEGIN
     END IF;
 
     RETURN CASE
-        WHEN p_old_status = 1 AND p_new_status = 2 THEN 1
-        WHEN p_old_status = 2 AND p_new_status IN (3, 6, 7) THEN 1
-        WHEN p_old_status = 3 AND p_new_status IN (4, 6, 7) THEN 1
-        WHEN p_old_status = 4 AND p_new_status IN (5, 6, 7) THEN 1
-        WHEN p_old_status = 7 AND p_new_status IN (1, 2) THEN 1
+        WHEN p_old_status = HEXTORAW('00000000000000000000000000000001') AND p_new_status = HEXTORAW('00000000000000000000000000000002') THEN 1
+        WHEN p_old_status = HEXTORAW('00000000000000000000000000000002') AND p_new_status IN (HEXTORAW('00000000000000000000000000000003'), HEXTORAW('00000000000000000000000000000006'), HEXTORAW('00000000000000000000000000000007')) THEN 1
+        WHEN p_old_status = HEXTORAW('00000000000000000000000000000003') AND p_new_status IN (HEXTORAW('00000000000000000000000000000004'), HEXTORAW('00000000000000000000000000000006'), HEXTORAW('00000000000000000000000000000007')) THEN 1
+        WHEN p_old_status = HEXTORAW('00000000000000000000000000000004') AND p_new_status IN (HEXTORAW('00000000000000000000000000000005'), HEXTORAW('00000000000000000000000000000006'), HEXTORAW('00000000000000000000000000000007')) THEN 1
+        WHEN p_old_status = HEXTORAW('00000000000000000000000000000007') AND p_new_status IN (HEXTORAW('00000000000000000000000000000001'), HEXTORAW('00000000000000000000000000000002')) THEN 1
         ELSE 0
     END;
 END;
@@ -26,12 +26,12 @@ END;
 
 -- Trigger, który blokuje niedozwolone przejścia statusu
 CREATE OR REPLACE TRIGGER t_status_transition
-    BEFORE UPDATE OF id_rs ON requests
+    BEFORE UPDATE OF request_status_id ON requests
     FOR EACH ROW
-    WHEN (NEW.id_rs != OLD.id_rs)
+    WHEN (NEW.request_status_id != OLD.request_status_id)
 BEGIN
-    IF is_valid_status_transition(:OLD.id_rs, :NEW.id_rs) = 0 THEN
-        RAISE_APPLICATION_ERROR(-20002, 'Niedozwolone przejście statusu wniosku: z ' || :OLD.id_rs || ' do ' || :NEW.id_rs || '.');
+    IF is_valid_status_transition(:OLD.request_status_id, :NEW.request_status_id) = 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Niedozwolone przejście statusu wniosku.');
     END IF;
 END;
 /
