@@ -49,7 +49,13 @@ CREATE TABLE cost_category(
     description CLOB
 );
 
--- 7. Tabela złożonych wniosków
+-- 7. Tabela przechowująca źródła finansowania
+CREATE TABLE funding_source(
+    id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
+    name VARCHAR2(100) NOT NULL UNIQUE
+);
+
+-- 8. Tabela złożonych wniosków
 CREATE TABLE requests(
     id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
     title VARCHAR2(100) NOT NULL,
@@ -60,16 +66,18 @@ CREATE TABLE requests(
     request_template_id RAW(16),
     department_id RAW(16) NOT NULL,
     cost_category_id RAW(16) NOT NULL,
+    funding_source_id RAW(16),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_request_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_request_dept FOREIGN KEY (department_id) REFERENCES department(id),
     CONSTRAINT fk_request_status FOREIGN KEY (request_status_id) REFERENCES request_status(id),
     CONSTRAINT fk_request_template FOREIGN KEY (request_template_id) REFERENCES request_templates(id),
-    CONSTRAINT fk_request_cost_category FOREIGN KEY (cost_category_id) REFERENCES cost_category(id)
+    CONSTRAINT fk_request_cost_category FOREIGN KEY (cost_category_id) REFERENCES cost_category(id),
+    CONSTRAINT fk_request_funding_source FOREIGN KEY (funding_source_id) REFERENCES funding_source(id)
 );
 
--- 8. Tabela do komentarzy we wnioskach
+-- 9. Tabela do komentarzy we wnioskach
 CREATE TABLE comments(
     id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
     request_id RAW(16) NOT NULL,
@@ -80,7 +88,7 @@ CREATE TABLE comments(
     CONSTRAINT fk_comments_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- 9. Tabela do załączników we wnioskach
+-- 10. Tabela do załączników we wnioskach
 CREATE TABLE attachments (
     id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
     request_id RAW(16) NOT NULL,
@@ -90,7 +98,7 @@ CREATE TABLE attachments (
     CONSTRAINT fk_attachments_request FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE
 );
 
--- 10. Tabela do aktywności w aplikacji( historia zmian, logi, audyty)
+-- 11. Tabela do aktywności w aplikacji( historia zmian, logi, audyty)
 CREATE TABLE activity_log(
     id RAW(16) DEFAULT SYS_GUID() PRIMARY KEY,
     request_id RAW(16) NOT NULL,

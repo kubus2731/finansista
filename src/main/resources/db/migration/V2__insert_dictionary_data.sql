@@ -46,7 +46,13 @@ VALUES (HEXTORAW('00000000000000000000000000000001'), 'Organizacja Wydarzeń Stu
 INSERT INTO cost_category (id, name, description)
 VALUES (HEXTORAW('00000000000000000000000000000002'), 'Nagrody i Stypendia', 'Środki przeznaczone na pulę nagród w konkursach, wsparcie socjalne oraz stypendia rektora.');
 
--- 6. Konta użytkowników do testów
+-- 6. Źródła finansowania
+INSERT INTO funding_source (id, name) VALUES (HEXTORAW('00000000000000000000000000000001'), 'Zarząd Samorządu Studentów');
+INSERT INTO funding_source (id, name) VALUES (HEXTORAW('00000000000000000000000000000002'), 'Rada Uczelniana');
+INSERT INTO funding_source (id, name) VALUES (HEXTORAW('00000000000000000000000000000003'), 'Dziekan Wydziału');
+INSERT INTO funding_source (id, name) VALUES (HEXTORAW('00000000000000000000000000000004'), 'Sponsor Prywatny');
+
+-- 7. Konta użytkowników do testów
 INSERT INTO users (id, name, surname, email, phone_number, password, role_id, department_id)
 VALUES (HEXTORAW('00000000000000000000000000000001'), 'Jakub', 'Matusiewicz', 'j.matusiewicz@student.pb.edu.pl', '500111222', '{noop}admin123', HEXTORAW('00000000000000000000000000000001'), HEXTORAW('00000000000000000000000000000003'));
 
