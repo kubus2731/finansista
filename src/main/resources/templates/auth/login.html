@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
+<head>
+    <title th:fragment="title">Logowanie &ndash; Finansista PB</title>
+</head>
+<body>
+<section th:fragment="content">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h1 class="h4 mb-4 text-center">Logowanie</h1>
+
+                    <!-- Komunikaty (gotowe pod Spring Security: ?error / ?logout) -->
+                    <div class="alert alert-danger" role="alert" th:if="${param.error}">
+                        Nieprawidłowy e-mail lub hasło.
+                    </div>
+                    <div class="alert alert-success" role="alert" th:if="${param.logout}">
+                        Wylogowano poprawnie.
+                    </div>
+
+                    <!-- TODO: podpięcie do Spring Security (formLogin) w kolejnym kroku -->
+                    <form th:action="@{/login}" method="post" novalidate>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Adres e-mail</label>
+                            <input type="email" class="form-control" id="email" name="username"
+                                   autocomplete="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Hasło</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Zaloguj się</button>
+                    </form>
+
+                    <p class="text-center text-secondary mt-3 mb-0">
+                        Nie masz konta?
+                        <a class="link-success" th:href="@{/register}">Zarejestruj się</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

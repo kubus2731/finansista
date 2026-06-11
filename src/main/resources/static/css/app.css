@@ -1,0 +1,66 @@
+/* Motyw Politechniki Białostockiej - nakładka na Bootstrap 5.3 */
+:root {
+    --pb-green: #00494b;        /* główna barwa PB */
+    --pb-green-dark: #00363a;   /* stan hover/active */
+    --pb-green-light: #e3ecec;  /* jasne tło sekcji */
+
+    /* Płaski motyw: zerujemy zaokrąglenia w całej aplikacji */
+    --bs-border-radius: 0;
+    --bs-border-radius-sm: 0;
+    --bs-border-radius-lg: 0;
+    --bs-border-radius-xl: 0;
+    --bs-border-radius-2xl: 0;
+    --bs-border-radius-pill: 0;
+}
+
+/* Nawigacja */
+.pb-navbar {
+    background-color: var(--pb-green) !important;
+}
+
+/* Stopka */
+.pb-footer {
+    background-color: var(--pb-green-light);
+    border-top: 3px solid var(--pb-green);
+}
+
+/* Przyciski podstawowe w kolorystyce PB (Bootstrap 5.3 używa zmiennych --bs-btn-*) */
+.btn-primary {
+    --bs-btn-bg: var(--pb-green);
+    --bs-btn-border-color: var(--pb-green);
+    --bs-btn-hover-bg: var(--pb-green-dark);
+    --bs-btn-hover-border-color: var(--pb-green-dark);
+    --bs-btn-active-bg: var(--pb-green-dark);
+    --bs-btn-active-border-color: var(--pb-green-dark);
+}
+
+.text-success,
+.link-success {
+    color: var(--pb-green-dark) !important;
+}
+
+/* Sekcja powitalna (hero) - prostokątna, z akcentem z lewej */
+.pb-hero {
+    background-color: var(--pb-green-light);
+    border-left: 6px solid var(--pb-green);
+}
+
+/* WCAG 2.1: widoczny skip-link po sfokusowaniu klawiaturą */
+.skip-link {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 1080;
+    background: #fff;
+    color: var(--pb-green-dark);
+    padding: 0.5rem 1rem;
+    box-shadow: 0 0 0 2px var(--pb-green);
+}
+
+/* WCAG 2.1: wyraźny obrys fokusu dla nawigacji klawiaturą */
+a:focus-visible,
+.btn:focus-visible,
+.nav-link:focus-visible {
+    outline: 3px solid var(--pb-green-dark);
+    outline-offset: 2px;
+}
