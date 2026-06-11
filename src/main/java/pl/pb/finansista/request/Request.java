@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pl.pb.finansista.common.ModificationAuditedEntity;
+import pl.pb.finansista.common.ExposableModificationAuditedEntity;
 import pl.pb.finansista.reference.CostCategory;
 import pl.pb.finansista.reference.Department;
 import pl.pb.finansista.reference.FundingSource;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "requests")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Request extends ModificationAuditedEntity {
+public class Request extends ExposableModificationAuditedEntity {
 
     @Column(nullable = false, length = 100)
     private String title;

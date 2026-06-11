@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import pl.pb.finansista.common.ModificationAuditedEntity;
+import pl.pb.finansista.common.ExposableModificationAuditedEntity;
 import pl.pb.finansista.reference.Department;
 
 import java.util.Collection;
@@ -15,7 +15,7 @@ import java.util.Collection;
 @Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends ModificationAuditedEntity {
+public class User extends ExposableModificationAuditedEntity {
     @Column(nullable = false, length = 50)
     private String name;
 

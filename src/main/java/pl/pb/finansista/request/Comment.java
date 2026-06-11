@@ -4,14 +4,14 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pl.pb.finansista.common.CreationAuditedEntity;
+import pl.pb.finansista.common.ExposableCreationAuditedEntity;
 import pl.pb.finansista.user.User;
 
 @Entity
 @Table(name = "comments")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends CreationAuditedEntity {
+public class Comment extends ExposableCreationAuditedEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id", nullable = false)
