@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import pl.pb.finansista.common.ModificationAuditedEntity;
 import pl.pb.finansista.reference.CostCategory;
 import pl.pb.finansista.reference.Department;
+import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.user.User;
 
 import java.math.BigDecimal;
@@ -46,7 +47,11 @@ public class Request extends ModificationAuditedEntity {
     @JoinColumn(name = "cost_category_id", nullable = false)
     private CostCategory costCategory;
 
-    public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "funding_source_id")
+    private FundingSource fundingSource;
+
+    public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory, FundingSource fundingSource) {
         this.title = title;
         this.description = description;
         this.amount = amount;
@@ -55,5 +60,6 @@ public class Request extends ModificationAuditedEntity {
         this.template = template;
         this.department = department;
         this.costCategory = costCategory;
+        this.fundingSource = fundingSource;
     }
 }

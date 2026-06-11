@@ -3,6 +3,8 @@ package pl.pb.finansista.request.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import pl.pb.finansista.request.RequestStatus;
 import java.util.UUID;
+import java.util.Optional;
 
-interface SpringDataJpaRequestStatusRepository extends JpaRepository<RequestStatus, UUID> {
+public interface SpringDataJpaRequestStatusRepository extends JpaRepository<RequestStatus, UUID> {
+    Optional<RequestStatus> findByName(String name);
 }

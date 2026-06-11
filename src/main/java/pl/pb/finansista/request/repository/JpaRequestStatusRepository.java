@@ -21,4 +21,9 @@ class JpaRequestStatusRepository implements RequestStatusRepository {
     public RequestStatus save(RequestStatus requestStatus) {
         return repository.save(requestStatus);
     }
+
+    @Override
+    public Optional<RequestStatus> findByName(String name) {
+        return repository.findByName(name);
+    }
 }

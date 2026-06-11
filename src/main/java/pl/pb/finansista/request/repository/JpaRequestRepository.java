@@ -3,6 +3,7 @@ import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.Request;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 @Repository
 class JpaRequestRepository implements RequestRepository {
 
@@ -15,6 +16,11 @@ class JpaRequestRepository implements RequestRepository {
     @Override
     public Optional<Request> findById(UUID id) {
         return repository.findById(id);
+    }
+
+    @Override
+    public List<Request> findAll(org.springframework.data.jpa.domain.Specification<Request> spec) {
+        return repository.findAll(spec);
     }
 
     @Override
