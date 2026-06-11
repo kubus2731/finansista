@@ -46,12 +46,18 @@ public class RequestController {
             @RequestParam(required = false) Long departmentId,
             Authentication authentication
     ) {
-        boolean isAdminOrDean = authentication.getAuthorities().stream()
-                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
-        
-        String filterEmail = isAdminOrDean ? null : authentication.getName();
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        List<Request> requests = getRequestsUseCase.execute(filterEmail, status, departmentId);
+        GetRequestsQuery query = new GetRequestsQuery(
+                authentication.getName(),
+                authorities,
+                status,
+                departmentId
+        );
+
+        List<Request> requests = getRequestsUseCase.execute(query);
         
         List<RequestResponse> response = requests.stream()
                 .map(RequestResponse::of)
