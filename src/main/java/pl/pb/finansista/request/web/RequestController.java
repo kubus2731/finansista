@@ -12,7 +12,6 @@ import pl.pb.finansista.request.usecase.CreateRequestUseCase;
 import pl.pb.finansista.request.usecase.GetRequestsUseCase;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,7 +35,7 @@ public class RequestController {
     @GetMapping
     public ResponseEntity<List<RequestResponse>> getRequests(
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) UUID departmentId,
+            @RequestParam(required = false) Long departmentId,
             Authentication authentication
     ) {
         boolean isAdminOrDean = authentication.getAuthorities().stream()

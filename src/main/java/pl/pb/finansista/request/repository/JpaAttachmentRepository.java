@@ -15,7 +15,7 @@ class JpaAttachmentRepository implements AttachmentRepository {
     }
 
     @Override
-    public Optional<Attachment> findById(UUID id) {
+    public Optional<Attachment> findById(Long id) {
         return repository.findById(id);
     }
 

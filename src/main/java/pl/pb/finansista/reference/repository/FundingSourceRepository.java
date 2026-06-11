@@ -5,5 +5,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FundingSourceRepository {
-    Optional<FundingSource> findById(UUID id);
+    Optional<FundingSource> findById(Long id);
 }

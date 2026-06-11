@@ -17,7 +17,7 @@ class JpaRequestRepository implements RequestRepository {
     }
 
     @Override
-    public Optional<Request> findById(UUID id) {
+    public Optional<Request> findById(Long id) {
         return repository.findById(id);
     }
 

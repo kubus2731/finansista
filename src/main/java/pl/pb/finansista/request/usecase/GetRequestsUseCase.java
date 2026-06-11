@@ -8,7 +8,6 @@ import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.repository.RequestRepository;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +16,7 @@ public class GetRequestsUseCase {
     private final RequestRepository requestRepository;
 
     @Transactional(readOnly = true)
-    public List<Request> execute(String userEmail, String status, UUID departmentId) {
+    public List<Request> execute(String userEmail, String status, Long departmentId) {
         Specification<Request> spec = (root, query, cb) -> cb.conjunction();
 
         if (userEmail != null && !userEmail.isBlank()) {

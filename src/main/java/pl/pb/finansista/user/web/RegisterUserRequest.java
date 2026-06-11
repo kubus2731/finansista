@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import pl.pb.finansista.user.usecase.RegisterUserCommand;
 
-import java.util.UUID;
 
 public record RegisterUserRequest(
         @NotBlank
@@ -26,10 +25,10 @@ public record RegisterUserRequest(
         String rawPassword,
 
         @NotNull
-        UUID roleId,
+        Long roleId,
 
         @NotNull
-        UUID departmentId
+        Long departmentId
 ) {
     public RegisterUserCommand toCommand() {
         return new RegisterUserCommand(

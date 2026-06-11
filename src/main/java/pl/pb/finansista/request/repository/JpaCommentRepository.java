@@ -5,7 +5,6 @@ import pl.pb.finansista.request.Comment;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 class JpaCommentRepository implements CommentRepository {
@@ -17,7 +16,7 @@ class JpaCommentRepository implements CommentRepository {
     }
 
     @Override
-    public Optional<Comment> findById(UUID id) {
+    public Optional<Comment> findById(Long id) {
         return repository.findById(id);
     }
 
@@ -27,12 +26,12 @@ class JpaCommentRepository implements CommentRepository {
     }
 
     @Override
-    public List<Comment> findByRequestId(UUID requestId) {
+    public List<Comment> findByRequestId(Long requestId) {
         return repository.findByRequestId(requestId);
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         repository.deleteById(id);
     }
 }

@@ -15,7 +15,7 @@ class JpaDepartmentRepository implements DepartmentRepository {
     }
 
     @Override
-    public Optional<Department> findById(UUID id) {
+    public Optional<Department> findById(Long id) {
         return repository.findById(id);
     }
 

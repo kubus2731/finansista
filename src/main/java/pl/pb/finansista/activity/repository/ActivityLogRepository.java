@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public interface ActivityLogRepository {
 
-    Optional<ActivityLog> findById(UUID id);
+    Optional<ActivityLog> findById(Long id);
 
     ActivityLog save(ActivityLog activityLog);
 }

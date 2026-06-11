@@ -4,9 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import pl.pb.finansista.user.User;
 
 import java.util.Optional;
-import java.util.UUID;
 
-interface SpringDataJpaUserRepository extends JpaRepository<User, UUID> {
+interface SpringDataJpaUserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 

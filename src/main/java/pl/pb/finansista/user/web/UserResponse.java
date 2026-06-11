@@ -1,10 +1,9 @@
 package pl.pb.finansista.user.web;
 
 import pl.pb.finansista.user.User;
-import java.util.UUID;
 
 public record UserResponse(
-        UUID id,
+        Long id,
         String name,
         String surname,
         String email,

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface DepartmentRepository {
 
-    Optional<Department> findById(UUID id);
+    Optional<Department> findById(Long id);
 
     Department save(Department department);
 }

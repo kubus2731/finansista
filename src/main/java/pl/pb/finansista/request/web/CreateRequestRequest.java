@@ -6,16 +6,15 @@ import jakarta.validation.constraints.Positive;
 import pl.pb.finansista.request.usecase.CreateRequestCommand;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public record CreateRequestRequest(
         @NotBlank String title,
         @NotBlank String description,
         @NotNull @Positive BigDecimal amount,
-        UUID templateId,
-        @NotNull UUID departmentId,
-        @NotNull UUID costCategoryId,
-        UUID fundingSourceId
+        Long templateId,
+        @NotNull Long departmentId,
+        @NotNull Long costCategoryId,
+        Long fundingSourceId
 ) {
     public CreateRequestCommand toCommand(String userEmail) {
         return new CreateRequestCommand(

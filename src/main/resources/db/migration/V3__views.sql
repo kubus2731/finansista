@@ -5,10 +5,10 @@ SELECT
     d.name AS department_name,
     COUNT(r.id) AS total_requests_count,
     NVL(SUM(r.amount), 0) AS total_requests_amount,
-    SUM(CASE WHEN r.request_status_id = HEXTORAW('00000000000000000000000000000005') THEN 1 ELSE 0 END) AS accepted_requests_count,
-    NVL(SUM(CASE WHEN r.request_status_id = HEXTORAW('00000000000000000000000000000005') THEN r.amount ELSE 0 END), 0) AS accepted_requests_amount,
-    SUM(CASE WHEN r.request_status_id = HEXTORAW('00000000000000000000000000000006') THEN 1 ELSE 0 END) AS rejected_requests_count,
-    NVL(SUM(CASE WHEN r.request_status_id = HEXTORAW('00000000000000000000000000000006') THEN r.amount ELSE 0 END), 0) AS rejected_requests_amount
+    SUM(CASE WHEN r.request_status_id = 5 THEN 1 ELSE 0 END) AS accepted_requests_count,
+    NVL(SUM(CASE WHEN r.request_status_id = 5 THEN r.amount ELSE 0 END), 0) AS accepted_requests_amount,
+    SUM(CASE WHEN r.request_status_id = 6 THEN 1 ELSE 0 END) AS rejected_requests_count,
+    NVL(SUM(CASE WHEN r.request_status_id = 6 THEN r.amount ELSE 0 END), 0) AS rejected_requests_amount
 FROM department d
          LEFT JOIN requests r ON d.id = r.department_id
 GROUP BY d.id, d.name;

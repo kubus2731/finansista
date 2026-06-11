@@ -4,9 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import pl.pb.finansista.user.Role;
 
 import java.util.Optional;
-import java.util.UUID;
 
-interface SpringDataJpaRoleRepository extends JpaRepository<Role, UUID> {
+interface SpringDataJpaRoleRepository extends JpaRepository<Role, Long> {
     
     Optional<Role> findByName(String name);
 }

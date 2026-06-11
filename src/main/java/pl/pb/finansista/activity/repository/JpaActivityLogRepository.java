@@ -13,7 +13,7 @@ class JpaActivityLogRepository implements ActivityLogRepository {
     }
 
     @Override
-    public Optional<ActivityLog> findById(UUID id) {
+    public Optional<ActivityLog> findById(Long id) {
         return repository.findById(id);
     }
 

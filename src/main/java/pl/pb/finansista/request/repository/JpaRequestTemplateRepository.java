@@ -13,7 +13,7 @@ class JpaRequestTemplateRepository implements RequestTemplateRepository {
     }
 
     @Override
-    public Optional<RequestTemplate> findById(UUID id) {
+    public Optional<RequestTemplate> findById(Long id) {
         return repository.findById(id);
     }
 

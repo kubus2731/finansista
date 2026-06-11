@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface RequestRepository {
 
-    Optional<Request> findById(UUID id);
+    Optional<Request> findById(Long id);
 
     List<Request> findAll(Specification<Request> spec);
 

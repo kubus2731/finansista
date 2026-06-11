@@ -4,18 +4,17 @@ import pl.pb.finansista.request.Request;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 public record RequestResponse(
-        UUID id,
+        Long id,
         String title,
         String description,
         BigDecimal amount,
         String status,
-        UUID templateId,
-        UUID departmentId,
-        UUID costCategoryId,
-        UUID fundingSourceId,
+        Long templateId,
+        Long departmentId,
+        Long costCategoryId,
+        Long fundingSourceId,
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt
 ) {

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface AttachmentRepository {
 
-    Optional<Attachment> findById(UUID id);
+    Optional<Attachment> findById(Long id);
 
     Attachment save(Attachment attachment);
 }

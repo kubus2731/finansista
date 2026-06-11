@@ -13,7 +13,7 @@ class JpaFundingSourceRepository implements FundingSourceRepository {
     private final SpringDataJpaFundingSourceRepository repository;
 
     @Override
-    public Optional<FundingSource> findById(UUID id) {
+    public Optional<FundingSource> findById(Long id) {
         return repository.findById(id);
     }
 }

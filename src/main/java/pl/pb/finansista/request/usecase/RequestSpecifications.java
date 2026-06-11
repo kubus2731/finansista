@@ -3,11 +3,10 @@ package pl.pb.finansista.request.usecase;
 import org.springframework.data.jpa.domain.Specification;
 import pl.pb.finansista.request.Request;
 
-import java.util.UUID;
 
 public class RequestSpecifications {
 
-    public static Specification<Request> hasDepartment(UUID departmentId) {
+    public static Specification<Request> hasDepartment(Long departmentId) {
         return (root, query, cb) -> 
                 departmentId == null ? null : cb.equal(root.join("department").get("id"), departmentId);
     }

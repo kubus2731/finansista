@@ -38,7 +38,7 @@ CREATE OR REPLACE TRIGGER t_block
     BEFORE UPDATE ON requests
     FOR EACH ROW
 BEGIN
-    IF :OLD.request_status_id NOT IN (HEXTORAW('00000000000000000000000000000001'), HEXTORAW('00000000000000000000000000000007')) THEN
+    IF :OLD.request_status_id NOT IN (1, 7) THEN
         IF :OLD.amount != :NEW.amount
             OR :OLD.title != :NEW.title
             OR :OLD.cost_category_id != :NEW.cost_category_id

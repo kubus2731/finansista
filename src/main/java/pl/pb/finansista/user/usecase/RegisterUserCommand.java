@@ -2,7 +2,6 @@ package pl.pb.finansista.user.usecase;
 
 import org.springframework.util.Assert;
 
-import java.util.UUID;
 
 public record RegisterUserCommand(
         String name,
@@ -10,8 +9,8 @@ public record RegisterUserCommand(
         String email,
         String phoneNumber,
         String rawPassword,
-        UUID roleId,
-        UUID departmentId) {
+        Long roleId,
+        Long departmentId) {
 
     public RegisterUserCommand {
         Assert.hasText(name, "Name cannot be blank");

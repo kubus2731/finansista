@@ -16,7 +16,7 @@ class JpaRoleRepository implements RoleRepository {
     }
 
     @Override
-    public Optional<Role> findById(UUID id) {
+    public Optional<Role> findById(Long id) {
         return repository.findById(id);
     }
 
