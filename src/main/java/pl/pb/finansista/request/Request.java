@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import pl.pb.finansista.common.ModificationAuditedEntity;
+import pl.pb.finansista.common.ExposableModificationAuditedEntity;
 import pl.pb.finansista.reference.CostCategory;
 import pl.pb.finansista.reference.Department;
+import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.user.User;
 
 import java.math.BigDecimal;
@@ -15,7 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "requests")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Request extends ModificationAuditedEntity {
+public class Request extends ExposableModificationAuditedEntity {
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -46,7 +47,11 @@ public class Request extends ModificationAuditedEntity {
     @JoinColumn(name = "cost_category_id", nullable = false)
     private CostCategory costCategory;
 
-    public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "funding_source_id")
+    private FundingSource fundingSource;
+
+    public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory, FundingSource fundingSource) {
         this.title = title;
         this.description = description;
         this.amount = amount;
@@ -55,5 +60,20 @@ public class Request extends ModificationAuditedEntity {
         this.template = template;
         this.department = department;
         this.costCategory = costCategory;
+        this.fundingSource = fundingSource;
+    }
+
+    public void update(String title, String description, BigDecimal amount, RequestTemplate template, Department department, CostCategory costCategory, FundingSource fundingSource) {
+        this.title = title;
+        this.description = description;
+        this.amount = amount;
+        this.template = template;
+        this.department = department;
+        this.costCategory = costCategory;
+        this.fundingSource = fundingSource;
+    }
+
+    public void changeStatus(RequestStatus newStatus) {
+        this.status = newStatus;
     }
 }

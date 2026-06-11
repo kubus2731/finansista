@@ -32,7 +32,7 @@ public class RegisterUserUseCase {
                 .orElseThrow(RoleNotFoundException::new);
 
         var department = departmentRepository.findById(command.departmentId())
-                .orElseThrow(DepartmentNotFoundException::new);
+                .orElseThrow(() -> new DepartmentNotFoundException());
 
         String hashedPassword = passwordEncoder.encode(command.rawPassword());
 

@@ -15,7 +15,7 @@ class JpaCostCategoryRepository implements CostCategoryRepository {
     }
 
     @Override
-    public Optional<CostCategory> findById(UUID id) {
+    public Optional<CostCategory> findById(Long id) {
         return repository.findById(id);
     }
 

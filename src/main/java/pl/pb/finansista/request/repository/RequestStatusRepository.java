@@ -6,7 +6,8 @@ import java.util.UUID;
 
 public interface RequestStatusRepository {
 
-    Optional<RequestStatus> findById(UUID id);
+    Optional<RequestStatus> findById(Long id);
+    Optional<RequestStatus> findByName(String name);
 
     RequestStatus save(RequestStatus requestStatus);
 }

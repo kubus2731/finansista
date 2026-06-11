@@ -1,12 +1,10 @@
-package pl.pb.finansista.activity;
+package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.pb.finansista.common.CreationAuditedEntity;
-import pl.pb.finansista.request.Request;
-import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.user.User;
 
 @Entity

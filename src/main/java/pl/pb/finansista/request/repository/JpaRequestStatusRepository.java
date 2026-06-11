@@ -13,12 +13,17 @@ class JpaRequestStatusRepository implements RequestStatusRepository {
     }
 
     @Override
-    public Optional<RequestStatus> findById(UUID id) {
+    public Optional<RequestStatus> findById(Long id) {
         return repository.findById(id);
     }
 
     @Override
     public RequestStatus save(RequestStatus requestStatus) {
         return repository.save(requestStatus);
+    }
+
+    @Override
+    public Optional<RequestStatus> findByName(String name) {
+        return repository.findByName(name);
     }
 }

@@ -4,10 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import pl.pb.finansista.request.Comment;
 
 import java.util.List;
-import java.util.UUID;
 
-interface SpringDataJpaCommentRepository extends JpaRepository<Comment, UUID> {
+interface SpringDataJpaCommentRepository extends JpaRepository<Comment, Long> {
     
-    List<Comment> findByRequestId(UUID requestId);
+    List<Comment> findByRequestId(Long requestId);
 }
 

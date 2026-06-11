@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface RequestTemplateRepository {
 
-    Optional<RequestTemplate> findById(UUID id);
+    Optional<RequestTemplate> findById(Long id);
 
     RequestTemplate save(RequestTemplate requestTemplate);
 }

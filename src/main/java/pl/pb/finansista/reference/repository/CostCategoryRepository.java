@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface CostCategoryRepository {
 
-    Optional<CostCategory> findById(UUID id);
+    Optional<CostCategory> findById(Long id);
 
     CostCategory save(CostCategory costCategory);
 }

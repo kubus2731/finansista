@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface RoleRepository {
 
-    Optional<Role> findById(UUID id);
+    Optional<Role> findById(Long id);
     Optional<Role> findByName(String name);
 }
 

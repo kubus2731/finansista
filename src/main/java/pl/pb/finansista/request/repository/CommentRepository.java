@@ -3,15 +3,14 @@ package pl.pb.finansista.request.repository;
 import pl.pb.finansista.request.Comment;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface CommentRepository {
 
-    Optional<Comment> findById(UUID id);
+    Optional<Comment> findById(Long id);
 
     Comment save(Comment comment);
 
-    List<Comment> findByRequestId(UUID requestId);
+    List<Comment> findByRequestId(Long requestId);
 
-    void deleteById(UUID id);
+    void deleteById(Long id);
 }
