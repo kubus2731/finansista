@@ -7,9 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.usecase.AddCommentUseCase;
 import pl.pb.finansista.request.usecase.ChangeRequestStatusUseCase;
 import pl.pb.finansista.request.usecase.CreateRequestUseCase;
 import pl.pb.finansista.request.usecase.EditRequestUseCase;
+import pl.pb.finansista.request.usecase.GetCommentsUseCase;
 import pl.pb.finansista.request.usecase.GetRequestHistoryUseCase;
 import pl.pb.finansista.request.usecase.GetRequestsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
@@ -31,6 +33,8 @@ public class RequestController {
     private final EditRequestUseCase editRequestUseCase;
     private final ChangeRequestStatusUseCase changeRequestStatusUseCase;
     private final GetRequestHistoryUseCase getRequestHistoryUseCase;
+    private final AddCommentUseCase addCommentUseCase;
+    private final GetCommentsUseCase getCommentsUseCase;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -114,5 +118,37 @@ public class RequestController {
                 .collect(Collectors.toList());
                 
         return ResponseEntity.ok(history);
+    }
+
+    @PostMapping("/{id}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<CommentResponse> addComment(
+            @PathVariable UUID id,
+            @Valid @RequestBody AddCommentRequest payload,
+            Authentication authentication
+    ) {
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        pl.pb.finansista.request.Comment comment = addCommentUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CommentResponse.of(comment));
+    }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<List<CommentResponse>> getComments(
+            @PathVariable UUID id,
+            Authentication authentication
+    ) {
+        boolean isAdminOrDean = authentication.getAuthorities().stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
+
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
+        
+        List<CommentResponse> comments = getCommentsUseCase.execute(query).stream()
+                .map(CommentResponse::of)
+                .collect(Collectors.toList());
+                
+        return ResponseEntity.ok(comments);
     }
 }
