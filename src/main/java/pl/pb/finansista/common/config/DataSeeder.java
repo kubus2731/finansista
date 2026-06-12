@@ -1,4 +1,4 @@
-package pl.pb.finansista.config;
+package pl.pb.finansista.common.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

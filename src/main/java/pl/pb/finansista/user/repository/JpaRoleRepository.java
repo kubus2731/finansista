@@ -3,6 +3,7 @@ package pl.pb.finansista.user.repository;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.user.Role;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,6 +24,11 @@ class JpaRoleRepository implements RoleRepository {
     @Override
     public Optional<Role> findByName(String name) {
         return repository.findByName(name);
+    }
+
+    @Override
+    public List<Role> findAll() {
+        return repository.findAll();
     }
 }
 

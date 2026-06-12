@@ -3,6 +3,7 @@ package pl.pb.finansista.user.repository;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.user.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,6 +34,11 @@ class JpaUserRepository implements UserRepository {
     @Override
     public User save(User user) {
         return repository.save(user);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return repository.findAll();
     }
 
     @Override
