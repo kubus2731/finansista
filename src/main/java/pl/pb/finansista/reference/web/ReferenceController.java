@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
-import pl.pb.finansista.user.repository.RoleRepository;
 
 import java.util.List;
 
@@ -17,19 +16,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReferenceController {
 
-    private final RoleRepository roleRepository;
     private final DepartmentRepository departmentRepository;
     private final CostCategoryRepository costCategoryRepository;
     private final FundingSourceRepository fundingSourceRepository;
-
-    @GetMapping("/roles")
-    public ResponseEntity<List<ReferenceResponse>> getRoles() {
-        return ResponseEntity.ok(
-                roleRepository.findAll().stream()
-                        .map(role -> new ReferenceResponse(role.getId(), role.getName()))
-                        .toList()
-        );
-    }
 
     @GetMapping("/departments")
     public ResponseEntity<List<ReferenceResponse>> getDepartments() {
