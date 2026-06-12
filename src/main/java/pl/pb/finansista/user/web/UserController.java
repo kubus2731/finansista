@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import pl.pb.finansista.user.usecase.ChangeUserDepartmentUseCase;
 import pl.pb.finansista.user.usecase.ChangeUserRoleUseCase;
 import pl.pb.finansista.user.usecase.GetUsersUseCase;
 
@@ -21,6 +22,7 @@ public class UserController {
 
     private final GetUsersUseCase getUsersUseCase;
     private final ChangeUserRoleUseCase changeUserRoleUseCase;
+    private final ChangeUserDepartmentUseCase changeUserDepartmentUseCase;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -40,9 +42,23 @@ public class UserController {
             @RequestBody @Valid ChangeUserRoleRequest request,
             Authentication authentication) {
 
-        log.info("Admin user {} is changing role and department for user ID: {}", authentication.getName(), id);
+        log.info("Admin user {} is changing role for user ID: {}", authentication.getName(), id);
         changeUserRoleUseCase.execute(request.toCommand(id));
-        log.info("Successfully updated user ID: {}", id);
+        log.info("Successfully updated role for user ID: {}", id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/department")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Void> changeUserDepartment(
+            @PathVariable UUID id,
+            @RequestBody @Valid ChangeUserDepartmentRequest request,
+            Authentication authentication) {
+
+        log.info("Admin user {} is changing department for user ID: {}", authentication.getName(), id);
+        changeUserDepartmentUseCase.execute(request.toCommand(id));
+        log.info("Successfully updated department for user ID: {}", id);
 
         return ResponseEntity.noContent().build();
     }

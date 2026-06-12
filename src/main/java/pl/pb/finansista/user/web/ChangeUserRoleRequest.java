@@ -6,10 +6,9 @@ import pl.pb.finansista.user.usecase.ChangeUserRoleCommand;
 import java.util.UUID;
 
 public record ChangeUserRoleRequest(
-        @NotNull Long roleId,
-        @NotNull Long departmentId
+        @NotNull Long roleId
 ) {
     public ChangeUserRoleCommand toCommand(UUID userExternalId) {
-        return new ChangeUserRoleCommand(userExternalId, roleId, departmentId);
+        return new ChangeUserRoleCommand(userExternalId, roleId);
     }
 }

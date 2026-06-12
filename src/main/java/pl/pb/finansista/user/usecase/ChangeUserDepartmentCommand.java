@@ -2,8 +2,8 @@ package pl.pb.finansista.user.usecase;
 
 import java.util.UUID;
 
-public record ChangeUserRoleCommand(
+public record ChangeUserDepartmentCommand(
         UUID userExternalId,
-        Long newRoleId
+        Long newDepartmentId
 ) {
 }
