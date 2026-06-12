@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -52,6 +54,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         pd.setProperty("traceId", getTraceId());
 
         return ResponseEntity.status(ex.getHttpStatus()).body(pd);
+    }
+
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    public ResponseEntity<ProblemDetail> handleAccessDeniedException(Exception ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, "You do not have permission to access this resource.");
+        pd.setTitle("Forbidden");
+        pd.setProperty("code", codeFor(ex));
+        pd.setProperty("traceId", getTraceId());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
     }
 
     private String codeFor(Exception ex) {
