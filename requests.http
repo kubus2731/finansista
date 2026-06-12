@@ -1,0 +1,113 @@
+### 1. LOGIN (Execute this first!)
+# The JWT is returned as a Cookie. IntelliJ's HTTP Client will automatically
+# save the Cookie and use it for all the subsequent requests below!
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "j.borkowski@student.pb.edu.pl",
+  "password": "admin123"
+}
+
+###
+
+### 2. Fetch all requests for the currently logged in user
+# You can append ?status=DRAFT to filter by status
+GET http://localhost:8080/api/v1/requests
+Accept: application/json
+
+###
+
+### 3. Fetch a single request by its UUID
+# (Replace the UUID with one you get from the GET /requests response)
+GET http://localhost:8080/api/v1/requests/req_AZ647sK5eZa56BQUKJVGYA
+Accept: application/json
+
+###
+
+### 4. Example of an ERROR - Request Not Found
+# This will trigger the RequestNotFoundException.
+# You will see the "Cost Category not found." (or Request) message, 
+# AND you will see the traceId injected into the JSON response!
+GET http://localhost:8080/api/v1/requests/ffffffff-ffff-ffff-ffff-ffffffffffff
+Accept: application/json
+
+###
+
+### 5. Create a new Request
+POST http://localhost:8080/api/v1/requests
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "New Laptop for Development",
+  "description": "Need a new MacBook Pro for the new backend developer.",
+  "amount": 12500.00,
+  "departmentId": 1,
+  "costCategoryId": 1,
+  "fundingSourceId": 1
+}
+
+###
+
+### 6. Example of a Validation ERROR
+# The amount is negative, which will trigger Jakarta validation errors.
+POST http://localhost:8080/api/v1/requests
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Invalid Request",
+  "description": "This request has a negative amount.",
+  "amount": -50.00,
+  "departmentId": 1,
+  "costCategoryId": 1,
+  "fundingSourceId": 1
+}
+
+###
+
+### 7. Add a Comment to a Request
+POST http://localhost:8080/api/v1/requests/req_AZ647sK5eZa56BQUKJVGYA/comments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "content": "Can we please expedite this? The new developer starts on Monday."
+}
+
+###
+
+### 8. Fetch Comments for a Request
+GET http://localhost:8080/api/v1/requests/req_AZ647sK5eZa56BQUKJVGYA/comments
+Accept: application/json
+
+###
+
+### 9. Delete a Request
+# NOTE: Depending on your business rules, you may only be able to delete DRAFT requests,
+# or only Admins can delete requests. Give it a try!
+DELETE http://localhost:8080/api/v1/requests/req_AZ647sK5eZa56BQUKJVGYA
+Accept: application/json
+
+###
+
+### 10. Change Request Status
+# Changes the status of a request (e.g., from DRAFT to PENDING, or PENDING to APPROVED).
+# The description is optional but good for audit logs!
+PATCH http://localhost:8080/api/v1/requests/req_AZ647sK5eZa56BQUKJVGYA/status
+Content-Type: application/json
+Accept: application/json
+
+{
+  "status": "SUBMITTED",
+  "description": "Ready for Dean's Office review."
+}
+
+###
+
+### 11. Fetch Request History (Audit Log)
+# See the full timeline of status changes, edits, and creation.
+GET http://localhost:8080/api/v1/requests/req_AZ647sK5eZa56BQUKJVGYA/history
+Accept: application/json

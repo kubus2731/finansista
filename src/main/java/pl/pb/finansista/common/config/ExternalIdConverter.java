@@ -1,4 +1,4 @@
-package pl.pb.finansista.config;
+package pl.pb.finansista.common.config;
 
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.convert.converter.Converter;

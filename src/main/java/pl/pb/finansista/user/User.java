@@ -48,4 +48,12 @@ public class User extends ExposableModificationAuditedEntity {
         this.role = role;
         this.department = department;
     }
+
+    public void changeRole(Role newRole) {
+        this.role = newRole;
+    }
+
+    public void changeDepartment(Department newDepartment) {
+        this.department = newDepartment;
+    }
 }
