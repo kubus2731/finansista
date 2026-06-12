@@ -2,8 +2,10 @@ package pl.pb.finansista.user.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.user.usecase.ChangeUserRoleUseCase;
 import pl.pb.finansista.user.usecase.GetUsersUseCase;
@@ -14,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final GetUsersUseCase getUsersUseCase;
@@ -21,7 +24,8 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers(Authentication authentication) {
+        log.info("Admin user {} is fetching all users", authentication.getName());
         return ResponseEntity.ok(
                 getUsersUseCase.execute().stream()
                         .map(UserResponse::of)
@@ -33,9 +37,12 @@ public class UserController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> changeUserRole(
             @PathVariable UUID id,
-            @RequestBody @Valid ChangeUserRoleRequest request) {
+            @RequestBody @Valid ChangeUserRoleRequest request,
+            Authentication authentication) {
 
+        log.info("Admin user {} is changing role and department for user ID: {}", authentication.getName(), id);
         changeUserRoleUseCase.execute(request.toCommand(id));
+        log.info("Successfully updated user ID: {}", id);
 
         return ResponseEntity.noContent().build();
     }
