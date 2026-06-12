@@ -21,6 +21,7 @@ public class AddCommentUseCase {
     private final RequestRepository requestRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final RequestAccessValidator accessValidator;
 
     @Transactional
     public Comment execute(AddCommentCommand command) {
@@ -30,12 +31,7 @@ public class AddCommentUseCase {
         User actor = userRepository.findByEmail(command.userEmail())
                 .orElseThrow(UserNotFoundException::new);
 
-        boolean isAdminOrDean = command.userAuthorities().stream()
-                .anyMatch(a -> a.equals("ROLE_ADMIN") || a.equals("ROLE_DEAN_OFFICE"));
-
-        if (!isAdminOrDean && !request.getUser().getEmail().equals(command.userEmail())) {
-            throw UnauthorizedRequestAccessException.forAction("comment on");
-        }
+        accessValidator.validateUserCanAccessRequest(request, actor, command.userAuthorities());
 
         Comment comment = new Comment(request, actor, command.content());
         return commentRepository.save(comment);

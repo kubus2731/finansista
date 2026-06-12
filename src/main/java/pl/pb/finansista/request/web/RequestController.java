@@ -79,10 +79,11 @@ public class RequestController {
             Authentication authentication
     ) {
         log.info("Fetching details for request ID: {} by user: {}", id, authentication.getName());
-        boolean isAdminOrDean = authentication.getAuthorities().stream()
-                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
         Request request = getSingleRequestUseCase.execute(query);
         return ResponseEntity.ok(RequestResponse.of(request));
     }
@@ -121,10 +122,11 @@ public class RequestController {
             Authentication authentication
     ) {
         log.info("Fetching history for request ID: {} by user: {}", id, authentication.getName());
-        boolean isAdminOrDean = authentication.getAuthorities().stream()
-                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
         
         List<ActivityLogResponse> history = getRequestHistoryUseCase.execute(query).stream()
                 .map(ActivityLogResponse::of)
@@ -156,10 +158,11 @@ public class RequestController {
             Authentication authentication
     ) {
         log.info("Fetching comments for request ID: {} by user: {}", id, authentication.getName());
-        boolean isAdminOrDean = authentication.getAuthorities().stream()
-                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
         
         List<CommentResponse> comments = getCommentsUseCase.execute(query).stream()
                 .map(CommentResponse::of)
@@ -174,10 +177,11 @@ public class RequestController {
             Authentication authentication
     ) {
         log.info("Deleting request ID: {} by user: {}", id, authentication.getName());
-        boolean isAdminOrDean = authentication.getAuthorities().stream()
-                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN") || Objects.equals(a.getAuthority(), "ROLE_DEAN_OFFICE"));
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
         deleteRequestUseCase.execute(query);
         log.info("Successfully deleted request ID: {}", id);
         return ResponseEntity.noContent().build();

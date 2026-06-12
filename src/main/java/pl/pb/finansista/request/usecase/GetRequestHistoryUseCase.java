@@ -11,6 +11,8 @@ import pl.pb.finansista.request.ActivityLog;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.ActivityLogRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
+import pl.pb.finansista.user.User;
+import pl.pb.finansista.user.repository.UserRepository;
 
 import java.util.List;
 
@@ -18,17 +20,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetRequestHistoryUseCase {
 
-    private final RequestRepository requestRepository;
     private final ActivityLogRepository activityLogRepository;
+    private final RequestRepository requestRepository;
+    private final UserRepository userRepository;
+    private final RequestAccessValidator accessValidator;
 
     @Transactional(readOnly = true)
     public List<ActivityLog> execute(GetSingleRequestQuery query) {
         Request request = requestRepository.findByExternalId(query.externalId())
                 .orElseThrow(RequestNotFoundException::new);
 
-        if (!query.isAdminOrDean() && !request.getUser().getEmail().equals(query.userEmail())) {
-            throw UnauthorizedRequestAccessException.forAction("view history for");
-        }
+        User user = userRepository.findByEmail(query.userEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        accessValidator.validateUserCanAccessRequest(request, user, query.userAuthorities());
 
         return activityLogRepository.findByRequestIdOrderByCreatedAtDesc(request.getId());
     }
