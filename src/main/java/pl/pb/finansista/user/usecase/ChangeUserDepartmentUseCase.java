@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.reference.Department;
+import pl.pb.finansista.reference.DepartmentNotFoundException;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.UserNotFoundException;
@@ -22,7 +23,7 @@ public class ChangeUserDepartmentUseCase {
                 .orElseThrow(UserNotFoundException::new);
 
         Department newDepartment = departmentRepository.findById(command.newDepartmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Department not found."));
+                .orElseThrow(DepartmentNotFoundException::new);
 
         user.changeDepartment(newDepartment);
         userRepository.save(user);

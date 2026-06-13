@@ -10,13 +10,14 @@ public record ChangeRequestStatusRequest(
         @NotBlank String status,
         String description
 ) {
-    public ChangeRequestStatusCommand toCommand(UUID externalId, String userEmail, List<String> userAuthorities) {
+    public ChangeRequestStatusCommand toCommand(UUID externalId, String userEmail, List<String> userAuthorities, Long version) {
         return new ChangeRequestStatusCommand(
                 externalId,
                 status,
                 description,
                 userEmail,
-                userAuthorities
+                userAuthorities,
+                version
         );
     }
 }

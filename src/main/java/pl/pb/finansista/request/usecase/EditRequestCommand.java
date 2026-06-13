@@ -1,17 +1,20 @@
 package pl.pb.finansista.request.usecase;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 public record EditRequestCommand(
         UUID externalId,
         String userEmail,
+        List<String> userAuthorities,
         String title,
         String description,
         BigDecimal amount,
-        Long templateId,
+        UUID templateId,
         Long departmentId,
         Long costCategoryId,
-        Long fundingSourceId
+        Long fundingSourceId,
+        Long version
 ) {
 }

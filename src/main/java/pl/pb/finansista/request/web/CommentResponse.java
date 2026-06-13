@@ -1,11 +1,12 @@
 package pl.pb.finansista.request.web;
 
+import pl.pb.finansista.common.web.ExternalIdEncoder;
 import pl.pb.finansista.request.Comment;
 
 import java.time.ZonedDateTime;
 
 public record CommentResponse(
-        Long id,
+        String id,
         String content,
         String userFullName,
         String userEmail,
@@ -13,7 +14,7 @@ public record CommentResponse(
 ) {
     public static CommentResponse of(Comment comment) {
         return new CommentResponse(
-                comment.getId(),
+                ExternalIdEncoder.encode("com", comment.getExternalId()),
                 comment.getContent(),
                 comment.getUser().getName() + " " + comment.getUser().getSurname(),
                 comment.getUser().getEmail(),

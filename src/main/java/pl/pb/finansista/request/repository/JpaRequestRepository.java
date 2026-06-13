@@ -3,9 +3,10 @@ package pl.pb.finansista.request.repository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.Request;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.List;
 
 @Repository
 class JpaRequestRepository implements RequestRepository {
@@ -27,6 +28,11 @@ class JpaRequestRepository implements RequestRepository {
     }
 
     @Override
+    public Optional<Request> findOne(Specification<Request> spec) {
+        return repository.findOne(spec);
+    }
+
+    @Override
     public List<Request> findAll(Specification<Request> spec) {
         return repository.findAll(spec);
     }
@@ -39,5 +45,10 @@ class JpaRequestRepository implements RequestRepository {
     @Override
     public void delete(Request request) {
         repository.delete(request);
+    }
+
+    @Override
+    public void setActor(long id) {
+        repository.setActor(id);
     }
 }

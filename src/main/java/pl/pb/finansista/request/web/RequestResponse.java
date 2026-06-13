@@ -1,5 +1,6 @@
 package pl.pb.finansista.request.web;
 
+import pl.pb.finansista.common.web.ExternalIdEncoder;
 import pl.pb.finansista.request.Request;
 
 import java.math.BigDecimal;
@@ -7,7 +8,6 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
-import pl.pb.finansista.common.ExternalIdEncoder;
 
 public record RequestResponse(
         String id,
@@ -15,7 +15,7 @@ public record RequestResponse(
         String description,
         BigDecimal amount,
         String status,
-        Long templateId,
+        String templateId,
         Long departmentId,
         Long costCategoryId,
         Long fundingSourceId,
@@ -55,7 +55,7 @@ public record RequestResponse(
                 request.getDescription(),
                 request.getAmount(),
                 request.getStatus().getName(),
-                request.getTemplate() != null ? request.getTemplate().getId() : null,
+                request.getTemplate() != null ? ExternalIdEncoder.encode("tpl", request.getTemplate().getExternalId()) : null,
                 request.getDepartment().getId(),
                 request.getCostCategory().getId(),
                 request.getFundingSource() != null ? request.getFundingSource().getId() : null,

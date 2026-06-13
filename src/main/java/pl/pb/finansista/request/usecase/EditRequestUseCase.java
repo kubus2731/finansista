@@ -1,26 +1,23 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.pb.finansista.reference.CostCategory;
-import pl.pb.finansista.reference.Department;
-import pl.pb.finansista.reference.FundingSource;
+import pl.pb.finansista.reference.*;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
-import pl.pb.finansista.reference.CostCategoryNotFoundException;
-import pl.pb.finansista.reference.FundingSourceNotFoundException;
-import pl.pb.finansista.reference.DepartmentNotFoundException;
-import pl.pb.finansista.request.exception.RequestNotFoundException;
-import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
-import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.RequestTemplate;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
+import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.request.repository.RequestTemplateRepository;
+import pl.pb.finansista.user.RoleName;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +34,20 @@ public class EditRequestUseCase {
         Request request = requestRepository.findByExternalId(command.externalId())
                 .orElseThrow(RequestNotFoundException::new);
 
-        if (!request.getUser().getEmail().equals(command.userEmail())) {
+        if (!request.getVersion().equals(command.version())) {
+            throw new ObjectOptimisticLockingFailureException(Request.class, request.getId());
+        }
+
+        boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
+        boolean isAuthor = request.getUser().getEmail().equals(command.userEmail());
+        boolean statusAllowsEdit = request.getStatus().getName().equals(RequestStatusName.DRAFT.name())
+                || request.getStatus().getName().equals(RequestStatusName.CORRECTION_REQUIRED.name());
+
+        if (!isAdmin && !isAuthor) {
             throw UnauthorizedRequestAccessException.forAction("edit");
         }
 
-        if (!request.getStatus().getName().equals("DRAFT") && !request.getStatus().getName().equals("CORRECTION_REQUIRED")) {
+        if (!statusAllowsEdit) {
             throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
         }
 
@@ -51,17 +57,13 @@ public class EditRequestUseCase {
         CostCategory costCategory = costCategoryRepository.findById(command.costCategoryId())
                 .orElseThrow(CostCategoryNotFoundException::new);
 
-        FundingSource fundingSource = null;
-        if (command.fundingSourceId() != null) {
-            fundingSource = fundingSourceRepository.findById(command.fundingSourceId())
-                    .orElseThrow(FundingSourceNotFoundException::new);
-        }
+        FundingSource fundingSource = command.fundingSourceId() != null
+                ? fundingSourceRepository.findById(command.fundingSourceId()).orElseThrow(FundingSourceNotFoundException::new)
+                : null;
 
-        RequestTemplate template = null;
-        if (command.templateId() != null) {
-            template = requestTemplateRepository.findById(command.templateId())
-                    .orElseThrow(RequestTemplateNotFoundException::new);
-        }
+        RequestTemplate template = command.templateId() != null
+                ? requestTemplateRepository.findByExternalId(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
+                : null;
 
         request.update(
                 command.title(),

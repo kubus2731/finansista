@@ -1,7 +1,7 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.Request;
 import org.springframework.data.jpa.domain.Specification;
+import pl.pb.finansista.request.Request;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +13,13 @@ public interface RequestRepository {
 
     Optional<Request> findByExternalId(UUID externalId);
 
+    Optional<Request> findOne(Specification<Request> spec);
+
     List<Request> findAll(Specification<Request> spec);
 
     Request save(Request request);
 
     void delete(Request request);
+
+    void setActor(long Id);
 }

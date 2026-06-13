@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import pl.pb.finansista.user.repository.RoleRepository;
 import pl.pb.finansista.user.usecase.ChangeUserDepartmentUseCase;
 import pl.pb.finansista.user.usecase.ChangeUserRoleUseCase;
 import pl.pb.finansista.user.usecase.GetMyProfileUseCase;
@@ -28,7 +27,6 @@ public class UserController {
     private final GetUserByIdUseCase getUserByIdUseCase;
     private final ChangeUserRoleUseCase changeUserRoleUseCase;
     private final ChangeUserDepartmentUseCase changeUserDepartmentUseCase;
-    private final RoleRepository roleRepository;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -53,15 +51,6 @@ public class UserController {
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
         return ResponseEntity.ok(
                 UserResponse.of(getUserByIdUseCase.execute(id))
-        );
-    }
-
-    @GetMapping("/roles")
-    public ResponseEntity<List<RoleResponse>> getRoles() {
-        return ResponseEntity.ok(
-                roleRepository.findAll().stream()
-                        .map(RoleResponse::of)
-                        .toList()
         );
     }
 

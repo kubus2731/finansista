@@ -1,33 +1,44 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.pb.finansista.request.exception.RequestNotFoundException;
-import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
-import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.repository.RequestRepository;
+import pl.pb.finansista.user.RoleName;
+import pl.pb.finansista.user.User;
+import pl.pb.finansista.user.UserNotFoundException;
+import pl.pb.finansista.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 public class DeleteRequestUseCase {
 
     private final RequestRepository requestRepository;
+    private final UserRepository userRepository;
+    private final RequestAccessSpecificationFactory accessSpecFactory;
 
     @Transactional
     public void execute(GetSingleRequestQuery query) {
-        Request request = requestRepository.findByExternalId(query.externalId())
+        User user = userRepository.findByEmail(query.userEmail())
+                .orElseThrow(UserNotFoundException::new);
+
+        Specification<Request> spec = Specification.allOf(
+                RequestSpecifications.hasExternalId(query.externalId()),
+                accessSpecFactory.createForUser(user, query.userAuthorities())
+        );
+
+        Request request = requestRepository.findOne(spec)
                 .orElseThrow(RequestNotFoundException::new);
 
-        if (!query.isAdminOrDean() && !request.getUser().getEmail().equals(query.userEmail())) {
-            throw UnauthorizedRequestAccessException.forAction("delete");
-        }
+        boolean isAdmin = query.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
 
-        // Students can only delete requests in DRAFT state. Admins/Deans can delete anything.
-        if (!query.isAdminOrDean() && !request.getStatus().getName().equals("DRAFT")) {
-            throw InvalidRequestStateException.notInDraft();
+        if (!isAdmin && !request.getStatus().getName().equals(RequestStatusName.DRAFT.name())) {
+            throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
         }
 
         requestRepository.delete(request);

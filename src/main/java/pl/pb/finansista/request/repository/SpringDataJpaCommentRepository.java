@@ -6,7 +6,7 @@ import pl.pb.finansista.request.Comment;
 import java.util.List;
 
 interface SpringDataJpaCommentRepository extends JpaRepository<Comment, Long> {
-    
+
     List<Comment> findByRequestId(Long requestId);
 }
 

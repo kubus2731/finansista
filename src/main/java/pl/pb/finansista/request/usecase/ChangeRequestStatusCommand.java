@@ -1,13 +1,14 @@
 package pl.pb.finansista.request.usecase;
 
-import java.util.UUID;
 import java.util.List;
+import java.util.UUID;
 
 public record ChangeRequestStatusCommand(
         UUID externalId,
         String newStatusName,
         String description,
         String userEmail,
-        List<String> userAuthorities
+        List<String> userAuthorities,
+        Long version
 ) {
 }

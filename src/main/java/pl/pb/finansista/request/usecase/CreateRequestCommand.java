@@ -3,13 +3,14 @@ package pl.pb.finansista.request.usecase;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public record CreateRequestCommand(
         String title,
         String description,
         BigDecimal amount,
         String userEmail,
-        Long templateId,
+        UUID templateId,
         Long departmentId,
         Long costCategoryId,
         Long fundingSourceId,
@@ -41,7 +42,7 @@ public record CreateRequestCommand(
      * Pola Załącznika 1 zostają puste, gdy wniosek tworzony jest przez API.
      */
     public CreateRequestCommand(String title, String description, BigDecimal amount, String userEmail,
-                                Long templateId, Long departmentId, Long costCategoryId, Long fundingSourceId) {
+                                UUID templateId, Long departmentId, Long costCategoryId, Long fundingSourceId) {
         this(title, description, amount, userEmail, templateId, departmentId, costCategoryId, fundingSourceId,
                 null, null, null, null, null, null, null,
                 null, null, null, null, null,
