@@ -10,6 +10,13 @@
     <p class="text-secondary">w ramach działalności studenckiej i doktoranckiej (Załącznik nr 1)</p>
     <p class="text-secondary">Składasz wniosek z: <strong th:text="${departmentName}">Wydział</strong></p>
 
+    <div class="alert alert-danger col-lg-10" th:if="${validationErrors}">
+        <strong>Popraw przed zapisaniem:</strong>
+        <ul class="mb-0">
+            <li th:each="err : ${validationErrors}" th:text="${err}">błąd</li>
+        </ul>
+    </div>
+
     <form th:action="@{/requests}" th:object="${form}" method="post" class="col-lg-10" novalidate>
 
         <!-- I. DANE DOTYCZĄCE PRZEDSIĘWZIĘCIA -->

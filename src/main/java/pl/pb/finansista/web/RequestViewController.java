@@ -22,6 +22,8 @@ import pl.pb.finansista.request.web.RequestResponse;
 import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,6 +100,14 @@ public class RequestViewController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("departmentName", user.getDepartment().getName());
+            return "requests/form";
+        }
+
+        // walidacja cross-field (spójność dat i kwot) - dla czytelnego komunikatu na froncie
+        List<String> errors = validateBusinessRules(form);
+        if (!errors.isEmpty()) {
+            model.addAttribute("departmentName", user.getDepartment().getName());
+            model.addAttribute("validationErrors", errors);
             return "requests/form";
         }
 
@@ -191,5 +201,51 @@ public class RequestViewController {
         return authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
                         || a.getAuthority().equals("ROLE_DEAN_OFFICE"));
+    }
+    
+    private List<String> validateBusinessRules(CreateRequestForm form) {
+        List<String> errors = new ArrayList<>();
+
+        if (form.getPlannedDateFrom() != null && form.getPlannedDateTo() != null
+                && form.getPlannedDateTo().isBefore(form.getPlannedDateFrom())) {
+            errors.add("Termin „do” nie może być wcześniejszy niż termin „od”.");
+        }
+
+        for (CreateRequestForm.TaskRow t : form.getTasks()) {
+            if (t.getDateFrom() != null && t.getDateTo() != null && t.getDateTo().isBefore(t.getDateFrom())) {
+                errors.add("Zadanie nr " + t.getTaskNo() + ": data zakończenia jest wcześniejsza niż rozpoczęcia.");
+            }
+            if (t.getPlannedCost() != null && t.getPlannedCost().signum() <= 0) {
+                errors.add("Zadanie nr " + t.getTaskNo() + ": planowany koszt musi być dodatni.");
+            }
+        }
+
+        for (CreateRequestForm.CostItemRow c : form.getCostItems()) {
+            if (c.getUnitCost() != null && c.getUnitCost().signum() <= 0) {
+                errors.add("Kosztorys: koszt pozycji „" + c.getItemName() + "” musi być dodatni.");
+            }
+            if (c.getQuantity() != null && c.getQuantity() <= 0) {
+                errors.add("Kosztorys: ilość pozycji „" + c.getItemName() + "” musi być dodatnia.");
+            }
+        }
+
+        boolean anyFunding = false;
+        BigDecimal fundingSum = BigDecimal.ZERO;
+        for (CreateRequestForm.FundingRow f : form.getFundings()) {
+            if (f.getAmountRequested() != null) {
+                anyFunding = true;
+                if (f.getAmountRequested().signum() <= 0) {
+                    errors.add("Źródło „" + f.getSourceName() + "”: kwota wnioskowana musi być dodatnia.");
+                } else {
+                    fundingSum = fundingSum.add(f.getAmountRequested());
+                }
+            }
+        }
+        if (anyFunding && form.getAmount() != null && fundingSum.compareTo(form.getAmount()) != 0) {
+            errors.add("Suma kwot ze źródeł (" + fundingSum + " zł) musi równać się łącznej wnioskowanej kwocie ("
+                    + form.getAmount() + " zł).");
+        }
+
+        return errors;
     }
 }
