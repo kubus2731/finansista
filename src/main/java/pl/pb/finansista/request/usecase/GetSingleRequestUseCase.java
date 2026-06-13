@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Request;
@@ -16,18 +17,19 @@ public class GetSingleRequestUseCase {
 
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
-    private final RequestAccessValidator accessValidator;
+    private final RequestAccessSpecificationFactory accessSpecFactory;
 
     @Transactional(readOnly = true)
     public Request execute(GetSingleRequestQuery query) {
-        Request request = requestRepository.findByExternalId(query.externalId())
-                .orElseThrow(RequestNotFoundException::new);
-
         User user = userRepository.findByEmail(query.userEmail())
                 .orElseThrow(UserNotFoundException::new);
 
-        accessValidator.validateUserCanAccessRequest(request, user, query.userAuthorities());
+        Specification<Request> spec = Specification.allOf(
+                RequestSpecifications.hasExternalId(query.externalId()),
+                accessSpecFactory.createForUser(user, query.userAuthorities())
+        );
 
-        return request;
+        return requestRepository.findOne(spec)
+                .orElseThrow(RequestNotFoundException::new);
     }
 }

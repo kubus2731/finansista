@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.request.exception.MissingFundingSourceException;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.repository.CommentRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
@@ -25,28 +27,31 @@ public class ChangeRequestStatusUseCase {
     private final RequestStatusRepository requestStatusRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
-    private final RequestAccessValidator accessValidator;
+    private final RequestAccessSpecificationFactory accessSpecFactory;
     private final RequestTransitionValidator transitionValidator;
 
     @Transactional
     public void execute(ChangeRequestStatusCommand command) {
-        Request request = requestRepository.findByExternalId(command.externalId())
-                .orElseThrow(RequestNotFoundException::new);
-
         User actor = userRepository.findByEmail(command.userEmail())
                 .orElseThrow(UserNotFoundException::new);
+
+        Specification<Request> spec = Specification.allOf(
+                RequestSpecifications.hasExternalId(command.externalId()),
+                accessSpecFactory.createForUser(actor, command.userAuthorities())
+        );
+
+        Request request = requestRepository.findOne(spec)
+                .orElseThrow(RequestNotFoundException::new);
 
         if (!request.getVersion().equals(command.version())) {
             throw new ObjectOptimisticLockingFailureException(Request.class, request.getId());
         }
 
-        accessValidator.validateUserCanAccessRequest(request, actor, command.userAuthorities());
-
         RequestStatus newStatus = requestStatusRepository.findByName(command.newStatusName())
                 .orElseThrow(() -> InvalidRequestStateException.withStatusName(command.newStatusName()));
 
         if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name()) && request.getFundingSource() == null) {
-            throw new IllegalStateException("Funding source must be provided before submitting the request.");
+            throw new MissingFundingSourceException();
         }
 
         transitionValidator.validateTransition(request, actor, command.userAuthorities(), RequestStatusName.valueOf(newStatus.getName()));

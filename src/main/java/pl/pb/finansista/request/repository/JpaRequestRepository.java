@@ -28,6 +28,11 @@ class JpaRequestRepository implements RequestRepository {
     }
 
     @Override
+    public Optional<Request> findOne(Specification<Request> spec) {
+        return repository.findOne(spec);
+    }
+
+    @Override
     public List<Request> findAll(Specification<Request> spec) {
         return repository.findAll(spec);
     }

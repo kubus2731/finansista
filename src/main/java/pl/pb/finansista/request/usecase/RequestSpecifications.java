@@ -4,9 +4,15 @@ import org.springframework.data.jpa.domain.Specification;
 import pl.pb.finansista.request.Request;
 
 import java.util.List;
+import java.util.UUID;
 
 
 public class RequestSpecifications {
+
+    public static Specification<Request> hasExternalId(UUID externalId) {
+        return (root, query, cb) ->
+                externalId == null ? null : cb.equal(root.get("externalId"), externalId);
+    }
 
     public static Specification<Request> hasDepartment(Long departmentId) {
         return (root, query, cb) ->

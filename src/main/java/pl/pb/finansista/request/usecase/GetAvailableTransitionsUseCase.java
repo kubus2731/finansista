@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Request;
@@ -18,15 +19,21 @@ public class GetAvailableTransitionsUseCase {
 
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
+    private final RequestAccessSpecificationFactory accessSpecFactory;
     private final RequestTransitionValidator transitionValidator;
 
     @Transactional(readOnly = true)
     public List<String> execute(GetSingleRequestQuery query) {
-        Request request = requestRepository.findByExternalId(query.externalId())
-                .orElseThrow(RequestNotFoundException::new);
-
         User actor = userRepository.findByEmail(query.userEmail())
                 .orElseThrow(UserNotFoundException::new);
+
+        Specification<Request> spec = Specification.allOf(
+                RequestSpecifications.hasExternalId(query.externalId()),
+                accessSpecFactory.createForUser(actor, query.userAuthorities())
+        );
+
+        Request request = requestRepository.findOne(spec)
+                .orElseThrow(RequestNotFoundException::new);
 
         return transitionValidator.getAvailableTransitions(request, actor, query.userAuthorities()).stream()
                 .map(Enum::name)

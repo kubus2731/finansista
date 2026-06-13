@@ -13,6 +13,8 @@ public interface RequestRepository {
 
     Optional<Request> findByExternalId(UUID externalId);
 
+    Optional<Request> findOne(Specification<Request> spec);
+
     List<Request> findAll(Specification<Request> spec);
 
     Request save(Request request);
