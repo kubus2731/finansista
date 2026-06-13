@@ -31,4 +31,9 @@ public class RequestSpecifications {
         return (root, query, cb) -> 
                 email == null ? null : cb.equal(root.join("user").get("email"), email);
     }
+
+    public static Specification<Request> hasFundingSource(String fundingSourceCode) {
+        return (root, query, cb) ->
+                fundingSourceCode == null ? null : cb.equal(root.join("fundingSource").get("name"), fundingSourceCode);
+    }
 }
