@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import pl.pb.finansista.common.web.ETags;
 import pl.pb.finansista.request.RequestTemplate;
 import pl.pb.finansista.request.usecase.*;
 
@@ -48,7 +49,7 @@ public class RequestTemplateController {
     public ResponseEntity<RequestTemplateResponse> getTemplate(@PathVariable UUID id) {
         RequestTemplate template = getSingleRequestTemplateUseCase.execute(id);
         return ResponseEntity.ok()
-                .eTag("\"" + template.getVersion() + "\"")
+                .eTag(ETags.format(template.getVersion()))
                 .body(RequestTemplateResponse.of(template));
     }
 
@@ -66,20 +67,11 @@ public class RequestTemplateController {
             @RequestHeader(value = HttpHeaders.IF_MATCH) String ifMatch,
             @Valid @RequestBody EditRequestTemplateRequest request
     ) {
-        Long version = parseIfMatch(ifMatch);
+        Long version = ETags.parseIfMatch(ifMatch);
         RequestTemplate template = editRequestTemplateUseCase.execute(id, request.title(), request.description(), request.active(), version);
         return ResponseEntity.ok()
-                .eTag("\"" + template.getVersion() + "\"")
+                .eTag(ETags.format(template.getVersion()))
                 .body(RequestTemplateResponse.of(template));
-    }
-
-    private Long parseIfMatch(String ifMatch) {
-        if (ifMatch == null || ifMatch.isBlank()) throw new IllegalArgumentException("If-Match header is required");
-        try {
-            return Long.parseLong(ifMatch.replace("\"", ""));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid If-Match header format");
-        }
     }
 
     @DeleteMapping("/{id}")

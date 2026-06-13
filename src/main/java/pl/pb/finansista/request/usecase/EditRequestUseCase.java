@@ -17,6 +17,7 @@ import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.request.repository.RequestTemplateRepository;
+import pl.pb.finansista.user.RoleName;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +38,16 @@ public class EditRequestUseCase {
             throw new ObjectOptimisticLockingFailureException(Request.class, request.getId());
         }
 
-        if (!request.getUser().getEmail().equals(command.userEmail())) {
+        boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
+        boolean isAuthor = request.getUser().getEmail().equals(command.userEmail());
+        boolean statusAllowsEdit = request.getStatus().getName().equals(RequestStatusName.DRAFT.name())
+                || request.getStatus().getName().equals(RequestStatusName.CORRECTION_REQUIRED.name());
+
+        if (!isAdmin && !isAuthor) {
             throw UnauthorizedRequestAccessException.forAction("edit");
         }
 
-        if (!request.getStatus().getName().equals(RequestStatusName.DRAFT.name()) && !request.getStatus().getName().equals(RequestStatusName.CORRECTION_REQUIRED.name())) {
+        if (!statusAllowsEdit) {
             throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
         }
 

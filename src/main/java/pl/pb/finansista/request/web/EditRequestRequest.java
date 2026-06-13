@@ -19,10 +19,11 @@ public record EditRequestRequest(
         @NotNull Long costCategoryId,
         Long fundingSourceId
 ) {
-    public EditRequestCommand toCommand(UUID externalId, String userEmail, Long version) {
+    public EditRequestCommand toCommand(UUID externalId, String userEmail, List<String> userAuthorities, Long version) {
         return new EditRequestCommand(
                 externalId,
                 userEmail,
+                userAuthorities,
                 title,
                 description,
                 amount,
