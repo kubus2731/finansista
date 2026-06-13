@@ -3,7 +3,10 @@ package pl.pb.finansista.request.web;
 import pl.pb.finansista.request.Request;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
 import pl.pb.finansista.common.ExternalIdEncoder;
 
 public record RequestResponse(
@@ -17,7 +20,33 @@ public record RequestResponse(
         Long costCategoryId,
         Long fundingSourceId,
         ZonedDateTime createdAt,
-        ZonedDateTime updatedAt
+        ZonedDateTime updatedAt,
+        // pola pomocnicze dla klienta frontowego (warstwa Thymeleaf konsumuje REST)
+        UUID externalId,
+        String departmentName,
+        String applicantName,
+        // Załącznik 1, sekcje I-III
+        String realizerType,
+        String projectKind,
+        String projectKindOther,
+        String projectScope,
+        String projectScopeOther,
+        String projectNature,
+        String projectNatureOther,
+        LocalDate plannedDateFrom,
+        LocalDate plannedDateTo,
+        String location,
+        Integer participantsInvolved,
+        Integer participantsBenefiting,
+        String supervisorName,
+        String supervisorEmail,
+        String supervisorPhone,
+        String supervisorDepartment,
+        String provostOpinion,
+        // sekcja IV i VI
+        List<TaskResponse> tasks,
+        List<CostItemResponse> costItems,
+        List<FundingResponse> fundings
 ) {
     public static RequestResponse of(Request request) {
         return new RequestResponse(
@@ -31,7 +60,46 @@ public record RequestResponse(
                 request.getCostCategory().getId(),
                 request.getFundingSource() != null ? request.getFundingSource().getId() : null,
                 request.getCreatedAt(),
-                request.getUpdatedAt()
+                request.getUpdatedAt(),
+                request.getExternalId(),
+                request.getDepartment().getName(),
+                request.getUser().getName() + " " + request.getUser().getSurname(),
+                request.getRealizerType(),
+                request.getProjectKind(),
+                request.getProjectKindOther(),
+                request.getProjectScope(),
+                request.getProjectScopeOther(),
+                request.getProjectNature(),
+                request.getProjectNatureOther(),
+                request.getPlannedDateFrom(),
+                request.getPlannedDateTo(),
+                request.getLocation(),
+                request.getParticipantsInvolved(),
+                request.getParticipantsBenefiting(),
+                request.getSupervisorName(),
+                request.getSupervisorEmail(),
+                request.getSupervisorPhone(),
+                request.getSupervisorDepartment(),
+                request.getProvostOpinion(),
+                request.getTasks().stream()
+                        .map(t -> new TaskResponse(t.getTaskNo(), t.getName(), t.getDateFrom(),
+                                t.getDateTo(), t.getPlannedCost(), t.getActions()))
+                        .toList(),
+                request.getCostItems().stream()
+                        .map(c -> new CostItemResponse(c.getTaskNo(), c.getItemName(),
+                                c.getQuantity(), c.getUnitCost(), c.getNotes()))
+                        .toList(),
+                request.getFundings().stream()
+                        .map(f -> new FundingResponse(f.getSourceName(), f.getAmountRequested(), f.getAmountGranted()))
+                        .toList()
         );
     }
+
+    public record TaskResponse(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
+                               BigDecimal plannedCost, String actions) {}
+
+    public record CostItemResponse(Integer taskNo, String itemName, Integer quantity,
+                                   BigDecimal unitCost, String notes) {}
+
+    public record FundingResponse(String sourceName, BigDecimal amountRequested, BigDecimal amountGranted) {}
 }

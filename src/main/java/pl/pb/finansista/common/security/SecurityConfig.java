@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/","/login", "/register", "/accessibility",
+                        .requestMatchers("/","/login", "/register", "/accessibility", "/error",
                                 "/css/**", "/js/**", "/img/**", "/favicon.ico",
                                 "/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated())

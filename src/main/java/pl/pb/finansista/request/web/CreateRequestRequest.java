@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Positive;
 import pl.pb.finansista.request.usecase.CreateRequestCommand;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 public record CreateRequestRequest(
         @NotBlank String title,
@@ -14,18 +16,65 @@ public record CreateRequestRequest(
         Long templateId,
         @NotNull Long departmentId,
         @NotNull Long costCategoryId,
-        Long fundingSourceId
+        Long fundingSourceId,
+        String realizerType,
+        String projectKind,
+        String projectKindOther,
+        String projectScope,
+        String projectScopeOther,
+        String projectNature,
+        String projectNatureOther,
+        LocalDate plannedDateFrom,
+        LocalDate plannedDateTo,
+        String location,
+        Integer participantsInvolved,
+        Integer participantsBenefiting,
+        String supervisorName,
+        String supervisorEmail,
+        String supervisorPhone,
+        String supervisorDepartment,
+        List<TaskItem> tasks,
+        List<CostItemEntry> costItems,
+        List<FundingEntry> fundings
 ) {
     public CreateRequestCommand toCommand(String userEmail) {
         return new CreateRequestCommand(
-                title,
-                description,
-                amount,
-                userEmail,
-                templateId,
-                departmentId,
-                costCategoryId,
-                fundingSourceId
+                title, description, amount, userEmail,
+                templateId, departmentId, costCategoryId, fundingSourceId,
+                realizerType, projectKind, projectKindOther,
+                projectScope, projectScopeOther, projectNature, projectNatureOther,
+                plannedDateFrom, plannedDateTo, location,
+                participantsInvolved, participantsBenefiting,
+                supervisorName, supervisorEmail, supervisorPhone, supervisorDepartment,
+                mapTasks(), mapCostItems(), mapFundings()
         );
     }
+
+    private List<CreateRequestCommand.TaskData> mapTasks() {
+        return tasks == null ? List.of() : tasks.stream()
+                .map(t -> new CreateRequestCommand.TaskData(t.taskNo(), t.name(), t.dateFrom(),
+                        t.dateTo(), t.plannedCost(), t.actions()))
+                .toList();
+    }
+
+    private List<CreateRequestCommand.CostItemData> mapCostItems() {
+        return costItems == null ? List.of() : costItems.stream()
+                .map(c -> new CreateRequestCommand.CostItemData(c.taskNo(), c.itemName(),
+                        c.quantity(), c.unitCost(), c.notes()))
+                .toList();
+    }
+
+    private List<CreateRequestCommand.FundingData> mapFundings() {
+        return fundings == null ? List.of() : fundings.stream()
+                .map(f -> new CreateRequestCommand.FundingData(f.sourceName(), f.amountRequested(), f.amountGranted()))
+                .toList();
+    }
+
+    public record TaskItem(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
+                           BigDecimal plannedCost, String actions) {}
+
+    public record CostItemEntry(Integer taskNo, String itemName, Integer quantity,
+                                BigDecimal unitCost, String notes) {}
+
+    public record FundingEntry(String sourceName, BigDecimal amountRequested, BigDecimal amountGranted) {}
 }

@@ -73,6 +73,30 @@ public class CreateRequestUseCase {
                 fundingSource
         );
 
+        // Załącznik 1, sekcje I-II
+        request.fillDetails(
+                command.realizerType(), command.projectKind(), command.projectKindOther(),
+                command.projectScope(), command.projectScopeOther(),
+                command.projectNature(), command.projectNatureOther(),
+                command.plannedDateFrom(), command.plannedDateTo(), command.location(),
+                command.participantsInvolved(), command.participantsBenefiting(),
+                command.supervisorName(), command.supervisorEmail(),
+                command.supervisorPhone(), command.supervisorDepartment());
+
+        // sekcja IV i VI - tabele-dzieci
+        if (command.tasks() != null) {
+            command.tasks().forEach(t ->
+                    request.addTask(t.taskNo(), t.name(), t.dateFrom(), t.dateTo(), t.plannedCost(), t.actions()));
+        }
+        if (command.costItems() != null) {
+            command.costItems().forEach(c ->
+                    request.addCostItem(c.taskNo(), c.itemName(), c.quantity(), c.unitCost(), c.notes()));
+        }
+        if (command.fundings() != null) {
+            command.fundings().forEach(f ->
+                    request.addFunding(f.sourceName(), f.amountRequested(), f.amountGranted()));
+        }
+
         return requestRepository.save(request);
     }
 }
