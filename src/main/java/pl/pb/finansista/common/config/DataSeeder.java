@@ -26,35 +26,48 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-        if (userRepository.existsByEmail("j.matusiewicz@student.pb.edu.pl")) {
-            log.info("Users already seeded. Skipping...");
+        log.info("Seeding users (idempotent - pomija istniejące)...");
+
+        // Role i działy ze słownika V2
+        Role adminRole = role(1L);
+        Role studentRole = role(2L);
+        Role wrssRole = role(3L);
+        Role commissionRole = role(4L);
+        Role deanOfficeRole = role(5L);
+
+        Department itDept = department(1L);            // Wydział Informatyki PB
+        Department itDeanOffice = department(2L);      // Dziekanat Wydziału Informatyki
+        Department mechDept = department(3L);          // Wydział Mechaniczny PB
+        Department samorzadDept = department(13L);     // Samorząd Studentów PB
+
+        // Konta pokrywające całą ścieżkę wniosku z Zarządzenia 13
+        seedUser("Jakub", "Matusiewicz", "j.matusiewicz@student.pb.edu.pl", "500111222", "admin123", adminRole, mechDept);
+        seedUser("Jakub", "Borkowski", "j.borkowski@student.pb.edu.pl", "500333444", "admin123", adminRole, itDept);
+        seedUser("Anna", "Zgodna", "a.zgodna@pb.edu.pl", "857460001", "komisja123", commissionRole, mechDept);
+        seedUser("Jan", "Wnioskodawca", "j.wnioskodawca@student.pb.edu.pl", "500999888", "student123", studentRole, itDept);
+        seedUser("Kamil", "Samorzadowy", "k.samorzad@pb.edu.pl", "500777111", "wrss123", wrssRole, samorzadDept);
+        seedUser("Ewa", "Dziekanska", "e.dziekan@pb.edu.pl", "500666222", "dziekanat123", deanOfficeRole, itDeanOffice);
+
+        log.info("Seeding zakończony.");
+    }
+
+    /** Tworzy konto tylko, jeśli e-mail jeszcze nie istnieje (bezpieczne przy każdym starcie). */
+    private void seedUser(String name, String surname, String email, String phone,
+                          String rawPassword, Role role, Department department) {
+        if (userRepository.existsByEmail(email)) {
             return;
         }
+        userRepository.save(new User(name, surname, email, phone, passwordEncoder.encode(rawPassword), role, department));
+        log.info("Dodano konto: {} ({})", email, role.getName());
+    }
 
-        log.info("Seeding initial mock users...");
+    private Role role(Long id) {
+        return roleRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Role " + id + " not found"));
+    }
 
-        // Fetch dictionary entities initialized by V2 Flyway script
-        Role adminRole = roleRepository.findById(1L).orElseThrow(() -> new IllegalStateException("Role 1 not found"));
-        Role studentRole = roleRepository.findById(2L).orElseThrow(() -> new IllegalStateException("Role 2 not found"));
-        Role commissionRole = roleRepository.findById(4L).orElseThrow(() -> new IllegalStateException("Role 4 not found"));
-
-        Department itDept = departmentRepository.findById(1L).orElseThrow(() -> new IllegalStateException("Department 1 not found"));
-        Department mechDept = departmentRepository.findById(3L).orElseThrow(() -> new IllegalStateException("Department 3 not found"));
-
-        String adminPass = passwordEncoder.encode("admin123");
-        String commissionPass = passwordEncoder.encode("komisja123");
-        String studentPass = passwordEncoder.encode("student123");
-
-        User admin1 = new User("Jakub", "Matusiewicz", "j.matusiewicz@student.pb.edu.pl", "500111222", adminPass, adminRole, mechDept);
-        User admin2 = new User("Jakub", "Borkowski", "j.borkowski@student.pb.edu.pl", "500333444", adminPass, adminRole, itDept);
-        User commission1 = new User("Anna", "Zgodna", "a.zgodna@pb.edu.pl", "857460001", commissionPass, commissionRole, mechDept);
-        User student1 = new User("Jan", "Wnioskodawca", "j.wnioskodawca@student.pb.edu.pl", "500999888", studentPass, studentRole, itDept);
-
-        userRepository.save(admin1);
-        userRepository.save(admin2);
-        userRepository.save(commission1);
-        userRepository.save(student1);
-
-        log.info("Mock users seeded successfully.");
+    private Department department(Long id) {
+        return departmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Department " + id + " not found"));
     }
 }

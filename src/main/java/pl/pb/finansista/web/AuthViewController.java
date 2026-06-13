@@ -17,8 +17,9 @@ import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.UserAlreadyExistsException;
 import pl.pb.finansista.user.usecase.LoginUserCommand;
 import pl.pb.finansista.user.usecase.LoginUserUseCase;
+import pl.pb.finansista.user.usecase.RegisterUserCommand;
 import pl.pb.finansista.user.usecase.RegisterUserUseCase;
-import pl.pb.finansista.user.web.RegisterUserRequest;
+import pl.pb.finansista.user.view.RegisterForm;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class AuthViewController {
     private final LoginUserUseCase loginUserUseCase;
     private final RegisterUserUseCase registerUserUseCase;
     private final JwtService jwtService;
+    private static final Long STUDENT_ROLE_ID = 2L;
 
     @PostMapping("/login")
     public String login(@RequestParam String email,
@@ -42,7 +44,7 @@ public class AuthViewController {
     }
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute RegisterUserRequest form,
+    public String register(@Valid @ModelAttribute RegisterForm form,
                            BindingResult bindingResult,
                            HttpServletResponse response,
                            Model model) {
@@ -51,8 +53,17 @@ public class AuthViewController {
             return "auth/register";
         }
         try {
-            User user = registerUserUseCase.execute(form.toCommand());
-            setJwtCookie(response, user);   // automatyczne zalogowanie po rejestracji
+            RegisterUserCommand command = new RegisterUserCommand(
+                    form.name(),
+                    form.surname(),
+                    form.email(),
+                    form.phoneNumber(),
+                    form.rawPassword(),
+                    STUDENT_ROLE_ID,
+                    form.departmentId());
+
+            User user = registerUserUseCase.execute(command);
+            setJwtCookie(response, user);
             return "redirect:/requests";
         } catch (UserAlreadyExistsException e) {
             model.addAttribute("errorMessage", "Konto z tym adresem e-mail lub telefonem już istnieje.");
