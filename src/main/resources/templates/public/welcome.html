@@ -4,12 +4,12 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
 <head>
-    <title th:fragment="title">Strona główna &ndash; Finansista PB</title>
+    <meta charset="UTF-8">
+    <title th:fragment="title">Wnioski &ndash; Finansista PB</title>
 </head>
 <body>
 <section th:fragment="content">
 
-    <!-- Hero -->
     <div class="pb-hero p-5 mb-5">
         <div class="container-fluid py-3">
             <h1 class="display-5 fw-bold">Wnioski finansowe Politechniki Białostockiej</h1>
@@ -27,7 +27,6 @@
         </div>
     </div>
 
-    <!-- Jak to działa -->
     <h2 class="h4 mb-4">Jak to działa?</h2>
     <div class="row g-4 mb-5">
         <div class="col-md-4">

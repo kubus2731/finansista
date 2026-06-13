@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title th:fragment="title">Nie znaleziono &ndash; Finansista PB</title>
+</head>
+<body>
+<section th:fragment="content">
+    <div class="text-center py-5">
+        <p class="display-1 fw-bold text-success mb-0">404</p>
+        <h1 class="h3 mb-3">Nie znaleziono</h1>
+        <p class="text-secondary">Strona o podanym adresie URL nie istnieje.</p>
+        <a th:href="@{/}" class="btn btn-primary mt-2">Wróc do strony głównej</a>
+    </div>
+</section>
+</body>

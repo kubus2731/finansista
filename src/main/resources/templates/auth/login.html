@@ -3,6 +3,7 @@
       xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
 <head>
+    <meta charset="UTF-8">
     <title th:fragment="title">Logowanie &ndash; Finansista PB</title>
 </head>
 <body>
@@ -14,7 +15,6 @@
                 <div class="card-body p-4">
                     <h1 class="h4 mb-4 text-center">Logowanie</h1>
 
-                    <!-- Komunikaty (gotowe pod Spring Security: ?error / ?logout) -->
                     <div class="alert alert-danger" role="alert" th:if="${param.error}">
                         Nieprawidłowy e-mail lub hasło.
                     </div>
@@ -22,11 +22,10 @@
                         Wylogowano poprawnie.
                     </div>
 
-                    <!-- TODO: podpięcie do Spring Security (formLogin) w kolejnym kroku -->
                     <form th:action="@{/login}" method="post" novalidate>
                         <div class="mb-3">
                             <label for="email" class="form-label">Adres e-mail</label>
-                            <input type="email" class="form-control" id="email" name="username"
+                            <input type="email" class="form-control" id="email" name="email"
                                    autocomplete="username" required>
                         </div>
                         <div class="mb-3">

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title th:fragment="title">Wnioski &ndash; Finansista PB</title>
+</head>
+<body>
+<section th:fragment="content">
+
+    <h1 class="h3 mb-4">Wnioski</h1>
+
+    <a th:href="@{/requests/new}" class="btn btn-primary mb-3">Złóż wniosek</a>
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Tytuł</th>
+                    <th scope="col" class="text-end">Kwota</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Wydział</th>
+                    <th scope="col">Wnioskodawca</th>
+                    <th scope="col">Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="r : ${requests}">
+                    <td>
+                        <a class="link-success fw-semibold"
+                           th:href="@{/requests/{id}(id=${r.id})}"
+                           th:text="${r.title}">Tytuł wniosku</a>
+                    </td>
+                    <td class="text-end" th:text="|${#numbers.formatDecimal(r.amount, 1, 2)} zł|">0,00 zł</td>
+                    <td>
+                        <span class="badge" th:classappend="${r.status == 'ACCEPTED'} ? 'text-bg-success'
+                        : (${r.status == 'REJECTED'} ? 'text-bg-danger'
+                        : (${r.status == 'UNDER_REVIEW' or r.status == 'FORMAL_EVALUATION'} ? 'text-bg-warning'
+                        : (${r.status == 'CORRECTION_REQUIRED'} ? 'text-bg-info'
+                        : 'text-bg-secondary')))"
+                        th:text="#{'status.' + ${r.status}}">STATUS</span>
+                    </td>
+                    <td th:text="${r.departmentName}">Wydział</td>
+                    <td th:text="${r.applicantName}">Wnioskodawca</td>
+                    <td th:text="${#temporals.format(r.createdAt, 'dd.MM.yyyy')}">01.01.2026</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(requests)}">
+                    <td colspan="6" class="text-center text-secondary py-4">Brak wniosków do wyświetlenia.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</section>
+</body>
+</html>

@@ -1,9 +1,4 @@
 <!DOCTYPE html>
-<!--
-  Główny szablon-układ (layout). Pozostałe widoki podłączają się przez:
-  <html th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
-  i dostarczają własny <title> oraz <section th:fragment="content">.
--->
 <html lang="pl"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
@@ -23,7 +18,7 @@
 
     <main id="main-content" role="main" class="container flex-grow-1 py-4">
         <th:block th:replace="${content}">
-            <!-- tutaj wstrzykiwana jest treść konkretnego widoku -->
+            <!-- tutaj będzie widok -->
         </th:block>
     </main>
 

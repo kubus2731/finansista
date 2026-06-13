@@ -11,6 +11,9 @@ import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.user.User;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "requests")
@@ -51,6 +54,40 @@ public class Request extends ExposableModificationAuditedEntity {
     @JoinColumn(name = "funding_source_id")
     private FundingSource fundingSource;
 
+    // --- Załącznik 1, sekcja I: dane przedsięwzięcia ---
+    private String realizerType;
+    private String projectKind;
+    private String projectKindOther;
+    private String projectScope;
+    private String projectScopeOther;
+    private String projectNature;
+    private String projectNatureOther;
+    private LocalDate plannedDateFrom;
+    private LocalDate plannedDateTo;
+    private String location;
+    private Integer participantsInvolved;
+    private Integer participantsBenefiting;
+
+    // --- Sekcja II: opiekun naukowy (opcjonalny, dla kół naukowych) ---
+    private String supervisorName;
+    private String supervisorEmail;
+    private String supervisorPhone;
+    private String supervisorDepartment;
+
+    // --- Sekcja III: opinia prorektora (wypełnia oceniający) ---
+    @Lob
+    private String provostOpinion;
+
+    // --- Sekcja IV i VI: tabele-dzieci (kaskada zapisu i usuwania) ---
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RequestTask> tasks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RequestCostItem> costItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RequestFunding> fundings = new ArrayList<>();
+
     public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory, FundingSource fundingSource) {
         this.title = title;
         this.description = description;
@@ -75,5 +112,45 @@ public class Request extends ExposableModificationAuditedEntity {
 
     public void changeStatus(RequestStatus newStatus) {
         this.status = newStatus;
+    }
+
+    /** Uzupełnia pola opisowe z Załącznika 1 (sekcje I-II). */
+    public void fillDetails(String realizerType, String projectKind, String projectKindOther,
+                            String projectScope, String projectScopeOther,
+                            String projectNature, String projectNatureOther,
+                            LocalDate plannedDateFrom, LocalDate plannedDateTo, String location,
+                            Integer participantsInvolved, Integer participantsBenefiting,
+                            String supervisorName, String supervisorEmail,
+                            String supervisorPhone, String supervisorDepartment) {
+        this.realizerType = realizerType;
+        this.projectKind = projectKind;
+        this.projectKindOther = projectKindOther;
+        this.projectScope = projectScope;
+        this.projectScopeOther = projectScopeOther;
+        this.projectNature = projectNature;
+        this.projectNatureOther = projectNatureOther;
+        this.plannedDateFrom = plannedDateFrom;
+        this.plannedDateTo = plannedDateTo;
+        this.location = location;
+        this.participantsInvolved = participantsInvolved;
+        this.participantsBenefiting = participantsBenefiting;
+        this.supervisorName = supervisorName;
+        this.supervisorEmail = supervisorEmail;
+        this.supervisorPhone = supervisorPhone;
+        this.supervisorDepartment = supervisorDepartment;
+    }
+
+    public void addTask(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
+                        BigDecimal plannedCost, String actions) {
+        this.tasks.add(new RequestTask(this, taskNo, name, dateFrom, dateTo, plannedCost, actions));
+    }
+
+    public void addCostItem(Integer taskNo, String itemName, Integer quantity,
+                            BigDecimal unitCost, String notes) {
+        this.costItems.add(new RequestCostItem(this, taskNo, itemName, quantity, unitCost, notes));
+    }
+
+    public void addFunding(String sourceName, BigDecimal amountRequested, BigDecimal amountGranted) {
+        this.fundings.add(new RequestFunding(this, sourceName, amountRequested, amountGranted));
     }
 }

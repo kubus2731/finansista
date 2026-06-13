@@ -3,6 +3,7 @@
       xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
 <head>
+    <meta charset="UTF-8">
     <title th:fragment="title">Deklaracja dostępności &ndash; Finansista PB</title>
 </head>
 <body>
@@ -18,8 +19,8 @@
             internetowych i aplikacji mobilnych podmiotów publicznych.
         </p>
         <ul>
-            <li>Data publikacji aplikacji: <strong>[data publikacji]</strong></li>
-            <li>Data ostatniej istotnej aktualizacji: <strong>[data aktualizacji]</strong></li>
+            <li>Data publikacji aplikacji: <strong>01.06.2026 r.</strong></li>
+            <li>Data ostatniej istotnej aktualizacji: <strong>13.06.2026 r.</strong></li>
         </ul>
 
         <h2 class="h5 mt-4">Status pod względem zgodności</h2>
@@ -29,13 +30,13 @@
         </p>
         <p class="mb-1">Treści lub funkcje niedostępne:</p>
         <ul>
-            <li>[np. brak alternatywnych opisów dla części załączników dodawanych przez użytkowników],</li>
-            <li>[np. niektóre komunikaty walidacji nie są jeszcze ogłaszane przez czytniki ekranu].</li>
+            <li>brak alternatywnych opisów dla części załączników dodawanych przez użytkowników,</li>
+            <li>niektóre komunikaty walidacji mogą nie być w pełni ogłaszane przez czytniki ekranu.</li>
         </ul>
 
         <h2 class="h5 mt-4">Przygotowanie deklaracji</h2>
         <ul>
-            <li>Data sporządzenia deklaracji: <strong>[data sporządzenia]</strong></li>
+            <li>Data sporządzenia deklaracji: <strong>13.06.2026 r.</strong></li>
             <li>Metoda przygotowania: deklarację sporządzono na podstawie
                 <strong>samooceny</strong> przeprowadzonej przez zespół projektowy.</li>
         </ul>
@@ -43,11 +44,11 @@
         <h2 class="h5 mt-4">Informacje zwrotne i dane kontaktowe</h2>
         <p>
             W przypadku problemów z dostępnością prosimy o kontakt. Osobą odpowiedzialną
-            jest <strong>[imię i nazwisko]</strong>.
+            jest <strong>Jakub Matusiewicz</strong>.
         </p>
         <ul>
-            <li>E-mail: <a class="link-success" th:href="'mailto:[adres@pb.edu.pl]'">[adres@pb.edu.pl]</a></li>
-            <li>Telefon: <strong>[numer telefonu]</strong></li>
+            <li>E-mail: <a class="link-success" th:href="'mailto:91914@student.pb.edu.pl'">91914@student.pb.edu.pl</a></li>
+            <li>Telefon: <strong>570 336 699</strong></li>
         </ul>
         <p>
             Tą samą drogą można składać wnioski o udostępnienie informacji niedostępnej
@@ -60,7 +61,7 @@
             lub jej elementu. Żądanie powinno zawierać dane kontaktowe osoby występującej,
             wskazanie elementu, którego dotyczy, oraz preferowaną formę kontaktu. Podmiot
             publiczny realizuje żądanie niezwłocznie, nie później niż w ciągu
-            <strong>7 dni</strong>; jeżeli nie jest to możliwe &ndash; w ciągu
+            <strong>7 dni</strong>; jeżeli nie jest to możliwe - w ciągu
             <strong>2 miesięcy</strong>. W przypadku odmowy wnoszący może złożyć skargę,
             a także powiadomić <strong>Rzecznika Praw Obywatelskich</strong>.
         </p>
@@ -75,8 +76,14 @@
         </ul>
 
         <h2 class="h5 mt-4">Dostępność architektoniczna</h2>
-        <p>[Opis dostępności architektonicznej budynku jednostki PB lub odnośnik do
-            ogólnouczelnianej deklaracji dostępności.]</p>
+        <p>
+            Informacje o dostępności architektonicznej budynków Politechniki Białostockiej
+            dostępne są na stronie:
+            <a class="link-success"
+               href="https://pb.edu.pl/dostepnosc-cyfrowa/dostepnosc-architektoniczna-budynkow-pb/"
+               target="_blank" rel="noopener">Dostępność architektoniczna budynków Politechniki
+                Białostockiej</a> (otwiera się w nowej karcie).
+        </p>
     </article>
 
 </section>
