@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -13,14 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.pb.finansista.common.security.JwtService;
-import pl.pb.finansista.request.Request;
-import pl.pb.finansista.request.usecase.*;
 import pl.pb.finansista.request.view.CreateRequestForm;
 import pl.pb.finansista.request.view.RequestView;
 import pl.pb.finansista.request.web.CreateRequestRequest;
 import pl.pb.finansista.request.web.RequestResponse;
-import pl.pb.finansista.user.UserNotFoundException;
-import pl.pb.finansista.user.repository.UserRepository;
+import pl.pb.finansista.user.web.UserResponse;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -31,9 +27,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RequestViewController {
 
-    private final GetSingleRequestUseCase getSingleRequestUseCase;
-    private final CreateRequestUseCase createRequestUseCase;
-    private final UserRepository userRepository;
     private final RestClient backendRestClient;
     private final JwtService jwtService;
 
@@ -68,10 +61,10 @@ public class RequestViewController {
     }
 
     @GetMapping("/requests/new")
-    public String createForm(Authentication authentication, Model model) {
-        var user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(UserNotFoundException::new);
-        model.addAttribute("departmentName", user.getDepartment().getName());
+    public String createForm(HttpServletRequest httpRequest, Model model) {
+        // dane zalogowanego usera pobieramy z REST (/me) - front NIE dotyka bazy
+        UserResponse me = fetchCurrentUser(httpRequest);
+        model.addAttribute("departmentName", me.departmentName());
 
         CreateRequestForm form = new CreateRequestForm();
         form.getTasks().add(taskRow(1));
@@ -91,22 +84,18 @@ public class RequestViewController {
     @PostMapping("/requests")
     public String create(@Valid @ModelAttribute("form") CreateRequestForm form,
                          BindingResult bindingResult,
-                         Authentication authentication,
                          HttpServletRequest httpRequest,
                          Model model,
                          RedirectAttributes redirectAttributes) {
-        var user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(UserNotFoundException::new);
-
         if (bindingResult.hasErrors()) {
-            model.addAttribute("departmentName", user.getDepartment().getName());
+            model.addAttribute("departmentName", fetchCurrentUser(httpRequest).departmentName());
             return "requests/form";
         }
 
         // walidacja cross-field (spójność dat i kwot) - dla czytelnego komunikatu na froncie
         List<String> errors = validateBusinessRules(form);
         if (!errors.isEmpty()) {
-            model.addAttribute("departmentName", user.getDepartment().getName());
+            model.addAttribute("departmentName", fetchCurrentUser(httpRequest).departmentName());
             model.addAttribute("validationErrors", errors);
             return "requests/form";
         }
@@ -129,11 +118,11 @@ public class RequestViewController {
                         f.getAmountRequested(), f.getAmountGranted()))
                 .toList();
 
-        // dział z konta zalogowanego usera (reguła "wydział z serwera")
+        // wydział wyznacza backend na podstawie zalogowanego usera - dlatego null
         CreateRequestRequest payload = new CreateRequestRequest(
                 form.getTitle(), form.getDescription(), form.getAmount(),
                 null,
-                user.getDepartment().getId(),
+                null,
                 form.getCostCategoryId(),
                 null,
                 form.getRealizerType(), form.getProjectKind(), form.getProjectKindOther(),
@@ -143,7 +132,7 @@ public class RequestViewController {
                 form.getParticipantsInvolved(), form.getParticipantsBenefiting(),
                 form.getSupervisorName(), form.getSupervisorEmail(),
                 form.getSupervisorPhone(), form.getSupervisorDepartment(),
-                tasks, costItems, fundings);
+                tasks, costItems, fundings, form.getCostCategoryOther());
 
         // zapis przez REST API, nie przez use case
         backendRestClient.post()
@@ -169,18 +158,6 @@ public class RequestViewController {
         return row;
     }
 
-    private RequestView toView(Request r) {
-        return new RequestView(
-                r.getExternalId(),
-                r.getTitle(),
-                r.getAmount(),
-                r.getStatus().getName(),
-                r.getDepartment().getName(),
-                r.getUser().getName() + " " + r.getUser().getSurname(),
-                r.getCreatedAt().toLocalDate()
-        );
-    }
-
     private RequestView toView(RequestResponse r) {
         return new RequestView(
                 r.externalId(),
@@ -197,12 +174,15 @@ public class RequestViewController {
         return "Bearer " + jwtService.getJwtFromCookies(request);
     }
 
-    private boolean hasAdminOrDeanRole(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
-                        || a.getAuthority().equals("ROLE_DEAN_OFFICE"));
+    /** Profil zalogowanego usera pobierany z REST API zamiast z bazy. */
+    private UserResponse fetchCurrentUser(HttpServletRequest httpRequest) {
+        return backendRestClient.get()
+                .uri("/api/v1/users/me")
+                .header("Authorization", bearer(httpRequest))
+                .retrieve()
+                .body(UserResponse.class);
     }
-    
+
     private List<String> validateBusinessRules(CreateRequestForm form) {
         List<String> errors = new ArrayList<>();
 

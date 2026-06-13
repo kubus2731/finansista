@@ -49,8 +49,11 @@
                             <option value="">Wybierz…</option>
                             <option value="1">Organizacja Wydarzeń Studenckich</option>
                             <option value="2">Nagrody i Stypendia</option>
+                            <option value="3">Inne</option>
                         </select>
                         <div class="invalid-feedback" th:if="${#fields.hasErrors('costCategoryId')}" th:errors="*{costCategoryId}"></div>
+                        <input type="text" class="form-control mt-2" th:field="*{costCategoryOther}"
+                               placeholder="Jeśli „Inne” – podaj jaka kategoria">
                     </div>
 
                     <div class="col-md-6">

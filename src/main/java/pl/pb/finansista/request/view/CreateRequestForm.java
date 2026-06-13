@@ -47,6 +47,8 @@ public class CreateRequestForm {
     @NotNull(message = "Kategoria nie może być pusta")
     private Long costCategoryId;
 
+    private String costCategoryOther;
+
     @NotNull(message = "Wartość nie może być pusta")
     @Positive(message = "Wartość nie może być ujemna")
     private BigDecimal amount;

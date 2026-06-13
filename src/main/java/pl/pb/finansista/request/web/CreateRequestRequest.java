@@ -14,7 +14,8 @@ public record CreateRequestRequest(
         @NotBlank String description,
         @NotNull @Positive BigDecimal amount,
         Long templateId,
-        @NotNull Long departmentId,
+        // wydział wyznaczany na podstawie zalogowanego użytkownika (backend)
+        Long departmentId,
         @NotNull Long costCategoryId,
         Long fundingSourceId,
         String realizerType,
@@ -35,7 +36,8 @@ public record CreateRequestRequest(
         String supervisorDepartment,
         List<TaskItem> tasks,
         List<CostItemEntry> costItems,
-        List<FundingEntry> fundings
+        List<FundingEntry> fundings,
+        String costCategoryOther
 ) {
     public CreateRequestCommand toCommand(String userEmail) {
         return new CreateRequestCommand(
@@ -46,7 +48,7 @@ public record CreateRequestRequest(
                 plannedDateFrom, plannedDateTo, location,
                 participantsInvolved, participantsBenefiting,
                 supervisorName, supervisorEmail, supervisorPhone, supervisorDepartment,
-                mapTasks(), mapCostItems(), mapFundings()
+                mapTasks(), mapCostItems(), mapFundings(), costCategoryOther
         );
     }
 

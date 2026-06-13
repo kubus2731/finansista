@@ -40,8 +40,10 @@ public class CreateRequestUseCase {
         var user = userRepository.findByEmail(command.userEmail())
                 .orElseThrow(UserNotFoundException::new);
 
-        var department = departmentRepository.findById(command.departmentId())
-                .orElseThrow(DepartmentNotFoundException::new);
+        // wydział pobierany z konta zalogowanego usera ("wydział z serwera")
+        // - klient nie ma jak go podmienić; command.departmentId() jest zachowany dla zgodności,
+        //   ale nie jest już używany do wyznaczenia wydziału wniosku.
+        var department = user.getDepartment();
 
         var costCategory = costCategoryRepository.findById(command.costCategoryId())
                 .orElseThrow(CostCategoryNotFoundException::new);
@@ -82,6 +84,7 @@ public class CreateRequestUseCase {
                 command.participantsInvolved(), command.participantsBenefiting(),
                 command.supervisorName(), command.supervisorEmail(),
                 command.supervisorPhone(), command.supervisorDepartment());
+        request.setCostCategoryOther(command.costCategoryOther());
 
         // sekcja IV i VI - tabele-dzieci
         if (command.tasks() != null) {

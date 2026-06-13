@@ -1,0 +1,419 @@
+\documentclass[12pt,a4paper]{article}
+
+% ====== PAKIETY ======
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+% ====== LINKI ======
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=teal,
+  citecolor=black
+}
+
+% ====== LISTINGS (kod) ======
+\definecolor{kodtlo}{RGB}{245,247,250}
+\definecolor{kodkomentarz}{RGB}{0,128,0}
+\definecolor{kodslowo}{RGB}{0,0,180}
+\definecolor{kodlancuch}{RGB}{163,21,21}
+\lstdefinestyle{kodstyl}{
+  backgroundcolor=\color{kodtlo},
+  basicstyle=\ttfamily\footnotesize,
+  commentstyle=\color{kodkomentarz},
+  keywordstyle=\color{kodslowo}\bfseries,
+  stringstyle=\color{kodlancuch},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=8pt,
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{lightgray},
+  tabsize=2,
+  captionpos=b
+}
+\lstset{style=kodstyl}
+
+% ====== METADANE ======
+\title{
+  \vspace{-2cm}
+  \large Politechnika Białostocka \\
+  \large Wydział Informatyki \\[1cm]
+  \Huge \textbf{Finansista PB} \\[0.4cm]
+  \Large System obsługi wniosków o finansowanie\\działalności studenckiej i doktoranckiej \\[1cm]
+  \large Dokumentacja projektowa
+}
+\author{
+  Jakub Matusiewicz \and Jakub Borkowski \\[0.3cm]
+  \small Przedmioty: Aplikacje webowe w Javie, Systemy baz danych
+}
+\date{Białystok, \today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+\newpage
+
+% ====================================================================
+\section{Wstęp}
+\label{sec:wstep}
+
+\subsection{Cel projektu}
+% TODO: 3-5 zdań - po co system, dla kogo, jaki realny problem rozwiązuje.
+Celem projektu jest dostarczenie systemu informatycznego usprawniającego proces
+składania, oceny i rozliczania wniosków o finansowanie działalności studenckiej
+i doktoranckiej w Politechnice Białostockiej. System realizuje papierowy obieg
+wniosku opisany w \emph{Zarządzeniu nr 13/2025 Rektora Politechniki Białostockiej
+z dnia 14 lutego 2025 r. w sprawie wydatkowania środków finansowych przeznaczonych
+na działalność studencką i doktorancką}, ze szczególnym uwzględnieniem
+\emph{Załącznika nr 1} (wzór formularza wniosku).
+
+\subsection{Zakres}
+System obejmuje:
+\begin{itemize}[leftmargin=*]
+  \item rejestrację oraz logowanie użytkowników z rozróżnieniem ról,
+  \item składanie wniosku w wersji elektronicznej w pełni odwzorowującej Załącznik nr 1,
+  \item walidację formularza (pola obowiązkowe, spójność dat i kwot, suma źródeł finansowania),
+  \item obieg statusów wniosku (maszyna stanów po stronie bazy danych),
+  \item podgląd statusu i szczegółów wniosku przez wnioskodawcę,
+  \item REST API jako warstwę komunikacji frontend--backend,
+  \item dokumentację OpenAPI dla wystawionych usług,
+  \item logikę składowaną w bazie danych (pakiety, widoki, wyzwalacze, funkcje),
+  \item zgodność z wymaganiami dostępności (deklaracja dostępności).
+\end{itemize}
+
+\subsection{Zespół i podział pracy}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Jakub Matusiewicz} -- warstwa bazy danych (Oracle, PL/SQL, migracje Flyway),
+    frontend (Thymeleaf, Bootstrap), integracja widoków z REST API.
+  \item \textbf{Jakub Borkowski} -- backend Spring Boot, model encji JPA, use case'y,
+    REST API, bezpieczeństwo (Spring Security + JWT).
+\end{itemize}
+
+% ====================================================================
+\section{Wymagania}
+\label{sec:wymagania}
+
+\subsection{Wymagania funkcjonalne}
+% Lista z deklaracji - możesz dopisać/skreślić wg stanu.
+\begin{enumerate}[leftmargin=*]
+  \item Rejestracja i logowanie użytkownika.
+  \item Tworzenie wniosków w wersji elektronicznej.
+  \item Wypełnianie wniosku poprzez formularz odwzorowujący Załącznik nr 1.
+  \item Walidacja formularza.
+  \item Wysyłanie wniosku do wyższych jednostek (zmiana statusu DRAFT $\to$ SUBMITTED).
+  \item Kontrola wniosku finansowego poprzez sprawdzanie jego statusu.
+  \item Edycja/poprawa wniosku w razie odrzucenia lub uwag.
+  \item Procedowanie wniosku przez wyższe jednostki (Dziekanat, CSSDiR, Kwestor) -- pola
+        dostępne dla odpowiednich ról oraz odpowiednie ścieżki dla konkretnych wniosków.
+  \item Dostępność aplikacji dla osób ze specjalnymi potrzebami.
+  \item Filtrowanie i wyszukiwanie wniosków.
+  \item Zarządzanie uprawnieniami i rolami użytkowników (administrator).
+  \item Wyświetlanie pełnej historii zmian statusu wniosku.
+  \item Źródło finansowania jako zmienna w encji wniosku.
+\end{enumerate}
+
+\subsection{Wymagania niefunkcjonalne}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Architektura}: klient--serwer; frontend działa niezależnie od backendu
+        i komunikuje się z nim wyłącznie poprzez REST API.
+  \item \textbf{Wydajność}: poprawna praca przy zbiorach 1\,000--1\,000\,000 wniosków
+        (z paginacją i odpowiednimi indeksami).
+  \item \textbf{Bezpieczeństwo}: uwierzytelnianie tokenem JWT przechowywanym w bezpiecznym
+        ciasteczku \texttt{HttpOnly}, autoryzacja oparta na rolach.
+  \item \textbf{Dostępność}: zgodność z WCAG 2.1 -- skip link, semantyczne nagłówki,
+        kontrast, etykiety formularzy, opublikowana deklaracja dostępności.
+\end{itemize}
+
+% ====================================================================
+\section{Architektura systemu}
+\label{sec:architektura}
+
+System jest aplikacją monolityczną logicznie podzieloną na trzy warstwy:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Warstwa prezentacji (frontend)} -- kontrolery Spring MVC zwracające
+        widoki Thymeleaf renderowane po stronie serwera. Frontend \emph{nie woła}
+        warstwy biznesowej bezpośrednio -- komunikuje się z backendem wyłącznie
+        przez REST API z użyciem \texttt{RestClient}, przekazując token JWT.
+  \item \textbf{Warstwa REST API (backend)} -- kontrolery \texttt{@RestController}
+        wystawiające usługi pod ścieżką \texttt{/api/v1/...} (JSON). Stanowi
+        kontrakt komunikacyjny niezależny od użytego klienta.
+  \item \textbf{Warstwa danych} -- baza Oracle z migracjami Flyway, logiką
+        składowaną (PL/SQL) oraz dostępem przez JPA/Hibernate.
+\end{itemize}
+
+\subsection{Schemat warstw}
+% TODO: wstaw diagram warstw - prosty rysunek (np. z draw.io) lub TikZ.
+\begin{figure}[H]
+  \centering
+  % \includegraphics[width=0.85\textwidth]{img/warstwy.png}
+  \fbox{\parbox{0.85\textwidth}{\centering \emph{Miejsce na schemat warstw \\
+  (Przeglądarka $\to$ Kontrolery MVC $\to$ REST API $\to$ Use case'y $\to$ JPA $\to$ Oracle)}}}
+  \caption{Schemat warstw aplikacji.}
+  \label{fig:warstwy}
+\end{figure}
+
+\subsection{Stos technologiczny}
+\begin{itemize}[leftmargin=*]
+  \item Java 25, Spring Boot 4.0
+  \item Spring MVC, Thymeleaf 3, Bootstrap 5
+  \item Spring Security, JJWT 0.12
+  \item Hibernate / Spring Data JPA
+  \item Flyway (migracje)
+  \item Oracle Database 23 Free (kontener Docker)
+  \item Lombok, springdoc-openapi (Swagger UI)
+  \item Build: Maven
+\end{itemize}
+
+% ====================================================================
+\section{Model danych}
+\label{sec:model-danych}
+
+\subsection{Diagram encji}
+% TODO: wstaw screen z DBeavera/SQL Developera (ladniejszy niz Mermaid).
+% Plik diagramu powinien lezec w docs/img/erd.png
+\begin{figure}[H]
+  \centering
+  % \includegraphics[width=\textwidth]{img/erd.png}
+  \fbox{\parbox{\textwidth}{\centering \emph{Miejsce na ERD wygenerowane z DBeavera}}}
+  \caption{Diagram związków encji (ERD).}
+  \label{fig:erd}
+\end{figure}
+
+\subsection{Główne tabele}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{users} -- konta użytkowników; powiązane z \texttt{roles} i \texttt{department}.
+  \item \texttt{requests} -- główna encja wniosku (sekcje I--III Załącznika nr 1).
+  \item \texttt{request\_task} -- pozycje harmonogramu (sekcja IV).
+  \item \texttt{request\_cost\_item} -- pozycje kosztorysu (sekcja IV).
+  \item \texttt{request\_funding} -- źródła finansowania z kwotą wnioskowaną i przyznaną (sekcja VI).
+  \item \texttt{request\_status} -- słownik statusów wniosku.
+  \item \texttt{activity\_log} -- historia zmian statusu.
+  \item \texttt{comments}, \texttt{attachments} -- komentarze i załączniki do wniosków.
+  \item Słowniki: \texttt{roles}, \texttt{department}, \texttt{cost\_category},
+        \texttt{funding\_source}, \texttt{request\_templates}.
+\end{itemize}
+
+\subsection{Klucze hybrydowe}
+Każda eksponowana encja używa dwóch identyfikatorów:
+wewnętrznego \texttt{id} (\texttt{NUMBER IDENTITY}) używanego w kluczach obcych
+oraz zewnętrznego \texttt{external\_id} (\texttt{RAW(16)} -- UUID v7),
+który jest jedynym identyfikatorem wystawianym w REST API i adresach URL.
+Zapobiega to wycieksowi informacji o liczności rekordów i utrudnia enumerację zasobów.
+
+\subsection{Migracje Flyway}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{V1} -- inicjalny schemat (11 tabel: users, roles, department, requests, \ldots).
+  \item \texttt{V2} -- wypełnienie słowników (role, działy, statusy, kategorie).
+  \item \texttt{V3} -- widoki bazodanowe (m.in. \texttt{v\_department\_requests\_summary}).
+  \item \texttt{V4} -- wyzwalacze (audyt, walidacje).
+  \item \texttt{V5} -- pakiet PL/SQL \texttt{pkg\_finansista} (procedury domenowe).
+  \item \texttt{V6} -- indeksy wydajnościowe.
+  \item \texttt{V7} -- maszyna stanów wniosku (funkcja + trigger blokujący niedozwolone przejścia).
+  \item \texttt{V8} -- rozszerzenie schematu pod Załącznik nr 1 (sekcje I--III + tabele
+        \texttt{request\_task}, \texttt{request\_cost\_item}, \texttt{request\_funding}).
+  \item \texttt{V9} -- dodanie jednostki \emph{Samorząd Doktorantów PB}.
+  \item \texttt{V10} -- kategoria \emph{Inne} + pole opisowe \texttt{cost\_category\_other}.
+\end{itemize}
+
+% ====================================================================
+\section{Logika w bazie danych}
+\label{sec:plsql}
+
+\subsection{Maszyna stanów wniosku}
+Dozwolone przejścia statusów są egzekwowane na poziomie bazy (V7):
+
+\begin{center}
+\begin{tabular}{ll}
+  \toprule
+  \textbf{Status} & \textbf{Dozwolone przejścia} \\
+  \midrule
+  DRAFT & SUBMITTED \\
+  SUBMITTED & FORMAL\_EVALUATION, REJECTED, CORRECTION\_REQUIRED \\
+  FORMAL\_EVALUATION & UNDER\_REVIEW, REJECTED, CORRECTION\_REQUIRED \\
+  UNDER\_REVIEW & ACCEPTED, REJECTED, CORRECTION\_REQUIRED \\
+  CORRECTION\_REQUIRED & DRAFT, SUBMITTED \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Próba zmiany statusu na niedozwolony skutkuje błędem \texttt{ORA-20002}.
+
+% TODO: jesli macie inne wazne mechanizmy PL/SQL - opis tu.
+
+\subsection{Widoki}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{v\_department\_requests\_summary} -- podsumowanie liczby i kosztu
+        wniosków per wydział (na potrzeby raportowania administratora).
+  % TODO: dopisz pozostałe widoki z V3
+\end{itemize}
+
+\subsection{Indeksy i wydajność}
+Po stronie bazy założono indeksy na kolumnach najczęściej używanych w filtrach
+(\texttt{request\_status\_id}, \texttt{department\_id}, \texttt{user\_id}, \texttt{created\_at}).
+Wyniki testów wydajnościowych dla zbiorów 1\,k, 10\,k, 100\,k oraz 1\,M wierszy
+znajdują się w pliku \texttt{docs/testy-wydajnosciowe.md}.
+
+% ====================================================================
+\section{REST API}
+\label{sec:api}
+
+Frontend Thymeleaf komunikuje się z backendem wyłącznie poprzez REST API, co
+wymusza poprawną architekturę klient--serwer. Token JWT z ciasteczka przeglądarki
+jest przekazywany jako nagłówek \texttt{Authorization: Bearer}.
+
+\subsection{Najważniejsze endpointy}
+\begin{tabularx}{\textwidth}{l l X}
+  \toprule
+  \textbf{Metoda} & \textbf{Ścieżka} & \textbf{Opis} \\
+  \midrule
+  POST & /api/v1/auth/register & rejestracja konta \\
+  POST & /api/v1/auth/login & logowanie (ustawia ciasteczko JWT) \\
+  POST & /api/v1/auth/logout & wylogowanie (kasuje ciasteczko) \\
+  GET  & /api/v1/requests & lista wniosków (filtr po statusie/wydziale) \\
+  POST & /api/v1/requests & utworzenie wniosku (pełny Załącznik nr 1) \\
+  GET  & /api/v1/requests/\{id\} & szczegóły wniosku \\
+  PUT  & /api/v1/requests/\{id\} & edycja wniosku \\
+  PATCH & /api/v1/requests/\{id\}/status & zmiana statusu \\
+  GET  & /api/v1/requests/\{id\}/history & historia zmian statusu \\
+  POST & /api/v1/requests/\{id\}/comments & dodanie komentarza \\
+  GET  & /api/v1/requests/\{id\}/comments & komentarze \\
+  DELETE & /api/v1/requests/\{id\} & usunięcie wniosku (admin) \\
+  \bottomrule
+\end{tabularx}
+
+\subsection{Specyfikacja OpenAPI}
+Pełna specyfikacja jest udostępniona przez Swagger UI pod adresem
+\url{http://localhost:8080/swagger-ui/index.html} oraz w formie JSON pod
+\url{http://localhost:8080/v3/api-docs}.
+
+% ====================================================================
+\section{Bezpieczeństwo}
+\label{sec:bezp}
+
+\subsection{Uwierzytelnianie}
+Po poprawnym zalogowaniu backend wystawia token JWT podpisany kluczem HMAC SHA-256
+i zwraca go w bezpiecznym ciasteczku z atrybutami \texttt{HttpOnly}, \texttt{SameSite=Strict}.
+Token zawiera identyfikator użytkownika (e-mail) oraz jego rolę.
+
+\subsection{Autoryzacja oparta na rolach}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{ROLE\_STUDENT} -- składa wnioski, widzi własne;
+  \item \texttt{ROLE\_WRSS} -- ocena merytoryczna w ramach Samorządu;
+  \item \texttt{ROLE\_LEGAL\_COMMISSION} -- ocena merytoryczna w komisji;
+  \item \texttt{ROLE\_DEAN\_OFFICE} -- ocena formalna (CSSDiR/Dziekanat);
+  \item \texttt{ROLE\_FINANCE\_OFFICE} -- Kwestura (rozliczenie);
+  \item \texttt{ROLE\_ADMIN} -- decyzja Rektora, zarządzanie systemem.
+\end{itemize}
+
+\subsection{Zabezpieczenia formularzy}
+Rola użytkownika \emph{nigdy} nie jest pobierana z formularza rejestracji --
+każde nowe konto otrzymuje rolę bazową \texttt{ROLE\_STUDENT} wymuszoną po stronie
+serwera. Przypisanie wyższej roli jest wyłącznie aktem administracyjnym.
+Podobnie wydział wnioskodawcy nie jest wybierany przy składaniu wniosku --
+pobierany jest z konta zalogowanego użytkownika.
+
+% ====================================================================
+\section{Frontend i dostępność}
+\label{sec:front}
+
+Warstwa prezentacji oparta jest o szablony Thymeleaf z motywem Politechniki
+Białostockiej (kolorystyka zielona, flat design, Bootstrap 5). Każdy widok
+dziedziczy po wspólnym układzie \texttt{layout/base.html} zawierającym nawigację
+i stopkę.
+
+\subsection{Dostępność}
+\begin{itemize}[leftmargin=*]
+  \item Skip link na początku każdego widoku.
+  \item Semantyczne nagłówki i etykiety formularzy.
+  \item Kontrast kolorów zgodny z WCAG 2.1 AA.
+  \item Opublikowana \emph{Deklaracja dostępności} pod adresem \texttt{/accessibility}.
+  \item Strony błędów 400/403/404/500 w spójnym stylu HTML (nie JSON).
+\end{itemize}
+
+% ====================================================================
+\section{Testy wydajnościowe}
+\label{sec:wydajnosc}
+
+Wykonano testy wydajnościowe na zbiorach 1\,000, 10\,000, 100\,000 oraz
+1\,000\,000 wierszy w tabeli \texttt{requests}. Sprawdzano:
+\begin{itemize}[leftmargin=*]
+  \item czas pobrania pojedynczego wniosku po \texttt{external\_id},
+  \item czas listowania wniosków z paginacją,
+  \item czas zmiany statusu (kluczowa operacja transakcyjna),
+  \item plany wykonania zapytań przed i po dodaniu indeksów (V6).
+\end{itemize}
+
+Szczegółowe wyniki oraz porównanie planów wykonania zostały umieszczone w pliku
+\texttt{docs/testy-wydajnosciowe.md}.
+
+% ====================================================================
+\section{Uruchomienie systemu}
+\label{sec:uruchomienie}
+
+\subsection{Wymagania}
+\begin{itemize}[leftmargin=*]
+  \item Java 25, Maven 3.9+
+  \item Docker (do uruchomienia Oracle Database 23 Free)
+\end{itemize}
+
+\subsection{Krok po kroku}
+\begin{lstlisting}[language=bash, caption={Uruchomienie aplikacji}]
+# 1. Uruchomienie bazy Oracle w Dockerze
+docker run -d --name oracle-pb -p 1521:1521 \
+  -e ORACLE_PASSWORD=paw1ewjav1e \
+  gvenzl/oracle-free:23-slim
+
+# 2. Utworzenie schematu admin_pb (z hasłem zgodnym z application.yaml)
+#    - skrypt w docs/install/create_schema.sql lub recznie w SQL Developer
+
+# 3. Uruchomienie aplikacji
+./mvnw spring-boot:run
+
+# 4. Aplikacja dostępna pod:
+#    http://localhost:8080
+\end{lstlisting}
+
+\subsection{Konta testowe (DataSeeder)}
+\begin{tabularx}{\textwidth}{l l X}
+  \toprule
+  \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
+  \midrule
+  j.wnioskodawca@student.pb.edu.pl & student123 & STUDENT / Wydział Informatyki \\
+  k.samorzad@pb.edu.pl & wrss123 & WRSS / Samorząd Studentów \\
+  a.zgodna@pb.edu.pl & komisja123 & LEGAL\_COMMISSION / Wydział Mechaniczny \\
+  e.dziekan@pb.edu.pl & dziekanat123 & DEAN\_OFFICE / Dziekanat WI \\
+  j.matusiewicz@student.pb.edu.pl & admin123 & ADMIN / Wydział Mechaniczny \\
+  j.borkowski@student.pb.edu.pl & admin123 & ADMIN / Wydział Informatyki \\
+  \bottomrule
+\end{tabularx}
+
+% ====================================================================
+\section{Podsumowanie}
+\label{sec:podsumowanie}
+
+% TODO: 4-6 zdań - co udało się zrealizować, czego nie, czego nauczyliśmy się
+% przy projekcie. Można wspomnieć o trudnościach (Spring Boot 4 jako swiezynka,
+% Oracle, integracja PL/SQL z JPA itp.).
+
+\end{document}

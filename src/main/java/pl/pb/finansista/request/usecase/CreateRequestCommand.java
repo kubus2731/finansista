@@ -33,7 +33,8 @@ public record CreateRequestCommand(
         // sekcja IV i VI
         List<TaskData> tasks,
         List<CostItemData> costItems,
-        List<FundingData> fundings
+        List<FundingData> fundings,
+        String costCategoryOther
 ) {
 
     /**
@@ -46,7 +47,7 @@ public record CreateRequestCommand(
                 null, null, null, null, null, null, null,
                 null, null, null, null, null,
                 null, null, null, null,
-                List.of(), List.of(), List.of());
+                List.of(), List.of(), List.of(), null);
     }
 
     public record TaskData(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,

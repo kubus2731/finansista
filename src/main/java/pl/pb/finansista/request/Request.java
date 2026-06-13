@@ -54,6 +54,9 @@ public class Request extends ExposableModificationAuditedEntity {
     @JoinColumn(name = "funding_source_id")
     private FundingSource fundingSource;
 
+    // opis kategorii, gdy wybrano "Inne"
+    private String costCategoryOther;
+
     // --- Załącznik 1, sekcja I: dane przedsięwzięcia ---
     private String realizerType;
     private String projectKind;
@@ -68,17 +71,14 @@ public class Request extends ExposableModificationAuditedEntity {
     private Integer participantsInvolved;
     private Integer participantsBenefiting;
 
-    // --- Sekcja II: opiekun naukowy (opcjonalny, dla kół naukowych) ---
     private String supervisorName;
     private String supervisorEmail;
     private String supervisorPhone;
     private String supervisorDepartment;
 
-    // --- Sekcja III: opinia prorektora (wypełnia oceniający) ---
     @Lob
     private String provostOpinion;
 
-    // --- Sekcja IV i VI: tabele-dzieci (kaskada zapisu i usuwania) ---
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RequestTask> tasks = new ArrayList<>();
 
@@ -114,7 +114,6 @@ public class Request extends ExposableModificationAuditedEntity {
         this.status = newStatus;
     }
 
-    /** Uzupełnia pola opisowe z Załącznika 1 (sekcje I-II). */
     public void fillDetails(String realizerType, String projectKind, String projectKindOther,
                             String projectScope, String projectScopeOther,
                             String projectNature, String projectNatureOther,
@@ -152,5 +151,9 @@ public class Request extends ExposableModificationAuditedEntity {
 
     public void addFunding(String sourceName, BigDecimal amountRequested, BigDecimal amountGranted) {
         this.fundings.add(new RequestFunding(this, sourceName, amountRequested, amountGranted));
+    }
+
+    public void setCostCategoryOther(String costCategoryOther) {
+        this.costCategoryOther = costCategoryOther;
     }
 }
