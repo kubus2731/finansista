@@ -15,7 +15,7 @@
 
     <h1 class="h3 mb-4" th:text="${request.title}">Tytuł wniosku</h1>
 
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-body">
             <dl class="row mb-0">
                 <dt class="col-sm-3">Status</dt>
@@ -28,18 +28,147 @@
                           th:text="#{'status.' + ${request.status}}">STATUS</span>
                 </dd>
 
-                <dt class="col-sm-3">Kwota</dt>
+                <dt class="col-sm-3">Łączna kwota</dt>
                 <dd class="col-sm-9" th:text="|${#numbers.formatDecimal(request.amount, 1, 2)} zł|">0,00 zł</dd>
 
                 <dt class="col-sm-3">Wydział</dt>
                 <dd class="col-sm-9" th:text="${request.departmentName}">Wydział</dd>
 
-                <dt class="col-sm-3">Wnioskodawca</dt>
+                <dt class="col-sm-3">Wnioskodawca (Koordynator)</dt>
                 <dd class="col-sm-9" th:text="${request.applicantName}">Wnioskodawca</dd>
 
                 <dt class="col-sm-3">Data utworzenia</dt>
                 <dd class="col-sm-9" th:text="${#temporals.format(request.createdAt, 'dd.MM.yyyy')}">01.01.2026</dd>
             </dl>
+        </div>
+    </div>
+
+    <!-- I. Dane przedsięwzięcia -->
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">I. Dane dotyczące przedsięwzięcia</div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Realizator</dt>
+                <dd class="col-sm-9" th:text="${req.realizerType} ?: '—'">—</dd>
+
+                <dt class="col-sm-3">Rodzaj</dt>
+                <dd class="col-sm-9" th:text="${(req.projectKind ?: '—') + (#strings.isEmpty(req.projectKindOther) ? '' : ' (' + req.projectKindOther + ')')}">—</dd>
+
+                <dt class="col-sm-3">Zasięg</dt>
+                <dd class="col-sm-9" th:text="${(req.projectScope ?: '—') + (#strings.isEmpty(req.projectScopeOther) ? '' : ' (' + req.projectScopeOther + ')')}">—</dd>
+
+                <dt class="col-sm-3">Charakter</dt>
+                <dd class="col-sm-9" th:text="${(req.projectNature ?: '—') + (#strings.isEmpty(req.projectNatureOther) ? '' : ' (' + req.projectNatureOther + ')')}">—</dd>
+
+                <dt class="col-sm-3">Termin realizacji</dt>
+                <dd class="col-sm-9">
+                    <span th:text="${req.plannedDateFrom != null ? #temporals.format(req.plannedDateFrom,'dd.MM.yyyy') : '—'}">—</span>
+                    &ndash;
+                    <span th:text="${req.plannedDateTo != null ? #temporals.format(req.plannedDateTo,'dd.MM.yyyy') : '—'}">—</span>
+                </dd>
+
+                <dt class="col-sm-3">Miejsce</dt>
+                <dd class="col-sm-9" th:text="${req.location} ?: '—'">—</dd>
+
+                <dt class="col-sm-3">Uczestnicy</dt>
+                <dd class="col-sm-9">
+                    zaangażowani: <span th:text="${req.participantsInvolved} ?: '—'">—</span>,
+                    korzystający: <span th:text="${req.participantsBenefiting} ?: '—'">—</span>
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- II. Opiekun naukowy -->
+    <div class="card mb-4" th:if="${!#strings.isEmpty(req.supervisorName)}">
+        <div class="card-header fw-semibold">II. Opiekun naukowy</div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Imię i nazwisko</dt>
+                <dd class="col-sm-9" th:text="${req.supervisorName}">—</dd>
+                <dt class="col-sm-3">Wydział</dt>
+                <dd class="col-sm-9" th:text="${req.supervisorDepartment} ?: '—'">—</dd>
+                <dt class="col-sm-3">Kontakt</dt>
+                <dd class="col-sm-9">
+                    <span th:text="${req.supervisorEmail} ?: '—'">—</span>
+                    / <span th:text="${req.supervisorPhone} ?: '—'">—</span>
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- III. Uzasadnienie -->
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">III. Opis przedsięwzięcia</div>
+        <div class="card-body">
+            <p class="mb-0" style="white-space: pre-wrap" th:text="${req.description} ?: '—'">Uzasadnienie…</p>
+            <hr th:if="${!#strings.isEmpty(req.provostOpinion)}">
+            <div th:if="${!#strings.isEmpty(req.provostOpinion)}">
+                <strong>Opinia prorektora:</strong>
+                <p class="mb-0" style="white-space: pre-wrap" th:text="${req.provostOpinion}"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- IV. Harmonogram -->
+    <div class="card mb-4" th:if="${!#lists.isEmpty(req.tasks)}">
+        <div class="card-header fw-semibold">IV. Harmonogram</div>
+        <div class="card-body table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr><th>Nr</th><th>Nazwa</th><th>Od</th><th>Do</th><th class="text-end">Koszt</th><th>Działania</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${req.tasks}">
+                        <td th:text="${t.taskNo}">1</td>
+                        <td th:text="${t.name} ?: '—'">—</td>
+                        <td th:text="${t.dateFrom != null ? #temporals.format(t.dateFrom,'dd.MM.yyyy') : '—'}">—</td>
+                        <td th:text="${t.dateTo != null ? #temporals.format(t.dateTo,'dd.MM.yyyy') : '—'}">—</td>
+                        <td class="text-end" th:text="${t.plannedCost != null ? #numbers.formatDecimal(t.plannedCost,1,2) + ' zł' : '—'}">—</td>
+                        <td th:text="${t.actions} ?: '—'">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- IV. Kosztorys -->
+    <div class="card mb-4" th:if="${!#lists.isEmpty(req.costItems)}">
+        <div class="card-header fw-semibold">IV. Kosztorys</div>
+        <div class="card-body table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr><th>Zad.</th><th>Przedmiot/usługa</th><th class="text-end">Ilość</th><th class="text-end">Koszt</th><th>Uwagi</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${req.costItems}">
+                        <td th:text="${c.taskNo} ?: '—'">—</td>
+                        <td th:text="${c.itemName} ?: '—'">—</td>
+                        <td class="text-end" th:text="${c.quantity} ?: '—'">—</td>
+                        <td class="text-end" th:text="${c.unitCost != null ? #numbers.formatDecimal(c.unitCost,1,2) + ' zł' : '—'}">—</td>
+                        <td th:text="${c.notes} ?: '—'">—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- VI. Źródła finansowania -->
+    <div class="card mb-4" th:if="${!#lists.isEmpty(req.fundings)}">
+        <div class="card-header fw-semibold">VI. Źródła finansowania</div>
+        <div class="card-body table-responsive">
+            <table class="table table-sm align-middle mb-0">
+                <thead>
+                    <tr><th>Źródło</th><th class="text-end">Wnioskowana</th><th class="text-end">Przyznana</th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="f : ${req.fundings}">
+                        <td th:text="${f.sourceName}">—</td>
+                        <td class="text-end" th:text="${f.amountRequested != null ? #numbers.formatDecimal(f.amountRequested,1,2) + ' zł' : '—'}">—</td>
+                        <td class="text-end" th:text="${f.amountGranted != null ? #numbers.formatDecimal(f.amountGranted,1,2) + ' zł' : '—'}">—</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 

@@ -6,6 +6,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -49,7 +50,7 @@ public class RequestViewController {
         GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), isAdminOrDean);
         Request request = getSingleRequestUseCase.execute(query);
         model.addAttribute("request", toView(request));
-
+        model.addAttribute("req", request);
 
         return "requests/details";
     }
@@ -59,7 +60,22 @@ public class RequestViewController {
         var user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
         model.addAttribute("departmentName", user.getDepartment().getName());
-        model.addAttribute("form", new CreateRequestForm(null, null, null, null));
+
+        CreateRequestForm form = new CreateRequestForm();
+        // harmonogram: 2 puste zadania (jak w papierowym Załączniku)
+        form.getTasks().add(taskRow(1));
+        form.getTasks().add(taskRow(2));
+        // kosztorys: 4 puste pozycje
+        for (int i = 0; i < 4; i++) {
+            form.getCostItems().add(new CreateRequestForm.CostItemRow());
+        }
+        // źródła finansowania: 4 stałe wiersze z sekcji VI Załącznika
+        form.getFundings().add(fundingRow("Samorząd Studentów PB"));
+        form.getFundings().add(fundingRow("Samorząd Doktorantów PB"));
+        form.getFundings().add(fundingRow("Inicjatywy kół naukowych / organizacji"));
+        form.getFundings().add(fundingRow("Środki Wydziału"));
+
+        model.addAttribute("form", form);
         return "requests/form";
     }
 
@@ -67,28 +83,68 @@ public class RequestViewController {
     public String create(@Valid @ModelAttribute("form") CreateRequestForm form,
                          BindingResult bindingResult,
                          Authentication authentication,
+                         Model model,
                          RedirectAttributes redirectAttributes) {
-        if (bindingResult.hasErrors()) {
-            return "requests/form";
-        }
-
         // dział bierzemy z konta zalogowanego usera (reguła: "wydział z serwera")
         var user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(UserNotFoundException::new);
-        Long departmentId = user.getDepartment().getId();
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("departmentName", user.getDepartment().getName());
+            return "requests/form";
+        }
+
+        // odsiewamy puste wiersze, których user nie wypełnił
+        List<CreateRequestCommand.TaskData> tasks = form.getTasks().stream()
+                .filter(t -> StringUtils.hasText(t.getName()) || t.getPlannedCost() != null)
+                .map(t -> new CreateRequestCommand.TaskData(t.getTaskNo(), t.getName(),
+                        t.getDateFrom(), t.getDateTo(), t.getPlannedCost(), t.getActions()))
+                .toList();
+
+        List<CreateRequestCommand.CostItemData> costItems = form.getCostItems().stream()
+                .filter(c -> StringUtils.hasText(c.getItemName()))
+                .map(c -> new CreateRequestCommand.CostItemData(c.getTaskNo(), c.getItemName(),
+                        c.getQuantity(), c.getUnitCost(), c.getNotes()))
+                .toList();
+
+        List<CreateRequestCommand.FundingData> fundings = form.getFundings().stream()
+                .filter(f -> f.getAmountRequested() != null)
+                .map(f -> new CreateRequestCommand.FundingData(f.getSourceName(),
+                        f.getAmountRequested(), f.getAmountGranted()))
+                .toList();
 
         CreateRequestCommand command = new CreateRequestCommand(
-                form.title(), form.description(), form.amount(),
+                form.getTitle(), form.getDescription(), form.getAmount(),
                 authentication.getName(),
                 null,
-                departmentId,
-                form.costCategoryId(),
-                null);
+                user.getDepartment().getId(),
+                form.getCostCategoryId(),
+                null,
+                form.getRealizerType(), form.getProjectKind(), form.getProjectKindOther(),
+                form.getProjectScope(), form.getProjectScopeOther(),
+                form.getProjectNature(), form.getProjectNatureOther(),
+                form.getPlannedDateFrom(), form.getPlannedDateTo(), form.getLocation(),
+                form.getParticipantsInvolved(), form.getParticipantsBenefiting(),
+                form.getSupervisorName(), form.getSupervisorEmail(),
+                form.getSupervisorPhone(), form.getSupervisorDepartment(),
+                tasks, costItems, fundings);
 
         createRequestUseCase.execute(command);
 
         redirectAttributes.addFlashAttribute("successMessage", "Wniosek został zapisany jako wersja robocza.");
         return "redirect:/requests";
+    }
+
+    private CreateRequestForm.TaskRow taskRow(int no) {
+        CreateRequestForm.TaskRow row = new CreateRequestForm.TaskRow();
+        row.setTaskNo(no);
+        return row;
+    }
+
+    private CreateRequestForm.FundingRow fundingRow(String sourceName) {
+        CreateRequestForm.FundingRow row = new CreateRequestForm.FundingRow();
+        row.setSourceName(sourceName);
+        return row;
     }
 
     private RequestView toView(Request r) {
