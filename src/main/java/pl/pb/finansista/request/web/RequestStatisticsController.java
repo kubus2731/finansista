@@ -11,7 +11,7 @@ import pl.pb.finansista.request.usecase.GetDepartmentSummariesUseCase;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/requests/statistics")
+@RequestMapping("/api/v1/requests/statistics")
 @RequiredArgsConstructor
 public class RequestStatisticsController {
 
