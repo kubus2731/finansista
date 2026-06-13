@@ -10,6 +10,7 @@ import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,20 +26,21 @@ public class GetRequestsUseCase {
         User currentUser = userRepository.findByEmail(query.userEmail())
                 .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = accessSpecificationFactory.createForUser(currentUser, query.userAuthorities());
+        List<Specification<Request>> specs = new ArrayList<>();
+        specs.add(accessSpecificationFactory.createForUser(currentUser, query.userAuthorities()));
 
         if (query.status() != null && !query.status().isBlank()) {
-            spec = spec.and(RequestSpecifications.hasStatus(query.status()));
+            specs.add(RequestSpecifications.hasStatus(query.status()));
         }
 
         if (query.departmentId() != null) {
-            spec = spec.and(RequestSpecifications.hasDepartment(query.departmentId()));
+            specs.add(RequestSpecifications.hasDepartment(query.departmentId()));
         }
 
         if (query.search() != null && !query.search().isBlank()) {
-            spec = spec.and(RequestSpecifications.containsText(query.search()));
+            specs.add(RequestSpecifications.containsText(query.search()));
         }
 
-        return requestRepository.findAll(spec);
+        return requestRepository.findAll(Specification.allOf(specs));
     }
 }
