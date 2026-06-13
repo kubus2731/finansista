@@ -1,7 +1,6 @@
 # Diagram encji (ERD) — Finansista PB
 
 Schemat bazy danych po migracjach V1–V8 (Oracle).
-Renderuje się na GitHubie oraz w podglądzie Mermaid (IntelliJ / VS Code).
 
 ```mermaid
 erDiagram
