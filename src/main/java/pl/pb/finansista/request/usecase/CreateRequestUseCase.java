@@ -22,6 +22,7 @@ import pl.pb.finansista.request.repository.RequestStatusRepository;
 import pl.pb.finansista.request.repository.RequestTemplateRepository;
 import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
+import pl.pb.finansista.user.RoleName;
 
 @Service
 @RequiredArgsConstructor
@@ -40,23 +41,24 @@ public class CreateRequestUseCase {
         var user = userRepository.findByEmail(command.userEmail())
                 .orElseThrow(UserNotFoundException::new);
 
+        String userRole = user.getRole().getName();
+        if (userRole.equals(RoleName.ROLE_DEAN_OFFICE.name()) || userRole.equals(RoleName.ROLE_FINANCE_OFFICE.name())) {
+            throw UnauthorizedRequestAccessException.forAction("create a request as an administrative employee");
+        }
+
         var department = departmentRepository.findById(command.departmentId())
                 .orElseThrow(DepartmentNotFoundException::new);
 
         var costCategory = costCategoryRepository.findById(command.costCategoryId())
                 .orElseThrow(CostCategoryNotFoundException::new);
 
-        RequestTemplate template = null;
-        if (command.templateId() != null) {
-            template = requestTemplateRepository.findById(command.templateId())
-                    .orElseThrow(RequestTemplateNotFoundException::new);
-        }
+        RequestTemplate template = command.templateId() != null
+                ? requestTemplateRepository.findById(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
+                : null;
 
-        FundingSource fundingSource = null;
-        if (command.fundingSourceId() != null) {
-            fundingSource = fundingSourceRepository.findById(command.fundingSourceId())
-                    .orElseThrow(FundingSourceNotFoundException::new);
-        }
+        FundingSource fundingSource = command.fundingSourceId() != null
+                ? fundingSourceRepository.findById(command.fundingSourceId()).orElseThrow(FundingSourceNotFoundException::new)
+                : null;
 
         RequestStatus status = requestStatusRepository.findByName("DRAFT")
                 .orElseThrow(() -> InvalidRequestStateException.withStatusName("DRAFT"));

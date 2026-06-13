@@ -6,10 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
-import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.user.User;
+import pl.pb.finansista.user.RoleName;
 import pl.pb.finansista.user.repository.UserRepository;
 
 @Service
@@ -30,9 +31,9 @@ public class DeleteRequestUseCase {
 
         accessValidator.validateUserCanAccessRequest(request, user, query.userAuthorities());
 
-        boolean isAdmin = query.userAuthorities().contains("ROLE_ADMIN");
+        boolean isAdmin = query.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
 
-        if (!isAdmin && !request.getStatus().getName().equals("DRAFT")) {
+        if (!isAdmin && !request.getStatus().getName().equals(RequestStatusName.DRAFT.name())) {
             throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
         }
 

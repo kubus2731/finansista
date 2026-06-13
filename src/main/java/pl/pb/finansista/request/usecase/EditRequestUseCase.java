@@ -14,9 +14,9 @@ import pl.pb.finansista.reference.FundingSourceNotFoundException;
 import pl.pb.finansista.reference.DepartmentNotFoundException;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
-import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestTemplate;
+import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.RequestRepository;
@@ -41,7 +41,7 @@ public class EditRequestUseCase {
             throw UnauthorizedRequestAccessException.forAction("edit");
         }
 
-        if (!request.getStatus().getName().equals("DRAFT") && !request.getStatus().getName().equals("CORRECTION_REQUIRED")) {
+        if (!request.getStatus().getName().equals(RequestStatusName.DRAFT.name()) && !request.getStatus().getName().equals(RequestStatusName.CORRECTION_REQUIRED.name())) {
             throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
         }
 
@@ -51,17 +51,13 @@ public class EditRequestUseCase {
         CostCategory costCategory = costCategoryRepository.findById(command.costCategoryId())
                 .orElseThrow(CostCategoryNotFoundException::new);
 
-        FundingSource fundingSource = null;
-        if (command.fundingSourceId() != null) {
-            fundingSource = fundingSourceRepository.findById(command.fundingSourceId())
-                    .orElseThrow(FundingSourceNotFoundException::new);
-        }
+        FundingSource fundingSource = command.fundingSourceId() != null
+                ? fundingSourceRepository.findById(command.fundingSourceId()).orElseThrow(FundingSourceNotFoundException::new)
+                : null;
 
-        RequestTemplate template = null;
-        if (command.templateId() != null) {
-            template = requestTemplateRepository.findById(command.templateId())
-                    .orElseThrow(RequestTemplateNotFoundException::new);
-        }
+        RequestTemplate template = command.templateId() != null
+                ? requestTemplateRepository.findById(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
+                : null;
 
         request.update(
                 command.title(),
