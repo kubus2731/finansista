@@ -8,12 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
-import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.usecase.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -28,10 +26,6 @@ public class RequestController {
     private final GetSingleRequestUseCase getSingleRequestUseCase;
     private final EditRequestUseCase editRequestUseCase;
     private final DeleteRequestUseCase deleteRequestUseCase;
-    private final ChangeRequestStatusUseCase changeRequestStatusUseCase;
-    private final GetRequestHistoryUseCase getRequestHistoryUseCase;
-    private final AddCommentUseCase addCommentUseCase;
-    private final GetCommentsUseCase getCommentsUseCase;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -98,77 +92,6 @@ public class RequestController {
         Request request = editRequestUseCase.execute(payload.toCommand(id, authentication.getName()));
         log.info("Successfully edited request ID: {}", id);
         return ResponseEntity.ok(RequestResponse.of(request));
-    }
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> changeStatus(
-            @PathVariable UUID id,
-            @Valid @RequestBody ChangeRequestStatusRequest payload,
-            Authentication authentication
-    ) {
-        log.info("Changing status for request ID: {} to {} by user: {}", id, payload.status(), authentication.getName());
-        List<String> authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        changeRequestStatusUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
-        log.info("Successfully changed status for request ID: {}", id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{id}/history")
-    public ResponseEntity<List<ActivityLogResponse>> getHistory(
-            @PathVariable UUID id,
-            Authentication authentication
-    ) {
-        log.info("Fetching history for request ID: {} by user: {}", id, authentication.getName());
-        List<String> authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
-        
-        List<ActivityLogResponse> history = getRequestHistoryUseCase.execute(query).stream()
-                .map(ActivityLogResponse::of)
-                .collect(Collectors.toList());
-                
-        return ResponseEntity.ok(history);
-    }
-
-    @PostMapping("/{id}/comments")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<CommentResponse> addComment(
-            @PathVariable UUID id,
-            @Valid @RequestBody AddCommentRequest payload,
-            Authentication authentication
-    ) {
-        log.info("Adding comment to request ID: {} by user: {}", id, authentication.getName());
-        List<String> authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        Comment comment = addCommentUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
-        log.info("Successfully added comment with ID: {}", comment.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommentResponse.of(comment));
-    }
-
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<List<CommentResponse>> getComments(
-            @PathVariable UUID id,
-            Authentication authentication
-    ) {
-        log.info("Fetching comments for request ID: {} by user: {}", id, authentication.getName());
-        List<String> authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
-        
-        List<CommentResponse> comments = getCommentsUseCase.execute(query).stream()
-                .map(CommentResponse::of)
-                .collect(Collectors.toList());
-                
-        return ResponseEntity.ok(comments);
     }
 
     @DeleteMapping("/{id}")
