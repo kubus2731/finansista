@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.web;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import pl.pb.finansista.request.usecase.ChangeRequestStatusCommand;
 
 import java.util.List;

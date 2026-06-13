@@ -56,7 +56,7 @@ public class EditRequestUseCase {
                 : null;
 
         RequestTemplate template = command.templateId() != null
-                ? requestTemplateRepository.findById(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
+                ? requestTemplateRepository.findByExternalId(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
                 : null;
 
         request.update(

@@ -12,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -66,6 +67,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         pd.setProperty("traceId", getTraceId());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(pd);
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ProblemDetail> handleOptimisticLockingFailure(ObjectOptimisticLockingFailureException ex) {
+        log.warn("Concurrency conflict occurred: {}", ex.getMessage());
+
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "The data has been modified by another user in the meantime. Please refresh the page and try again.");
+        pd.setTitle("Concurrency Conflict");
+        pd.setProperty("code", codeFor(ex));
+        pd.setProperty("traceId", getTraceId());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
     }
 
     private String codeFor(Exception ex) {

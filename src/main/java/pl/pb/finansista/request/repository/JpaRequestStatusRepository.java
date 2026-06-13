@@ -2,7 +2,8 @@ package pl.pb.finansista.request.repository;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.RequestStatus;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
 @Repository
 class JpaRequestStatusRepository implements RequestStatusRepository {
 
@@ -20,6 +21,11 @@ class JpaRequestStatusRepository implements RequestStatusRepository {
     @Override
     public RequestStatus save(RequestStatus requestStatus) {
         return repository.save(requestStatus);
+    }
+
+    @Override
+    public List<RequestStatus> findAll() {
+        return repository.findAll();
     }
 
     @Override

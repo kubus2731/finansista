@@ -9,7 +9,7 @@ public record EditRequestCommand(
         String title,
         String description,
         BigDecimal amount,
-        Long templateId,
+        UUID templateId,
         Long departmentId,
         Long costCategoryId,
         Long fundingSourceId

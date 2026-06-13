@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import pl.pb.finansista.request.usecase.EditRequestCommand;
+import pl.pb.finansista.common.ExternalIdEncoder;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -12,7 +13,7 @@ public record EditRequestRequest(
         @NotBlank String title,
         @NotBlank String description,
         @NotNull @Positive BigDecimal amount,
-        Long templateId,
+        String templateId,
         @NotNull Long departmentId,
         @NotNull Long costCategoryId,
         Long fundingSourceId
@@ -24,7 +25,7 @@ public record EditRequestRequest(
                 title,
                 description,
                 amount,
-                templateId,
+                templateId != null ? ExternalIdEncoder.decode(templateId) : null,
                 departmentId,
                 costCategoryId,
                 fundingSourceId

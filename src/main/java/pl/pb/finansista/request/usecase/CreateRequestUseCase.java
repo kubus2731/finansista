@@ -53,7 +53,7 @@ public class CreateRequestUseCase {
                 .orElseThrow(CostCategoryNotFoundException::new);
 
         RequestTemplate template = command.templateId() != null
-                ? requestTemplateRepository.findById(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
+                ? requestTemplateRepository.findByExternalId(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
                 : null;
 
         FundingSource fundingSource = command.fundingSourceId() != null

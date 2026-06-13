@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.request.usecase.ChangeRequestStatusUseCase;
 import pl.pb.finansista.request.usecase.GetAvailableTransitionsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
+import pl.pb.finansista.request.usecase.GetAllRequestStatusesUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,16 @@ public class RequestStatusController {
 
     private final ChangeRequestStatusUseCase changeRequestStatusUseCase;
     private final GetAvailableTransitionsUseCase getAvailableTransitionsUseCase;
+    private final GetAllRequestStatusesUseCase getAllRequestStatusesUseCase;
+
+    @GetMapping("/statuses")
+    public ResponseEntity<List<RequestStatusResponse>> getAllStatuses() {
+        return ResponseEntity.ok(
+                getAllRequestStatusesUseCase.execute().stream()
+                        .map(st -> new RequestStatusResponse(st.getId(), st.getName()))
+                        .toList()
+        );
+    }
 
     @GetMapping("/{id}/status/available-transitions")
     public ResponseEntity<List<String>> getAvailableTransitions(
