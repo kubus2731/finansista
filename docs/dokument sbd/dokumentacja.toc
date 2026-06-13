@@ -1,0 +1,35 @@
+\babel@toc {polish}{}\relax 
+\contentsline {section}{\numberline {1}Wstęp}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Cel projektu}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Zakres}{2}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Zespół i podział pracy}{2}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Wymagania}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Wymagania funkcjonalne}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Wymagania niefunkcjonalne}{3}{subsection.2.2}%
+\contentsline {section}{\numberline {3}Architektura systemu}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Schemat warstw}{4}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Stos technologiczny}{4}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Model danych}{4}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Diagram encji}{4}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Główne tabele}{5}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Klucze hybrydowe}{5}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Migracje Flyway}{5}{subsection.4.4}%
+\contentsline {section}{\numberline {5}Logika w bazie danych}{6}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Maszyna stanów wniosku}{6}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Widoki}{6}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Indeksy i wydajność}{6}{subsection.5.3}%
+\contentsline {section}{\numberline {6}REST API}{6}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Najważniejsze endpointy}{7}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Specyfikacja OpenAPI}{7}{subsection.6.2}%
+\contentsline {section}{\numberline {7}Bezpieczeństwo}{7}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Uwierzytelnianie}{7}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Autoryzacja oparta na rolach}{7}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Zabezpieczenia formularzy}{8}{subsection.7.3}%
+\contentsline {section}{\numberline {8}Frontend i dostępność}{8}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Dostępność}{8}{subsection.8.1}%
+\contentsline {section}{\numberline {9}Testy wydajnościowe}{8}{section.9}%
+\contentsline {section}{\numberline {10}Uruchomienie systemu}{8}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Wymagania}{8}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}Krok po kroku}{9}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Konta testowe (DataSeeder)}{9}{subsection.10.3}%
+\contentsline {section}{\numberline {11}Podsumowanie}{9}{section.11}%

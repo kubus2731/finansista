@@ -16,6 +16,8 @@
 \usepackage{listings}
 \usepackage{hyperref}
 \usepackage{microtype}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
 
 % ====== LINKI ======
 \hypersetup{
@@ -25,54 +27,69 @@
   citecolor=black
 }
 
-% ====== LISTINGS (kod) ======
-\definecolor{kodtlo}{RGB}{245,247,250}
-\definecolor{kodkomentarz}{RGB}{0,128,0}
-\definecolor{kodslowo}{RGB}{0,0,180}
-\definecolor{kodlancuch}{RGB}{163,21,21}
-\lstdefinestyle{kodstyl}{
-  backgroundcolor=\color{kodtlo},
-  basicstyle=\ttfamily\footnotesize,
-  commentstyle=\color{kodkomentarz},
-  keywordstyle=\color{kodslowo}\bfseries,
-  stringstyle=\color{kodlancuch},
-  numbers=left,
-  numberstyle=\tiny\color{gray},
-  stepnumber=1,
-  numbersep=8pt,
-  showstringspaces=false,
-  breaklines=true,
-  frame=single,
-  rulecolor=\color{lightgray},
-  tabsize=2,
-  captionpos=b
+
+\lstset{
+	basicstyle=\ttfamily\footnotesize,
+	keywordstyle=\color{blue}\bfseries,
+	commentstyle=\color{gray}\itshape,
+	stringstyle=\color{orange!80!black},
+	numbers=left,
+	numberstyle=\tiny\color{gray},
+	stepnumber=1,
+	breaklines=true,
+	frame=single,
+	rulecolor=\color{black!30},
+	backgroundcolor=\color{gray!8},
+	captionpos=b,
+	showstringspaces=false,
+	tabsize=4,
+	extendedchars=true,
+	literate={ą}{{\k{a}}}1 {ć}{{\'c}}1 {ę}{{\k{e}}}1 {ł}{{\l{}}}1 {ń}{{\'n}}1 {ó}{{\'o}}1 {ś}{{\'s}}1 {ź}{{\'z}}1 {ż}{{\.z}}1
+	{Ą}{{\k{A}}}1 {Ć}{{\'C}}1 {Ę}{{\k{E}}}1 {Ł}{{\L{}}}1 {Ń}{{\'N}}1 {Ó}{{\'O}}1 {Ś}{{\'S}}1 {Ź}{{\'Z}}1 {Ż}{{\.Z}}1
+	{α}{{$\alpha$}}1 {·}{{$\cdot$}}1 
 }
-\lstset{style=kodstyl}
+\renewcommand{\lstlistingname}{Kod}
 
 % ====== METADANE ======
-\title{
-  \vspace{-2cm}
-  \large Politechnika Białostocka \\
-  \large Wydział Informatyki \\[1cm]
-  \Huge \textbf{Finansista PB} \\[0.4cm]
-  \Large System obsługi wniosków o finansowanie\\działalności studenckiej i doktoranckiej \\[1cm]
-  \large Dokumentacja projektowa
-}
-\author{
-  Jakub Matusiewicz \and Jakub Borkowski \\[0.3cm]
-  \small Przedmioty: Aplikacje webowe w Javie, Systemy baz danych
-}
-\date{Białystok, \today}
-
 \begin{document}
-
-\maketitle
-\thispagestyle{empty}
-\newpage
-
-\tableofcontents
-\newpage
-
+	
+	\begin{titlepage}
+		\centering
+		\vspace*{2cm}
+		
+		{\Large \textbf{Politechnika Białostocka} \par}
+		{\large Wydział Informatyki \par}
+		
+		\vspace{3.5cm}
+		
+		{\Huge \textbf{Finansista PB} \par}
+		\vspace{0.8cm}
+		{\Large System obsługi wniosków o finansowanie \\ działalności studenckiej i doktoranckiej \par}
+		
+		\vspace{2.5cm}
+		
+		{\Large \textbf{Dokumentacja projektowa} \par}
+		
+		\vspace{2.5cm}
+		
+		{\large \textbf{Autorzy:} \par}
+		\vspace{0.2cm}
+		{\large Jakub Matusiewicz \par}
+		{\large Jakub Borkowski \par}
+		
+		\vspace{0.8cm}
+		{\small Przedmioty: Aplikacje webowe w Javie, Systemy baz danych \par}
+		
+		\vfill
+		
+		{\large Białystok, \today \par}
+	\end{titlepage}
+	
+	\thispagestyle{empty}
+	\newpage
+	
+	\tableofcontents
+	\newpage
 % ====================================================================
 \section{Wstęp}
 \label{sec:wstep}
@@ -190,13 +207,11 @@ System jest aplikacją monolityczną logicznie podzieloną na trzy warstwy:
 \label{sec:model-danych}
 
 \subsection{Diagram encji}
-% TODO: wstaw screen z DBeavera/SQL Developera (ladniejszy niz Mermaid).
 % Plik diagramu powinien lezec w docs/img/erd.png
 \begin{figure}[H]
   \centering
-  % \includegraphics[width=\textwidth]{img/erd.png}
-  \fbox{\parbox{\textwidth}{\centering \emph{Miejsce na ERD wygenerowane z DBeavera}}}
-  \caption{Diagram związków encji (ERD).}
+  \includegraphics[width=\textwidth]{diagram_encji.png}
+  \caption{Diagram encji}
   \label{fig:erd}
 \end{figure}
 
