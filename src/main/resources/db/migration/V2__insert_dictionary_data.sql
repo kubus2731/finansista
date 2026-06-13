@@ -1,10 +1,11 @@
 -- 1. Role w tabeli roles jako domyślne
 INSERT INTO roles (id, name) VALUES (1, 'ROLE_ADMIN');
 INSERT INTO roles (id, name) VALUES (2, 'ROLE_STUDENT');
-INSERT INTO roles (id, name) VALUES (3, 'ROLE_WRSS');
-INSERT INTO roles (id, name) VALUES (4, 'ROLE_LEGAL_COMMISSION');
-INSERT INTO roles (id, name) VALUES (5, 'ROLE_DEAN_OFFICE');
-INSERT INTO roles (id, name) VALUES (6, 'ROLE_FINANCE_OFFICE');
+INSERT INTO roles (id, name) VALUES (3, 'ROLE_STUDENT_COUNCIL');
+INSERT INTO roles (id, name) VALUES (4, 'ROLE_DOCTORAL_COUNCIL');
+INSERT INTO roles (id, name) VALUES (5, 'ROLE_LEGAL_COMMISSION');
+INSERT INTO roles (id, name) VALUES (6, 'ROLE_DEAN_OFFICE');
+INSERT INTO roles (id, name) VALUES (7, 'ROLE_FINANCE_OFFICE');
 
 -- 2. Domyślne departamenty
 INSERT INTO department (id, name) VALUES (1, 'Wydział Informatyki PB');
@@ -47,9 +48,9 @@ INSERT INTO cost_category (id, name, description)
 VALUES (2, 'Nagrody i Stypendia', 'Środki przeznaczone na pulę nagród w konkursach, wsparcie socjalne oraz stypendia rektora.');
 
 -- 6. Źródła finansowania
-INSERT INTO funding_source (id, name) VALUES (1, 'Zarząd Samorządu Studentów');
-INSERT INTO funding_source (id, name) VALUES (2, 'Rada Uczelniana');
-INSERT INTO funding_source (id, name) VALUES (3, 'Dziekan Wydziału');
-INSERT INTO funding_source (id, name) VALUES (4, 'Sponsor Prywatny');
+INSERT INTO funding_source (id, name) VALUES (1, 'STUDENT_COUNCIL');
+INSERT INTO funding_source (id, name) VALUES (2, 'DOCTORAL_COUNCIL');
+INSERT INTO funding_source (id, name) VALUES (3, 'INITIATIVE_FUNDS');
+INSERT INTO funding_source (id, name) VALUES (4, 'FACULTY_FUNDS');
 
 COMMIT;
