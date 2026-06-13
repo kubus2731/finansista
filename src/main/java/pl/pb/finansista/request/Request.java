@@ -54,18 +54,15 @@ public class Request extends ExposableModificationAuditedEntity {
     @JoinColumn(name = "funding_source_id")
     private FundingSource fundingSource;
 
-    // --- Załącznik 1, sekcja I-II: dane przedsięwzięcia i opiekun naukowy ---
     @Embedded
     private ProjectDetails projectDetails;
 
     @Embedded
     private SupervisorInfo supervisor;
 
-    // --- Sekcja III: opinia prorektora (wypełnia oceniający) ---
     @Lob
     private String provostOpinion;
 
-    // --- Sekcja IV i VI: tabele-dzieci (kaskada zapisu i usuwania) ---
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RequestTask> tasks = new ArrayList<>();
 
@@ -101,7 +98,6 @@ public class Request extends ExposableModificationAuditedEntity {
         this.status = newStatus;
     }
 
-    /** Uzupełnia pola opisowe z Załącznika 1 (sekcje I-II). */
     public void fillDetails(ProjectDetails projectDetails, SupervisorInfo supervisor) {
         this.projectDetails = projectDetails;
         this.supervisor = supervisor;

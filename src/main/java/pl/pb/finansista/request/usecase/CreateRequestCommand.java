@@ -14,7 +14,6 @@ public record CreateRequestCommand(
         Long departmentId,
         Long costCategoryId,
         Long fundingSourceId,
-        // Załącznik 1, sekcja I-II
         String realizerType,
         String projectKind,
         String projectKindOther,
@@ -31,16 +30,11 @@ public record CreateRequestCommand(
         String supervisorEmail,
         String supervisorPhone,
         String supervisorDepartment,
-        // sekcja IV i VI
         List<TaskData> tasks,
         List<CostItemData> costItems,
         List<FundingData> fundings
 ) {
 
-    /**
-     * Zgodność wsteczna z REST-em (CreateRequestRequest.toCommand) - stary, krótki konstruktor.
-     * Pola Załącznika 1 zostają puste, gdy wniosek tworzony jest przez API.
-     */
     public CreateRequestCommand(String title, String description, BigDecimal amount, String userEmail,
                                 UUID templateId, Long departmentId, Long costCategoryId, Long fundingSourceId) {
         this(title, description, amount, userEmail, templateId, departmentId, costCategoryId, fundingSourceId,

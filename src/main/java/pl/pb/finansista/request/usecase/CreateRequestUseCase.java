@@ -76,7 +76,6 @@ public class CreateRequestUseCase {
                 fundingSource
         );
 
-        // Załącznik 1, sekcje I-II
         request.fillDetails(
                 new ProjectDetails(
                         command.realizerType(), command.projectKind(), command.projectKindOther(),
@@ -88,7 +87,6 @@ public class CreateRequestUseCase {
                         command.supervisorName(), command.supervisorEmail(),
                         command.supervisorPhone(), command.supervisorDepartment()));
 
-        // sekcja IV i VI - tabele-dzieci
         if (command.tasks() != null) {
             command.tasks().forEach(t ->
                     request.addTask(t.taskNo(), t.name(), t.dateFrom(), t.dateTo(), t.plannedCost(), t.actions()));
