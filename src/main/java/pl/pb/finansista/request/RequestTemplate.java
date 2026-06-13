@@ -36,16 +36,10 @@ public class RequestTemplate extends ExposableModificationAuditedEntity {
     }
 
     public void deactivate() {
-        if (!this.active) {
-            throw new IllegalStateException("Already inactive.");
-        }
         this.active = false;
     }
 
     public void activate() {
-        if (this.active) {
-            throw new IllegalStateException("Already active.");
-        }
         this.active = true;
     }
 }
