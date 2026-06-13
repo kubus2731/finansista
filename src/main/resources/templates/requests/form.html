@@ -8,7 +8,7 @@
 <section th:fragment="content">
     <h1 class="h3 mb-4">Nowy wniosek</h1>
 
-    <p class="text-secondary">Składasz wniosek z: <strong>Wydział Informatyki PB</strong></p>
+    <p class="text-secondary">Składasz wniosek z: <strong th:text="${departmentName}">Wydział</strong></p>
 
     <form th:action="@{/requests}" th:object="${form}" method="post" class="col-lg-8" novalidate>
 

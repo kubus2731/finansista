@@ -15,6 +15,8 @@
                 <div class="card-body p-4">
                     <h1 class="h4 mb-4 text-center">Rejestracja konta</h1>
 
+                    <div class="alert alert-danger" role="alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
                     <form th:action="@{/register}" method="post" novalidate>
                         <div class="row g-3">
                             <div class="col-sm-6">
