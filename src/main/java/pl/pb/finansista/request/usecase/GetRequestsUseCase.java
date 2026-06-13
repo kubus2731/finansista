@@ -35,6 +35,10 @@ public class GetRequestsUseCase {
             spec = spec.and(RequestSpecifications.hasDepartment(query.departmentId()));
         }
 
+        if (query.search() != null && !query.search().isBlank()) {
+            spec = spec.and(RequestSpecifications.containsText(query.search()));
+        }
+
         return requestRepository.findAll(spec);
     }
 }

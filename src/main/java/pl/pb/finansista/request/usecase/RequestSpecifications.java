@@ -36,4 +36,14 @@ public class RequestSpecifications {
         return (root, query, cb) ->
                 fundingSourceCode == null ? null : cb.equal(root.join("fundingSource").get("name"), fundingSourceCode);
     }
+    public static Specification<Request> containsText(String keyword) {
+        return (root, query, cb) -> {
+            if (keyword == null || keyword.isBlank()) return null;
+            String likePattern = "%" + keyword.toLowerCase() + "%";
+            return cb.or(
+                    cb.like(cb.lower(root.get("title")), likePattern),
+                    cb.like(cb.lower(root.get("description")), likePattern)
+            );
+        };
+    }
 }

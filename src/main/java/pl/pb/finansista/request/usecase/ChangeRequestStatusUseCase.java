@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
@@ -40,6 +41,10 @@ public class ChangeRequestStatusUseCase {
 
         User actor = userRepository.findByEmail(command.userEmail())
                 .orElseThrow(UserNotFoundException::new);
+
+        if (!request.getVersion().equals(command.version())) {
+            throw new ObjectOptimisticLockingFailureException(Request.class, request.getId());
+        }
 
         accessValidator.validateUserCanAccessRequest(request, actor, command.userAuthorities());
 

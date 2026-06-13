@@ -6,6 +6,7 @@ public record GetRequestsQuery(
         String userEmail,
         List<String> userAuthorities,
         String status,
-        Long departmentId
+        Long departmentId,
+        String search
 ) {
 }

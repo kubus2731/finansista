@@ -8,6 +8,7 @@ public record ChangeRequestStatusCommand(
         String newStatusName,
         String description,
         String userEmail,
-        List<String> userAuthorities
+        List<String> userAuthorities,
+        Long version
 ) {
 }

@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.reference.CostCategory;
@@ -36,6 +37,10 @@ public class EditRequestUseCase {
     public Request execute(EditRequestCommand command) {
         Request request = requestRepository.findByExternalId(command.externalId())
                 .orElseThrow(RequestNotFoundException::new);
+
+        if (!request.getVersion().equals(command.version())) {
+            throw new ObjectOptimisticLockingFailureException(Request.class, request.getId());
+        }
 
         if (!request.getUser().getEmail().equals(command.userEmail())) {
             throw UnauthorizedRequestAccessException.forAction("edit");

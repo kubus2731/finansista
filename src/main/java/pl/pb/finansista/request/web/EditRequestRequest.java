@@ -18,7 +18,7 @@ public record EditRequestRequest(
         @NotNull Long costCategoryId,
         Long fundingSourceId
 ) {
-    public EditRequestCommand toCommand(UUID externalId, String userEmail) {
+    public EditRequestCommand toCommand(UUID externalId, String userEmail, Long version) {
         return new EditRequestCommand(
                 externalId,
                 userEmail,
@@ -28,7 +28,8 @@ public record EditRequestRequest(
                 templateId != null ? ExternalIdEncoder.decode(templateId) : null,
                 departmentId,
                 costCategoryId,
-                fundingSourceId
+                fundingSourceId,
+                version
         );
     }
 }

@@ -12,6 +12,7 @@ public record EditRequestCommand(
         UUID templateId,
         Long departmentId,
         Long costCategoryId,
-        Long fundingSourceId
+        Long fundingSourceId,
+        Long version
 ) {
 }

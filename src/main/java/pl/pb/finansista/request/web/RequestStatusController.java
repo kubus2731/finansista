@@ -3,6 +3,7 @@ package pl.pb.finansista.request.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -53,6 +54,7 @@ public class RequestStatusController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> changeStatus(
             @PathVariable UUID id,
+            @RequestHeader(value = HttpHeaders.IF_MATCH) String ifMatch,
             @Valid @RequestBody ChangeRequestStatusRequest payload,
             Authentication authentication
     ) {
@@ -61,8 +63,18 @@ public class RequestStatusController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        changeRequestStatusUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
+        Long version = parseIfMatch(ifMatch);
+        changeRequestStatusUseCase.execute(payload.toCommand(id, authentication.getName(), authorities, version));
         log.info("Successfully changed status for request ID: {}", id);
         return ResponseEntity.noContent().build();
+    }
+
+    private Long parseIfMatch(String ifMatch) {
+        if (ifMatch == null || ifMatch.isBlank()) throw new IllegalArgumentException("If-Match header is required");
+        try {
+            return Long.parseLong(ifMatch.replace("\"", ""));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid If-Match header format");
+        }
     }
 }

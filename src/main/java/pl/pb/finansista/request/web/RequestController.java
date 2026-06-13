@@ -3,6 +3,7 @@ package pl.pb.finansista.request.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -43,6 +44,7 @@ public class RequestController {
     public ResponseEntity<List<RequestResponse>> getRequests(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long departmentId,
+            @RequestParam(required = false) String search,
             Authentication authentication
     ) {
         log.info("Fetching requests for user: {}", authentication.getName());
@@ -54,7 +56,8 @@ public class RequestController {
                 authentication.getName(),
                 authorities,
                 status,
-                departmentId
+                departmentId,
+                search
         );
 
         List<Request> requests = getRequestsUseCase.execute(query);
@@ -79,19 +82,34 @@ public class RequestController {
 
         GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
         Request request = getSingleRequestUseCase.execute(query);
-        return ResponseEntity.ok(RequestResponse.of(request));
+        return ResponseEntity.ok()
+                .eTag("\"" + request.getVersion() + "\"")
+                .body(RequestResponse.of(request));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<RequestResponse> editRequest(
             @PathVariable UUID id,
+            @RequestHeader(value = HttpHeaders.IF_MATCH) String ifMatch,
             @Valid @RequestBody EditRequestRequest payload,
             Authentication authentication
     ) {
         log.info("Editing request ID: {} by user: {}", id, authentication.getName());
-        Request request = editRequestUseCase.execute(payload.toCommand(id, authentication.getName()));
+        Long version = parseIfMatch(ifMatch);
+        Request request = editRequestUseCase.execute(payload.toCommand(id, authentication.getName(), version));
         log.info("Successfully edited request ID: {}", id);
-        return ResponseEntity.ok(RequestResponse.of(request));
+        return ResponseEntity.ok()
+                .eTag("\"" + request.getVersion() + "\"")
+                .body(RequestResponse.of(request));
+    }
+
+    private Long parseIfMatch(String ifMatch) {
+        if (ifMatch == null || ifMatch.isBlank()) throw new IllegalArgumentException("If-Match header is required");
+        try {
+            return Long.parseLong(ifMatch.replace("\"", ""));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid If-Match header format");
+        }
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import jakarta.validation.Valid;
 import pl.pb.finansista.request.usecase.*;
@@ -46,7 +47,9 @@ public class RequestTemplateController {
     @GetMapping("/{id}")
     public ResponseEntity<RequestTemplateResponse> getTemplate(@PathVariable UUID id) {
         RequestTemplate template = getSingleRequestTemplateUseCase.execute(id);
-        return ResponseEntity.ok(RequestTemplateResponse.of(template));
+        return ResponseEntity.ok()
+                .eTag("\"" + template.getVersion() + "\"")
+                .body(RequestTemplateResponse.of(template));
     }
 
     @PostMapping
@@ -60,9 +63,22 @@ public class RequestTemplateController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<RequestTemplateResponse> editTemplate(
             @PathVariable UUID id,
+            @RequestHeader(value = HttpHeaders.IF_MATCH) String ifMatch,
             @Valid @RequestBody EditRequestTemplateRequest request) {
-        RequestTemplate template = editRequestTemplateUseCase.execute(id, request.title(), request.description(), request.active());
-        return ResponseEntity.ok(RequestTemplateResponse.of(template));
+        Long version = parseIfMatch(ifMatch);
+        RequestTemplate template = editRequestTemplateUseCase.execute(id, request.title(), request.description(), request.active(), version);
+        return ResponseEntity.ok()
+                .eTag("\"" + template.getVersion() + "\"")
+                .body(RequestTemplateResponse.of(template));
+    }
+
+    private Long parseIfMatch(String ifMatch) {
+        if (ifMatch == null || ifMatch.isBlank()) throw new IllegalArgumentException("If-Match header is required");
+        try {
+            return Long.parseLong(ifMatch.replace("\"", ""));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid If-Match header format");
+        }
     }
 
     @DeleteMapping("/{id}")
