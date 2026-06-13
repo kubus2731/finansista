@@ -10,9 +10,11 @@ import pl.pb.finansista.reference.FundingSourceNotFoundException;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
+import pl.pb.finansista.request.ProjectDetails;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.request.RequestTemplate;
+import pl.pb.finansista.request.SupervisorInfo;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
@@ -76,13 +78,15 @@ public class CreateRequestUseCase {
 
         // Załącznik 1, sekcje I-II
         request.fillDetails(
-                command.realizerType(), command.projectKind(), command.projectKindOther(),
-                command.projectScope(), command.projectScopeOther(),
-                command.projectNature(), command.projectNatureOther(),
-                command.plannedDateFrom(), command.plannedDateTo(), command.location(),
-                command.participantsInvolved(), command.participantsBenefiting(),
-                command.supervisorName(), command.supervisorEmail(),
-                command.supervisorPhone(), command.supervisorDepartment());
+                new ProjectDetails(
+                        command.realizerType(), command.projectKind(), command.projectKindOther(),
+                        command.projectScope(), command.projectScopeOther(),
+                        command.projectNature(), command.projectNatureOther(),
+                        command.plannedDateFrom(), command.plannedDateTo(), command.location(),
+                        command.participantsInvolved(), command.participantsBenefiting()),
+                new SupervisorInfo(
+                        command.supervisorName(), command.supervisorEmail(),
+                        command.supervisorPhone(), command.supervisorDepartment()));
 
         // sekcja IV i VI - tabele-dzieci
         if (command.tasks() != null) {

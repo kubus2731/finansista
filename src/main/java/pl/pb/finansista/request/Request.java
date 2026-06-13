@@ -54,25 +54,12 @@ public class Request extends ExposableModificationAuditedEntity {
     @JoinColumn(name = "funding_source_id")
     private FundingSource fundingSource;
 
-    // --- Załącznik 1, sekcja I: dane przedsięwzięcia ---
-    private String realizerType;
-    private String projectKind;
-    private String projectKindOther;
-    private String projectScope;
-    private String projectScopeOther;
-    private String projectNature;
-    private String projectNatureOther;
-    private LocalDate plannedDateFrom;
-    private LocalDate plannedDateTo;
-    private String location;
-    private Integer participantsInvolved;
-    private Integer participantsBenefiting;
+    // --- Załącznik 1, sekcja I-II: dane przedsięwzięcia i opiekun naukowy ---
+    @Embedded
+    private ProjectDetails projectDetails;
 
-    // --- Sekcja II: opiekun naukowy (opcjonalny, dla kół naukowych) ---
-    private String supervisorName;
-    private String supervisorEmail;
-    private String supervisorPhone;
-    private String supervisorDepartment;
+    @Embedded
+    private SupervisorInfo supervisor;
 
     // --- Sekcja III: opinia prorektora (wypełnia oceniający) ---
     @Lob
@@ -115,29 +102,9 @@ public class Request extends ExposableModificationAuditedEntity {
     }
 
     /** Uzupełnia pola opisowe z Załącznika 1 (sekcje I-II). */
-    public void fillDetails(String realizerType, String projectKind, String projectKindOther,
-                            String projectScope, String projectScopeOther,
-                            String projectNature, String projectNatureOther,
-                            LocalDate plannedDateFrom, LocalDate plannedDateTo, String location,
-                            Integer participantsInvolved, Integer participantsBenefiting,
-                            String supervisorName, String supervisorEmail,
-                            String supervisorPhone, String supervisorDepartment) {
-        this.realizerType = realizerType;
-        this.projectKind = projectKind;
-        this.projectKindOther = projectKindOther;
-        this.projectScope = projectScope;
-        this.projectScopeOther = projectScopeOther;
-        this.projectNature = projectNature;
-        this.projectNatureOther = projectNatureOther;
-        this.plannedDateFrom = plannedDateFrom;
-        this.plannedDateTo = plannedDateTo;
-        this.location = location;
-        this.participantsInvolved = participantsInvolved;
-        this.participantsBenefiting = participantsBenefiting;
-        this.supervisorName = supervisorName;
-        this.supervisorEmail = supervisorEmail;
-        this.supervisorPhone = supervisorPhone;
-        this.supervisorDepartment = supervisorDepartment;
+    public void fillDetails(ProjectDetails projectDetails, SupervisorInfo supervisor) {
+        this.projectDetails = projectDetails;
+        this.supervisor = supervisor;
     }
 
     public void addTask(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,

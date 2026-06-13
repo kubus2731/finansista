@@ -1,7 +1,9 @@
 package pl.pb.finansista.request.web;
 
 import pl.pb.finansista.common.web.ExternalIdEncoder;
+import pl.pb.finansista.request.ProjectDetails;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.SupervisorInfo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -49,6 +51,8 @@ public record RequestResponse(
         List<FundingResponse> fundings
 ) {
     public static RequestResponse of(Request request) {
+        ProjectDetails pd = request.getProjectDetails() != null ? request.getProjectDetails() : ProjectDetails.empty();
+        SupervisorInfo sup = request.getSupervisor() != null ? request.getSupervisor() : SupervisorInfo.empty();
         return new RequestResponse(
                 ExternalIdEncoder.encode("req", request.getExternalId()),
                 request.getTitle(),
@@ -64,22 +68,22 @@ public record RequestResponse(
                 request.getExternalId(),
                 request.getDepartment().getName(),
                 request.getUser().getName() + " " + request.getUser().getSurname(),
-                request.getRealizerType(),
-                request.getProjectKind(),
-                request.getProjectKindOther(),
-                request.getProjectScope(),
-                request.getProjectScopeOther(),
-                request.getProjectNature(),
-                request.getProjectNatureOther(),
-                request.getPlannedDateFrom(),
-                request.getPlannedDateTo(),
-                request.getLocation(),
-                request.getParticipantsInvolved(),
-                request.getParticipantsBenefiting(),
-                request.getSupervisorName(),
-                request.getSupervisorEmail(),
-                request.getSupervisorPhone(),
-                request.getSupervisorDepartment(),
+                pd.getRealizerType(),
+                pd.getProjectKind(),
+                pd.getProjectKindOther(),
+                pd.getProjectScope(),
+                pd.getProjectScopeOther(),
+                pd.getProjectNature(),
+                pd.getProjectNatureOther(),
+                pd.getPlannedDateFrom(),
+                pd.getPlannedDateTo(),
+                pd.getLocation(),
+                pd.getParticipantsInvolved(),
+                pd.getParticipantsBenefiting(),
+                sup.getName(),
+                sup.getEmail(),
+                sup.getPhone(),
+                sup.getDepartment(),
                 request.getProvostOpinion(),
                 request.getTasks().stream()
                         .map(t -> new TaskResponse(t.getTaskNo(), t.getName(), t.getDateFrom(),
