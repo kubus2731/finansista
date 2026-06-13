@@ -40,4 +40,9 @@ class JpaRequestRepository implements RequestRepository {
     public void delete(Request request) {
         repository.delete(request);
     }
+
+    @Override
+    public void setActor(long id) {
+        repository.setActor(id);
+    }
 }

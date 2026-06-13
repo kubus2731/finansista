@@ -8,6 +8,7 @@ import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
+import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.request.repository.CommentRepository;
@@ -18,6 +19,9 @@ import pl.pb.finansista.user.repository.UserRepository;
 
 import java.util.Collection;
 
+import pl.pb.finansista.reference.FundingSourceName;
+import pl.pb.finansista.user.RoleName;
+
 @Service
 @RequiredArgsConstructor
 public class ChangeRequestStatusUseCase {
@@ -27,6 +31,7 @@ public class ChangeRequestStatusUseCase {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final RequestAccessValidator accessValidator;
+    private final RequestTransitionValidator transitionValidator;
 
     @Transactional
     public void execute(ChangeRequestStatusCommand command) {
@@ -41,12 +46,13 @@ public class ChangeRequestStatusUseCase {
         RequestStatus newStatus = requestStatusRepository.findByName(command.newStatusName())
                 .orElseThrow(() -> InvalidRequestStateException.withStatusName(command.newStatusName()));
 
-        boolean isAdmin = command.userAuthorities().stream()
-                .anyMatch(a -> a.equals("ROLE_ADMIN"));
-
-        if (!isAdmin) {
-            validateRoutingRules(request, actor, command.userAuthorities(), newStatus);
+        if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name()) && request.getFundingSource() == null) {
+            throw new IllegalStateException("Funding source must be provided before submitting the request.");
         }
+
+        transitionValidator.validateTransition(request, actor, command.userAuthorities(), RequestStatusName.valueOf(newStatus.getName()));
+
+        requestRepository.setActor(actor.getId());
 
         request.changeStatus(newStatus);
         requestRepository.save(request);
@@ -55,55 +61,5 @@ public class ChangeRequestStatusUseCase {
             Comment comment = new Comment(request, actor, command.description());
             commentRepository.save(comment);
         }
-    }
-
-    private void validateRoutingRules(Request request, User actor, Collection<String> roles, RequestStatus newStatus) {
-        String oldStatus = request.getStatus().getName();
-        String targetStatus = newStatus.getName();
-        String fundingSource = request.getFundingSource() != null ? request.getFundingSource().getName() : "";
-        boolean isAuthor = request.getUser().getId().equals(actor.getId());
-        boolean isSameDepartment = request.getDepartment().getId().equals(actor.getDepartment().getId());
-
-        if (targetStatus.equals("SUBMITTED")) {
-            if (!isAuthor) {
-                throw UnauthorizedRequestAccessException.forAction("submit");
-            }
-            return;
-        }
-
-        if (oldStatus.equals("SUBMITTED")) {
-            if (!roles.contains("ROLE_DEAN_OFFICE") || !isSameDepartment) {
-                throw UnauthorizedRequestAccessException.forAction("formally evaluate");
-            }
-            return;
-        }
-
-        if (oldStatus.equals("FORMAL_EVALUATION")) {
-            if (fundingSource.equals("Dziekan Wydziału")) {
-                if (!roles.contains("ROLE_DEAN_OFFICE") || !isSameDepartment) {
-                    throw UnauthorizedRequestAccessException.forAction("review merit for Dean's funds");
-                }
-            } else {
-                if (!roles.contains("ROLE_WRSS") && !roles.contains("ROLE_LEGAL_COMMISSION")) {
-                    throw UnauthorizedRequestAccessException.forAction("review merit");
-                }
-            }
-            return;
-        }
-
-        if (oldStatus.equals("UNDER_REVIEW")) {
-            if (fundingSource.equals("Dziekan Wydziału")) {
-                if (!roles.contains("ROLE_FINANCE_OFFICE") && !roles.contains("ROLE_DEAN_OFFICE")) {
-                    throw UnauthorizedRequestAccessException.forAction("accept Dean's funds");
-                }
-            } else {
-                if (!roles.contains("ROLE_FINANCE_OFFICE")) {
-                    throw UnauthorizedRequestAccessException.forAction("accept this request");
-                }
-            }
-            return;
-        }
-
-        throw UnauthorizedRequestAccessException.forAction("perform this status transition");
     }
 }

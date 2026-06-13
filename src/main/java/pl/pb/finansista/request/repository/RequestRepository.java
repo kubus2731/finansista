@@ -18,4 +18,6 @@ public interface RequestRepository {
     Request save(Request request);
 
     void delete(Request request);
+
+    void setActor(long Id);
 }
