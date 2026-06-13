@@ -1,6 +1,6 @@
 package pl.pb.finansista.request.web;
 
-import pl.pb.finansista.common.ExternalIdEncoder;
+import pl.pb.finansista.common.web.ExternalIdEncoder;
 import pl.pb.finansista.request.Request;
 
 import java.math.BigDecimal;

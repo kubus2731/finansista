@@ -1,7 +1,7 @@
 package pl.pb.finansista.user.web;
 
 import pl.pb.finansista.user.User;
-import pl.pb.finansista.common.ExternalIdEncoder;
+import pl.pb.finansista.common.web.ExternalIdEncoder;
 
 public record UserResponse(
         String id,
