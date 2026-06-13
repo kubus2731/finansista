@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.pb.finansista.common.security.JwtService;
-import pl.pb.finansista.request.Request;
-import pl.pb.finansista.request.usecase.*;
 import pl.pb.finansista.request.view.CreateRequestForm;
 import pl.pb.finansista.request.view.RequestView;
 import pl.pb.finansista.request.web.CreateRequestRequest;
@@ -31,8 +29,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RequestViewController {
 
-    private final GetSingleRequestUseCase getSingleRequestUseCase;
-    private final CreateRequestUseCase createRequestUseCase;
     private final UserRepository userRepository;
     private final RestClient backendRestClient;
     private final JwtService jwtService;
@@ -54,7 +50,6 @@ public class RequestViewController {
 
     @GetMapping("/requests/{id}")
     public String details(@PathVariable UUID id, HttpServletRequest httpRequest, Model model) {
-        // szczegóły także przez REST; autoryzacja (czyj wniosek / admin) dzieje się po stronie backendu
         RequestResponse response = backendRestClient.get()
                 .uri("/api/v1/requests/{id}", id)
                 .header("Authorization", bearer(httpRequest))
@@ -103,7 +98,6 @@ public class RequestViewController {
             return "requests/form";
         }
 
-        // walidacja cross-field (spójność dat i kwot) - dla czytelnego komunikatu na froncie
         List<String> errors = validateBusinessRules(form);
         if (!errors.isEmpty()) {
             model.addAttribute("departmentName", user.getDepartment().getName());
@@ -129,7 +123,6 @@ public class RequestViewController {
                         f.getAmountRequested(), f.getAmountGranted()))
                 .toList();
 
-        // dział z konta zalogowanego usera (reguła "wydział z serwera")
         CreateRequestRequest payload = new CreateRequestRequest(
                 form.getTitle(), form.getDescription(), form.getAmount(),
                 null,
@@ -145,7 +138,6 @@ public class RequestViewController {
                 form.getSupervisorPhone(), form.getSupervisorDepartment(),
                 tasks, costItems, fundings);
 
-        // zapis przez REST API, nie przez use case
         backendRestClient.post()
                 .uri("/api/v1/requests")
                 .header("Authorization", bearer(httpRequest))
@@ -169,18 +161,6 @@ public class RequestViewController {
         return row;
     }
 
-    private RequestView toView(Request r) {
-        return new RequestView(
-                r.getExternalId(),
-                r.getTitle(),
-                r.getAmount(),
-                r.getStatus().getName(),
-                r.getDepartment().getName(),
-                r.getUser().getName() + " " + r.getUser().getSurname(),
-                r.getCreatedAt().toLocalDate()
-        );
-    }
-
     private RequestView toView(RequestResponse r) {
         return new RequestView(
                 r.externalId(),
@@ -197,12 +177,6 @@ public class RequestViewController {
         return "Bearer " + jwtService.getJwtFromCookies(request);
     }
 
-    private boolean hasAdminOrDeanRole(Authentication authentication) {
-        return authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
-                        || a.getAuthority().equals("ROLE_DEAN_OFFICE"));
-    }
-    
     private List<String> validateBusinessRules(CreateRequestForm form) {
         List<String> errors = new ArrayList<>();
 
