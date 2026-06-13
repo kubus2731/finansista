@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.web;
 
 import pl.pb.finansista.request.DepartmentRequestsSummary;
+
 import java.math.BigDecimal;
 
 public record DepartmentRequestsSummaryResponse(

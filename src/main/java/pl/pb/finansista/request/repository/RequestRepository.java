@@ -1,7 +1,7 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.Request;
 import org.springframework.data.jpa.domain.Specification;
+import pl.pb.finansista.request.Request;
 
 import java.util.List;
 import java.util.Optional;

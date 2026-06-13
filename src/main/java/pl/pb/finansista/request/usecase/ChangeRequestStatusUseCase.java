@@ -4,24 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.pb.finansista.request.exception.RequestNotFoundException;
-import pl.pb.finansista.request.exception.InvalidRequestStateException;
-import pl.pb.finansista.user.UserNotFoundException;
+import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.request.RequestStatusName;
-import pl.pb.finansista.request.Comment;
-import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
+import pl.pb.finansista.request.exception.InvalidRequestStateException;
+import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.repository.CommentRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.request.repository.RequestStatusRepository;
 import pl.pb.finansista.user.User;
+import pl.pb.finansista.user.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
-
-import java.util.Collection;
-
-import pl.pb.finansista.reference.FundingSourceName;
-import pl.pb.finansista.user.RoleName;
 
 @Service
 @RequiredArgsConstructor

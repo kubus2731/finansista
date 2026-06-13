@@ -15,6 +15,26 @@ import java.util.List;
 @Component
 public class RequestTransitionValidator {
 
+    private static boolean canEvaluate(Collection<String> roles, String fundingSource, boolean isSameDepartment) {
+        if (fundingSource.equals(FundingSourceName.FACULTY_FUNDS.name()) || fundingSource.equals(FundingSourceName.INITIATIVE_FUNDS.name())) {
+            return roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment;
+        } else if (fundingSource.equals(FundingSourceName.STUDENT_COUNCIL.name())) {
+            return roles.contains(RoleName.ROLE_STUDENT_COUNCIL.name()) || roles.contains(RoleName.ROLE_LEGAL_COMMISSION.name());
+        } else if (fundingSource.equals(FundingSourceName.DOCTORAL_COUNCIL.name())) {
+            return roles.contains(RoleName.ROLE_DOCTORAL_COUNCIL.name()) || roles.contains(RoleName.ROLE_LEGAL_COMMISSION.name());
+        }
+
+        return false;
+    }
+
+    private static boolean canAccept(Collection<String> roles, String fundingSource, boolean isSameDepartment) {
+        if (fundingSource.equals(FundingSourceName.FACULTY_FUNDS.name())) {
+            return roles.contains(RoleName.ROLE_FINANCE_OFFICE.name()) || (roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment);
+        }
+
+        return roles.contains(RoleName.ROLE_FINANCE_OFFICE.name());
+    }
+
     public List<RequestStatusName> getAvailableTransitions(Request request, User actor, Collection<String> roles) {
         RequestStatusName oldStatus = RequestStatusName.valueOf(request.getStatus().getName());
         boolean isAdmin = roles.contains(RoleName.ROLE_ADMIN.name());
@@ -42,7 +62,7 @@ public class RequestTransitionValidator {
                 if (isAdmin || canEvaluate(roles, fundingSource, isSameDepartment)) {
                     available.add(RequestStatusName.UNDER_REVIEW);
                 }
-                
+
                 if (isAdmin || isDean || canEvaluate(roles, fundingSource, isSameDepartment)) {
                     available.add(RequestStatusName.REJECTED);
                     available.add(RequestStatusName.CORRECTION_REQUIRED);
@@ -61,31 +81,11 @@ public class RequestTransitionValidator {
                     available.add(RequestStatusName.SUBMITTED);
                 }
             }
-            default -> {}
+            default -> {
+            }
         }
         return available;
     }
-
-    private static boolean canEvaluate(Collection<String> roles, String fundingSource, boolean isSameDepartment) {
-        if (fundingSource.equals(FundingSourceName.FACULTY_FUNDS.name()) || fundingSource.equals(FundingSourceName.INITIATIVE_FUNDS.name())) {
-            return roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment;
-        } else if (fundingSource.equals(FundingSourceName.STUDENT_COUNCIL.name())) {
-            return roles.contains(RoleName.ROLE_STUDENT_COUNCIL.name()) || roles.contains(RoleName.ROLE_LEGAL_COMMISSION.name());
-        } else if (fundingSource.equals(FundingSourceName.DOCTORAL_COUNCIL.name())) {
-            return roles.contains(RoleName.ROLE_DOCTORAL_COUNCIL.name()) || roles.contains(RoleName.ROLE_LEGAL_COMMISSION.name());
-        }
-
-        return false;
-    }
-
-    private static boolean canAccept(Collection<String> roles, String fundingSource, boolean isSameDepartment) {
-        if (fundingSource.equals(FundingSourceName.FACULTY_FUNDS.name())) {
-            return roles.contains(RoleName.ROLE_FINANCE_OFFICE.name()) || (roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment);
-        }
-
-        return roles.contains(RoleName.ROLE_FINANCE_OFFICE.name());
-    }
-
 
     public void validateTransition(Request request, User actor, Collection<String> roles, RequestStatusName targetStatus) {
         List<RequestStatusName> available = getAvailableTransitions(request, actor, roles);

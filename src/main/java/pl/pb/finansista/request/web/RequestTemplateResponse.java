@@ -1,7 +1,7 @@
 package pl.pb.finansista.request.web;
 
-import pl.pb.finansista.request.RequestTemplate;
 import pl.pb.finansista.common.ExternalIdEncoder;
+import pl.pb.finansista.request.RequestTemplate;
 
 public record RequestTemplateResponse(
         String id,

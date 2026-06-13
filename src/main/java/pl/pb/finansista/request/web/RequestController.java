@@ -62,11 +62,11 @@ public class RequestController {
 
         List<Request> requests = getRequestsUseCase.execute(query);
         log.info("Found {} requests for user: {}", requests.size(), authentication.getName());
-        
+
         List<RequestResponse> response = requests.stream()
                 .map(RequestResponse::of)
                 .collect(Collectors.toList());
-                
+
         return ResponseEntity.ok(response);
     }
 

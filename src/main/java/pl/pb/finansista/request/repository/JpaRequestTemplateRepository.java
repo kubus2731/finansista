@@ -1,9 +1,12 @@
 package pl.pb.finansista.request.repository;
+
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.RequestTemplate;
-import java.util.Optional;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
 @Repository
 class JpaRequestTemplateRepository implements RequestTemplateRepository {
 

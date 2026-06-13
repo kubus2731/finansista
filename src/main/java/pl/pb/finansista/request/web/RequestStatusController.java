@@ -9,9 +9,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.request.usecase.ChangeRequestStatusUseCase;
+import pl.pb.finansista.request.usecase.GetAllRequestStatusesUseCase;
 import pl.pb.finansista.request.usecase.GetAvailableTransitionsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
-import pl.pb.finansista.request.usecase.GetAllRequestStatusesUseCase;
 
 import java.util.List;
 import java.util.UUID;

@@ -31,8 +31,8 @@ public class RequestCommentController {
     public ResponseEntity<CommentResponse> addComment(
             @PathVariable UUID id,
             @Valid @RequestBody AddCommentRequest payload,
-            Authentication authentication)
-    {
+            Authentication authentication
+    ) {
         log.info("Adding comment to request ID: {} by user: {}", id, authentication.getName());
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -46,8 +46,8 @@ public class RequestCommentController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<List<CommentResponse>> getComments(
             @PathVariable UUID id,
-            Authentication authentication)
-    {
+            Authentication authentication
+    ) {
         log.info("Fetching comments for request ID: {} by user: {}", id, authentication.getName());
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

@@ -26,7 +26,7 @@ public class EditRequestTemplateUseCase {
         }
 
         template.updateDetails(title, description);
-        
+
         if (active && !template.isActive()) {
             template.activate();
         } else if (!active && template.isActive()) {

@@ -24,7 +24,7 @@ public class RequestStatisticsController {
                 .stream()
                 .map(DepartmentRequestsSummaryResponse::of)
                 .toList();
-        
+
         return ResponseEntity.ok(responses);
     }
 }

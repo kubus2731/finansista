@@ -1,10 +1,10 @@
 package pl.pb.finansista.request.web;
 
+import pl.pb.finansista.common.ExternalIdEncoder;
 import pl.pb.finansista.request.Request;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import pl.pb.finansista.common.ExternalIdEncoder;
 
 public record RequestResponse(
         String id,

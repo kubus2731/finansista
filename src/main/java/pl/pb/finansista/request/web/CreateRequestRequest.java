@@ -3,8 +3,8 @@ package pl.pb.finansista.request.web;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import pl.pb.finansista.request.usecase.CreateRequestCommand;
 import pl.pb.finansista.common.ExternalIdEncoder;
+import pl.pb.finansista.request.usecase.CreateRequestCommand;
 
 import java.math.BigDecimal;
 

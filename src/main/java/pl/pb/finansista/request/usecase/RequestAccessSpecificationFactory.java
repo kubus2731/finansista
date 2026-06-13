@@ -34,26 +34,29 @@ public class RequestAccessSpecificationFactory {
 
         if (userAuthorities.contains(RoleName.ROLE_LEGAL_COMMISSION.name())) {
             allowedSpecs.add(RequestSpecifications.hasStatusIn(List.of(
-                    RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
-                    RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
-                    RequestStatusName.CORRECTION_REQUIRED.name()))
+                            RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
+                            RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
+                            RequestStatusName.CORRECTION_REQUIRED.name()
+                    ))
                     .and(RequestSpecifications.hasFundingSource(FundingSourceName.STUDENT_COUNCIL.name())
                             .or(RequestSpecifications.hasFundingSource(FundingSourceName.DOCTORAL_COUNCIL.name()))));
         }
 
         if (userAuthorities.contains(RoleName.ROLE_STUDENT_COUNCIL.name())) {
             allowedSpecs.add(RequestSpecifications.hasStatusIn(List.of(
-                    RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
-                    RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
-                    RequestStatusName.CORRECTION_REQUIRED.name()))
+                            RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
+                            RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
+                            RequestStatusName.CORRECTION_REQUIRED.name()
+                    ))
                     .and(RequestSpecifications.hasFundingSource(FundingSourceName.STUDENT_COUNCIL.name())));
         }
 
         if (userAuthorities.contains(RoleName.ROLE_DOCTORAL_COUNCIL.name())) {
             allowedSpecs.add(RequestSpecifications.hasStatusIn(List.of(
-                    RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
-                    RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
-                    RequestStatusName.CORRECTION_REQUIRED.name()))
+                            RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
+                            RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
+                            RequestStatusName.CORRECTION_REQUIRED.name()
+                    ))
                     .and(RequestSpecifications.hasFundingSource(FundingSourceName.DOCTORAL_COUNCIL.name())));
         }
 

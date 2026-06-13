@@ -1,12 +1,9 @@
 package pl.pb.finansista.request.web;
 
+import pl.pb.finansista.common.ExternalIdEncoder;
 import pl.pb.finansista.request.Comment;
 
 import java.time.ZonedDateTime;
-
-import java.util.UUID;
-
-import pl.pb.finansista.common.ExternalIdEncoder;
 
 public record CommentResponse(
         String id,

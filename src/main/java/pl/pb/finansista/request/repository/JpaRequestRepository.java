@@ -3,9 +3,10 @@ package pl.pb.finansista.request.repository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.Request;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.List;
 
 @Repository
 class JpaRequestRepository implements RequestRepository {

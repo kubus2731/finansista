@@ -25,7 +25,6 @@ public class RequestTemplate extends ExposableModificationAuditedEntity {
     private boolean active = true;
 
 
-
     public RequestTemplate(String title, String description) {
         this.title = title;
         this.description = description;

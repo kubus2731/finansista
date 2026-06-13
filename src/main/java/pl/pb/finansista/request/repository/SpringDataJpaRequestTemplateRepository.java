@@ -9,5 +9,6 @@ import java.util.UUID;
 
 interface SpringDataJpaRequestTemplateRepository extends JpaRepository<RequestTemplate, Long> {
     List<RequestTemplate> findByActiveTrue();
+
     Optional<RequestTemplate> findByExternalId(UUID externalId);
 }

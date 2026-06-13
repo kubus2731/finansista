@@ -1,12 +1,12 @@
 package pl.pb.finansista.request.usecase;
 
 import org.springframework.stereotype.Component;
+import pl.pb.finansista.reference.FundingSourceName;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
 import pl.pb.finansista.user.RoleName;
 import pl.pb.finansista.user.User;
-import pl.pb.finansista.reference.FundingSourceName;
 
 import java.util.Collection;
 
@@ -42,8 +42,8 @@ public class RequestAccessValidator {
         String fundingSource = request.getFundingSource() != null ? request.getFundingSource().getName() : "";
 
         if (isLegalCommission) {
-            if (!request.getStatus().getName().equals(RequestStatusName.DRAFT.name()) && 
-                (fundingSource.equals(FundingSourceName.STUDENT_COUNCIL.name()) || fundingSource.equals(FundingSourceName.DOCTORAL_COUNCIL.name()))) {
+            if (!request.getStatus().getName().equals(RequestStatusName.DRAFT.name()) &&
+                    (fundingSource.equals(FundingSourceName.STUDENT_COUNCIL.name()) || fundingSource.equals(FundingSourceName.DOCTORAL_COUNCIL.name()))) {
                 return;
             }
         }

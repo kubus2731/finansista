@@ -1,11 +1,10 @@
 package pl.pb.finansista.request.repository;
 
 import pl.pb.finansista.request.RequestTemplate;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
-import java.util.Optional;
-import java.util.List;
 
 public interface RequestTemplateRepository {
 

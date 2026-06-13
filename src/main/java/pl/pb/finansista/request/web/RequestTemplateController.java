@@ -1,14 +1,14 @@
 package pl.pb.finansista.request.web;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import jakarta.validation.Valid;
-import pl.pb.finansista.request.usecase.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.request.RequestTemplate;
+import pl.pb.finansista.request.usecase.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -64,7 +64,8 @@ public class RequestTemplateController {
     public ResponseEntity<RequestTemplateResponse> editTemplate(
             @PathVariable UUID id,
             @RequestHeader(value = HttpHeaders.IF_MATCH) String ifMatch,
-            @Valid @RequestBody EditRequestTemplateRequest request) {
+            @Valid @RequestBody EditRequestTemplateRequest request
+    ) {
         Long version = parseIfMatch(ifMatch);
         RequestTemplate template = editRequestTemplateUseCase.execute(id, request.title(), request.description(), request.active(), version);
         return ResponseEntity.ok()
