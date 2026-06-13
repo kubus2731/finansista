@@ -34,11 +34,11 @@ INSERT INTO request_status (id, name) VALUES (6, 'REJECTED');
 INSERT INTO request_status (id, name) VALUES (7, 'CORRECTION_REQUIRED');
 
 -- 4. Szablony wniosków
-INSERT INTO request_templates (id, title, description, active)
-VALUES (1, 'Wniosek o dofinansowanie wydarzenia wydziałowego', 'Standardowy formularz zgłoszeniowy na organizację wydarzeń integracyjnych, kulturalnych i plenerowych dla studentów wydziału.', TRUE);
+INSERT INTO request_templates (id, external_id, title, description, active)
+VALUES (1, HEXTORAW('0190A1B2C3D47000A000000000000001'), 'Wniosek o dofinansowanie wydarzenia wydziałowego', 'Standardowy formularz zgłoszeniowy na organizację wydarzeń integracyjnych, kulturalnych i plenerowych dla studentów wydziału.', TRUE);
 
-INSERT INTO request_templates (id, title, description, active)
-VALUES (2, 'Wniosek o dofinansowanie projektu koła naukowego', 'Formularz ubiegania się o środki na projekty inżynierskie, zakup podzespołów lub wyjazdy konferencyjne.', TRUE);
+INSERT INTO request_templates (id, external_id, title, description, active)
+VALUES (2, HEXTORAW('0190A1B2C3D47000A000000000000002'), 'Wniosek o dofinansowanie projektu koła naukowego', 'Formularz ubiegania się o środki na projekty inżynierskie, zakup podzespołów lub wyjazdy konferencyjne.', TRUE);
 
 -- 5. Kategorie wniosków
 INSERT INTO cost_category (id, name, description)
