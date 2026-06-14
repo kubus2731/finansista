@@ -9,6 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import pl.pb.finansista.common.web.ETags;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.usecase.*;
@@ -47,9 +51,11 @@ public class RequestController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) String search,
+            @PageableDefault(size = 1000, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication authentication
     ) {
-        log.info("Fetching requests for user: {}", authentication.getName());
+        log.info("Fetching requests for user: {} (page={}, size={})",
+                authentication.getName(), pageable.getPageNumber(), pageable.getPageSize());
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
@@ -62,14 +68,19 @@ public class RequestController {
                 search
         );
 
-        List<Request> requests = getRequestsUseCase.execute(query);
-        log.info("Found {} requests for user: {}", requests.size(), authentication.getName());
+        Page<Request> page = getRequestsUseCase.execute(query, pageable);
+        log.info("Found {} requests on page {} (total elements={}) for user: {}",
+                page.getNumberOfElements(), page.getNumber(), page.getTotalElements(),
+                authentication.getName());
 
-        List<RequestResponse> response = requests.stream()
+        List<RequestResponse> response = page.getContent().stream()
                 .map(RequestResponse::of)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(page.getTotalElements()))
+                .header("X-Total-Pages", String.valueOf(page.getTotalPages()))
+                .body(response);
     }
 
     @GetMapping("/{id}")

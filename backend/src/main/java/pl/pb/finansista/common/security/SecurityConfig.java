@@ -42,7 +42,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/","/login", "/register", "/accessibility", "/error",
                                 "/css/**", "/js/**", "/img/**", "/favicon.ico",
-                                "/api/v1/auth/**").permitAll()
+                                "/api/v1/auth/**",
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET,
                                 "/api/v1/reference/**",
                                 "/api/v1/roles").permitAll()

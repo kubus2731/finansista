@@ -4,6 +4,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.Request;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,6 +37,11 @@ class JpaRequestRepository implements RequestRepository {
     @Override
     public List<Request> findAll(Specification<Request> spec) {
         return repository.findAll(spec);
+    }
+
+    @Override
+    public Page<Request> findAll(Specification<Request> spec, Pageable pageable) {
+        return repository.findAll(spec, pageable);
     }
 
     @Override

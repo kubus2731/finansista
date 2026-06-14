@@ -10,6 +10,8 @@ import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +24,7 @@ public class GetRequestsUseCase {
     private final RequestAccessSpecificationFactory accessSpecificationFactory;
 
     @Transactional(readOnly = true)
-    public List<Request> execute(GetRequestsQuery query) {
+    public Page<Request> execute(GetRequestsQuery query, Pageable pageable) {
         User currentUser = userRepository.findByEmail(query.userEmail())
                 .orElseThrow(UserNotFoundException::new);
 
@@ -41,6 +43,6 @@ public class GetRequestsUseCase {
             specs.add(RequestSpecifications.containsText(query.search()));
         }
 
-        return requestRepository.findAll(Specification.allOf(specs));
+        return requestRepository.findAll(Specification.allOf(specs), pageable);
     }
 }
