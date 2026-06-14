@@ -1,5 +1,6 @@
 package pl.pb.finansista.reference.web;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class ReferenceController {
     }
 
     @PostMapping("/departments")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<ReferenceResponse> createDepartment(@RequestBody DepartmentRequest request) {
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ReferenceResponse> createDepartment(@Valid @RequestBody DepartmentRequest request) {
         log.info("Admin user is creating department: {}", request.name());
         return ResponseEntity.ok(
                 ReferenceResponse.of(createDepartmentUseCase.execute(request.name()))
@@ -41,18 +42,18 @@ public class ReferenceController {
     }
 
     @DeleteMapping("/departments/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
         log.info("Admin user is deleting department with ID: {}", id);
         deleteDepartmentUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/departments/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/departments/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ReferenceResponse> editDepartment(
             @PathVariable Long id,
-            @RequestBody DepartmentRequest request
+            @Valid @RequestBody DepartmentRequest request
     ) {
         log.info("Admin user is editing department with ID: {}", id);
         return ResponseEntity.ok(

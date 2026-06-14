@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -75,6 +76,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         var pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "The data has been modified by another user in the meantime. Please refresh the page and try again.");
         pd.setTitle("Concurrency Conflict");
+        pd.setProperty("code", codeFor(ex));
+        pd.setProperty("traceId", getTraceId());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMessage());
+
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
+                "This operation conflicts with existing data (the record may still be in use or a value must be unique).");
+        pd.setTitle("Data Integrity Conflict");
         pd.setProperty("code", codeFor(ex));
         pd.setProperty("traceId", getTraceId());
 

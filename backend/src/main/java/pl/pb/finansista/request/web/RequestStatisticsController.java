@@ -18,7 +18,7 @@ public class RequestStatisticsController {
     private final GetDepartmentSummariesUseCase getDepartmentSummariesUseCase;
 
     @GetMapping("/departments")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<DepartmentRequestsSummaryResponse>> getDepartmentSummaries() {
         List<DepartmentRequestsSummaryResponse> responses = getDepartmentSummariesUseCase.execute()
                 .stream()
