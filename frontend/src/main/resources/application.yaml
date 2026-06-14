@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: finansista-frontend
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8081
+
+# Base URL of the backend REST API the frontend consumes.
+app:
+  backend:
+    url: http://localhost:8080

@@ -1,0 +1,39 @@
+package pl.pb.finansista.common;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+
+import java.time.ZonedDateTime;
+
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ModificationAuditedEntity extends CreationAuditedEntity {
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
+    private ZonedDateTime updatedAt;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
+    /**
+     * Guards the optimistic-locking precondition: the caller's expected version
+     * must match the persisted one, otherwise the edit is acting on stale data.
+     */
+    public void assertVersion(Long expectedVersion) {
+        if (!version.equals(expectedVersion)) {
+            throw new ObjectOptimisticLockingFailureException(getClass(), getId());
+        }
+    }
+}
