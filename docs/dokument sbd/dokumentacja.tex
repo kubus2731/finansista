@@ -78,7 +78,7 @@
 		{\large Jakub Borkowski \par}
 		
 		\vspace{0.8cm}
-		{\small Przedmioty: Aplikacje webowe w Javie, Systemy baz danych \par}
+		{\small Przedmioty: Programowanie aplikacji WWW w języku Java, Systemy Baz Danych \par}
 		
 		\vfill
 		
@@ -654,7 +654,6 @@ Szczegółowy raport (czterokrotny przebieg, pełne podsumowania w JSON oraz
 przepis odtworzenia) znajduje się w pliku \texttt{docs/testy-wydajnosciowe.md}
 oraz \texttt{docs/k6/get-requests.summary.json}.
 
-% ====================================================================
 \section{Uruchomienie systemu}
 \label{sec:uruchomienie}
 
@@ -685,7 +684,7 @@ docker run -d --name oracle-pb -p 1521:1521 \
 Aplikacja przygotowuje konta demonstracyjne z dwóch niezależnych źródeł.
 Oba źródła współistnieją bez konfliktu: \texttt{DataSeeder} sprawdza
 \texttt{existsByEmail} przed zapisem, a migracja \texttt{V10} używa
-warunku \texttt{WHERE NOT EXISTS} -- każde uruchomienie jest idempotentne.
+warunku \texttt{WHERE NOT EXISTS} - każde uruchomienie jest idempotentne.
 
 \paragraph{Konta z \texttt{DataSeeder.java} (warstwa aplikacji)}
 Tworzone w runtime przy starcie aplikacji, hasła hashowane BCryptem
@@ -736,7 +735,6 @@ po jednym w różnym statusie obiegu:
         autor: demo-wrss, kwota 7\,600{,}00 zł.
 \end{itemize}
 
-% ====================================================================
 \section{Podsumowanie}
 \label{sec:podsumowanie}
 

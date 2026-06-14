@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.26)  14 JUN 2026 14:32
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.26)  14 JUN 2026 14:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -781,19 +781,19 @@ File: lstlang1.sty 2024/09/23 1.10c listings language file
 (C:\Users\kubam\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2024/09/23 1.10c listings language file
 )
-Underfull \hbox (badness 2057) in paragraph at lines 705--705
+Underfull \hbox (badness 2057) in paragraph at lines 704--704
 []|\T1/lmr/m/n/12 (+20) LEGAL_COMMISSION / Wy-
  []
 
 
-Overfull \hbox (17.62482pt too wide) in paragraph at lines 705--706
+Overfull \hbox (17.62482pt too wide) in paragraph at lines 704--705
 [][] 
  []
 
 
 
 [14]
-Overfull \hbox (17.62482pt too wide) in paragraph at lines 725--726
+Overfull \hbox (17.62482pt too wide) in paragraph at lines 724--725
 [][] 
  []
 
@@ -826,7 +826,7 @@ C:/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr6.pfb><C:
 /Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:
 /Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C:
 /Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtti10.pfb>
-Output written on dokumentacja.pdf (16 pages, 434797 bytes).
+Output written on dokumentacja.pdf (16 pages, 436208 bytes).
 PDF statistics:
  421 PDF objects out of 1000 (max. 8388607)
  114 named destinations out of 1000 (max. 500000)
