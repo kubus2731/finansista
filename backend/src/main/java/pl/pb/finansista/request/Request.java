@@ -118,7 +118,7 @@ public class Request extends ExposableModificationAuditedEntity {
                 .findFirst();
     }
 
-    public boolean allFundingsGranted() {
+    public boolean allFundingGranted() {
         return !fundings.isEmpty() && fundings.stream().allMatch(RequestFunding::isGranted);
     }
 
@@ -130,7 +130,7 @@ public class Request extends ExposableModificationAuditedEntity {
         this.costItems.clear();
     }
 
-    public void clearFundings() {
+    public void clearFunding() {
         this.fundings.clear();
     }
 }

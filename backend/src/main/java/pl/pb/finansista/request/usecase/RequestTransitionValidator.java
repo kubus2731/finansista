@@ -57,7 +57,7 @@ public class RequestTransitionValidator {
             }
             case UNDER_REVIEW -> {
                 if (isAdmin || isFinance) {
-                    if (request.allFundingsGranted()) {
+                    if (request.allFundingGranted()) {
                         available.add(RequestStatusName.ACCEPTED);
                     }
                     available.add(RequestStatusName.REJECTED);

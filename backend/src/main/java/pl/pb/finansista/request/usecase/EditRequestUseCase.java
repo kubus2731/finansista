@@ -82,7 +82,7 @@ public class EditRequestUseCase {
         request.clearCostItems();
         command.costItems().forEach(c ->
                 request.addCostItem(c.taskNo(), c.itemName(), c.quantity(), c.unitCost(), c.notes()));
-        request.clearFundings();
+        request.clearFunding();
         command.fundings().forEach(f -> {
             FundingSource fundingSource = fundingSourceRepository.findById(f.fundingSourceId())
                     .orElseThrow(FundingSourceNotFoundException::new);
