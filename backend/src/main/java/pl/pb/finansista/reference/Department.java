@@ -20,4 +20,8 @@ public class Department extends BaseEntity {
     public Department(String name) {
         this.name = name;
     }
+
+    public void rename(String name) {
+        this.name = name;
+    }
 }

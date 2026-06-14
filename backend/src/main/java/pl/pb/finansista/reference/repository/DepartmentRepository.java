@@ -12,4 +12,8 @@ public interface DepartmentRepository {
     Department save(Department department);
 
     List<Department> findAll();
+
+    void delete(Department department);
+
+    boolean existsByName(String name);
 }

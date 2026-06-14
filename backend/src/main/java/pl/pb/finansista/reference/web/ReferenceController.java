@@ -1,22 +1,24 @@
 package pl.pb.finansista.reference.web;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import pl.pb.finansista.reference.usecase.GetAllCostCategoriesUseCase;
-import pl.pb.finansista.reference.usecase.GetAllDepartmentsUseCase;
-import pl.pb.finansista.reference.usecase.GetAllFundingSourcesUseCase;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import pl.pb.finansista.reference.usecase.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reference")
 @RequiredArgsConstructor
+@Slf4j
 public class ReferenceController {
 
     private final GetAllDepartmentsUseCase getAllDepartmentsUseCase;
+    private final CreateDepartmentUseCase createDepartmentUseCase;
+    private final DeleteDepartmentUseCase deleteDepartmentUseCase;
+    private final EditDepartmentUseCase editDepartmentUseCase;
     private final GetAllCostCategoriesUseCase getAllCostCategoriesUseCase;
     private final GetAllFundingSourcesUseCase getAllFundingSourcesUseCase;
 
@@ -26,6 +28,35 @@ public class ReferenceController {
                 getAllDepartmentsUseCase.execute().stream()
                         .map(dep -> new ReferenceResponse(dep.getId(), dep.getName()))
                         .toList()
+        );
+    }
+
+    @PostMapping("/departments")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ReferenceResponse> createDepartment(@RequestBody DepartmentRequest request) {
+        log.info("Admin user is creating department: {}", request.name());
+        return ResponseEntity.ok(
+                ReferenceResponse.of(createDepartmentUseCase.execute(request.name()))
+        );
+    }
+
+    @DeleteMapping("/departments/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteDepartment(@PathVariable Long id) {
+        log.info("Admin user is deleting department with ID: {}", id);
+        deleteDepartmentUseCase.execute(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/departments/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ReferenceResponse> editDepartment(
+            @PathVariable Long id,
+            @RequestBody DepartmentRequest request
+    ) {
+        log.info("Admin user is editing department with ID: {}", id);
+        return ResponseEntity.ok(
+                ReferenceResponse.of(editDepartmentUseCase.execute(id, request.name()))
         );
     }
 
