@@ -1,0 +1,747 @@
+\documentclass[12pt,a4paper]{article}
+
+% ====== PAKIETY ======
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+
+% ====== LINKI ======
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=teal,
+  citecolor=black
+}
+
+
+\lstset{
+	basicstyle=\ttfamily\footnotesize,
+	keywordstyle=\color{blue}\bfseries,
+	commentstyle=\color{gray}\itshape,
+	stringstyle=\color{orange!80!black},
+	numbers=left,
+	numberstyle=\tiny\color{gray},
+	stepnumber=1,
+	breaklines=true,
+	frame=single,
+	rulecolor=\color{black!30},
+	backgroundcolor=\color{gray!8},
+	captionpos=b,
+	showstringspaces=false,
+	tabsize=4,
+	extendedchars=true,
+	literate={ą}{{\k{a}}}1 {ć}{{\'c}}1 {ę}{{\k{e}}}1 {ł}{{\l{}}}1 {ń}{{\'n}}1 {ó}{{\'o}}1 {ś}{{\'s}}1 {ź}{{\'z}}1 {ż}{{\.z}}1
+	{Ą}{{\k{A}}}1 {Ć}{{\'C}}1 {Ę}{{\k{E}}}1 {Ł}{{\L{}}}1 {Ń}{{\'N}}1 {Ó}{{\'O}}1 {Ś}{{\'S}}1 {Ź}{{\'Z}}1 {Ż}{{\.Z}}1
+	{α}{{$\alpha$}}1 {·}{{$\cdot$}}1 
+}
+\renewcommand{\lstlistingname}{Kod}
+
+% ====== METADANE ======
+\begin{document}
+	
+	\begin{titlepage}
+		\centering
+		\vspace*{2cm}
+		
+		{\Large \textbf{Politechnika Białostocka} \par}
+		{\large Wydział Informatyki \par}
+		
+		\vspace{3.5cm}
+		
+		{\Huge \textbf{Finansista PB} \par}
+		\vspace{0.8cm}
+		{\Large System obsługi wniosków o finansowanie \\ działalności studenckiej i doktoranckiej \par}
+		
+		\vspace{2.5cm}
+		
+		{\Large \textbf{Dokumentacja projektowa} \par}
+		
+		\vspace{2.5cm}
+		
+		{\large \textbf{Autorzy:} \par}
+		\vspace{0.2cm}
+		{\large Jakub Matusiewicz \par}
+		{\large Jakub Borkowski \par}
+		
+		\vspace{0.8cm}
+		{\small Przedmioty: Aplikacje webowe w Javie, Systemy baz danych \par}
+		
+		\vfill
+		
+		{\large Białystok, \today \par}
+	\end{titlepage}
+	
+	\thispagestyle{empty}
+	\newpage
+	
+	\tableofcontents
+	\newpage
+% ====================================================================
+\section{Wstęp}
+\label{sec:wstep}
+
+\subsection{Cel projektu}
+Celem projektu jest dostarczenie systemu informatycznego usprawniającego proces
+składania, oceny i rozliczania wniosków o finansowanie działalności studenckiej
+i doktoranckiej w Politechnice Białostockiej. System realizuje papierowy obieg
+wniosku opisany w \emph{Zarządzeniu nr 13/2025 Rektora Politechniki Białostockiej
+z dnia 14 lutego 2025 r. w sprawie wydatkowania środków finansowych przeznaczonych
+na działalność studencką i doktorancką}, ze szczególnym uwzględnieniem
+\emph{Załącznika nr 1} (wzór formularza wniosku).
+
+\subsection{Zakres}
+System obejmuje:
+\begin{itemize}[leftmargin=*]
+  \item rejestrację oraz logowanie użytkowników z rozróżnieniem ról,
+  \item składanie wniosku w wersji elektronicznej w pełni odwzorowującej Załącznik nr 1,
+  \item walidację formularza (pola obowiązkowe, spójność dat i kwot, suma źródeł finansowania),
+  \item obieg statusów wniosku (maszyna stanów po stronie bazy danych),
+  \item podgląd statusu i szczegółów wniosku przez wnioskodawcę,
+  \item REST API jako warstwę komunikacji frontend--backend,
+  \item dokumentację OpenAPI dla wystawionych usług,
+  \item logikę składowaną w bazie danych (pakiety, widoki, wyzwalacze, funkcje),
+  \item zgodność z wymaganiami dostępności (deklaracja dostępności).
+\end{itemize}
+
+\subsection{Zespół i podział pracy}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Jakub Matusiewicz} - warstwa bazy danych (Oracle, PL/SQL, migracje Flyway),
+    frontend (Thymeleaf, Bootstrap), integracja widoków z REST API.
+  \item \textbf{Jakub Borkowski} - backend Spring Boot, model encji JPA, use case'y,
+    REST API, bezpieczeństwo (Spring Security + JWT).
+\end{itemize}
+
+\section{Wymagania}
+\label{sec:wymagania}
+
+\subsection{Wymagania funkcjonalne}
+\begin{enumerate}[leftmargin=*]
+  \item Rejestracja i logowanie użytkownika.
+  \item Wypełnianie wniosku poprzez formularz odwzorowujący Załącznik nr 1.
+  \item Walidacja formularza.
+  \item Wysyłanie wniosku do wyższych jednostek (zmiana statusu DRAFT $\to$ SUBMITTED) - dostępne tylko od strony back-end.
+  \item Kontrola wniosku finansowego poprzez sprawdzanie jego statusu.
+  \item Edycja/poprawa wniosku w razie odrzucenia lub uwag - dostępne tylko od strony back-end.
+  \item Procedowanie wniosku przez wyższe jednostki (Dziekanat, CSSDiR, Kwestor) - pola
+        dostępne dla odpowiednich ról oraz odpowiednie ścieżki dla konkretnych wniosków - dostępne tylko od strony back-end.
+  \item Dostępność aplikacji dla osób ze specjalnymi potrzebami.
+  \item Filtrowanie i wyszukiwanie wniosków - dostępne tylko od strony back-end.
+  \item Zarządzanie uprawnieniami i rolami użytkowników (administrator) - dostępne tylko od strony back-end.
+  \item Wyświetlanie pełnej historii zmian statusu wniosku - dostępne tylko od strony back-end.
+  \item Źródło finansowania jako zmienna w encji wniosku.
+\end{enumerate}
+
+\subsection{Wymagania niefunkcjonalne}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Architektura}: klient--serwer; frontend działa niezależnie od backendu
+        i komunikuje się z nim wyłącznie poprzez REST API.
+  \item \textbf{Wydajność}: poprawna praca przy zbiorach 1\,000--1\,000\,000 wniosków
+        (z paginacją i odpowiednimi indeksami).
+  \item \textbf{Bezpieczeństwo}: uwierzytelnianie tokenem JWT przechowywanym w bezpiecznym
+        ciasteczku \texttt{HttpOnly}, autoryzacja oparta na rolach.
+  \item \textbf{Dostępność}: zgodność z WCAG 2.1 - skip link, semantyczne nagłówki,
+        kontrast, etykiety formularzy, opublikowana deklaracja dostępności.
+\end{itemize}
+
+
+\section{Architektura systemu}
+\label{sec:architektura}
+
+System jest aplikacją monolityczną logicznie podzieloną na trzy warstwy:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Warstwa prezentacji (frontend)} -- kontrolery Spring MVC zwracające
+        widoki Thymeleaf renderowane po stronie serwera. Frontend \emph{nie woła}
+        warstwy biznesowej bezpośrednio -- komunikuje się z backendem wyłącznie
+        przez REST API z użyciem \texttt{RestClient}, przekazując token JWT.
+  \item \textbf{Warstwa REST API (backend)} -- kontrolery \texttt{@RestController}
+        wystawiające usługi pod ścieżką \texttt{/api/v1/...} (JSON). Stanowi
+        kontrakt komunikacyjny niezależny od użytego klienta.
+  \item \textbf{Warstwa danych} -- baza Oracle z migracjami Flyway, logiką
+        składowaną (PL/SQL) oraz dostępem przez JPA/Hibernate.
+\end{itemize}
+
+\subsection{Stos technologiczny}
+\begin{itemize}[leftmargin=*]
+  \item Java 25, Spring Boot 4.0
+  \item Spring MVC, Thymeleaf 3, Bootstrap 5
+  \item Spring Security, JJWT 0.12
+  \item Hibernate / Spring Data JPA
+  \item Flyway (migracje)
+  \item Oracle Database 23 Free (kontener Docker)
+  \item Lombok, springdoc-openapi 2.8.9 (Swagger UI / OpenAPI 3.1)
+  \item Build: Maven
+\end{itemize}
+
+\section{Model danych}
+\label{sec:model-danych}
+
+\subsection{Diagram encji}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{diagram_encji.png}
+  \caption{Diagram encji}
+  \label{fig:erd}
+\end{figure}
+
+\subsection{Główne tabele}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{users} - konta użytkowników; powiązane z \texttt{roles} i \texttt{department}.
+  \item \texttt{requests} - główna encja wniosku (sekcje I--III Załącznika nr 1).
+  \item \texttt{request\_task} - pozycje harmonogramu (sekcja IV).
+  \item \texttt{request\_cost\_item} - pozycje kosztorysu (sekcja IV).
+  \item \texttt{request\_funding} - źródła finansowania z kwotą wnioskowaną i przyznaną (sekcja VI).
+  \item \texttt{request\_status} - słownik statusów wniosku.
+  \item \texttt{activity\_log} - historia zmian statusu.
+  \item \texttt{comments}, \texttt{attachments} -- komentarze i załączniki do wniosków.
+  \item Słowniki: \texttt{roles}, \texttt{department}, \texttt{cost\_category},
+        \texttt{funding\_source}, \texttt{request\_templates}.
+\end{itemize}
+
+\subsection{Klucze hybrydowe}
+Każda eksponowana encja używa dwóch identyfikatorów:
+wewnętrznego \texttt{id} (\texttt{NUMBER IDENTITY}) używanego w kluczach obcych
+oraz zewnętrznego \texttt{external\_id} (\texttt{RAW(16)} -- UUID v7),
+który jest jedynym identyfikatorem wystawianym w REST API i adresach URL.
+Zapobiega to wycieksowi informacji o liczności rekordów i utrudnia enumerację zasobów.
+
+\subsection{Migracje Flyway}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{V1} - inicjalny schemat (11 tabel: users, roles, department, requests, \ldots).
+  \item \texttt{V2} - wypełnienie słowników (role, działy, statusy, kategorie).
+  \item \texttt{V3} - widoki bazodanowe (m.in. \texttt{v\_department\_requests\_summary}).
+  \item \texttt{V4} - wyzwalacze (audyt, walidacje).
+  \item \texttt{V5} - pakiet PL/SQL \texttt{pkg\_finansista} (procedury domenowe).
+  \item \texttt{V6} - indeksy wydajnościowe.
+  \item \texttt{V7} - maszyna stanów wniosku (funkcja + trigger blokujący niedozwolone przejścia).
+  \item \texttt{V8} - rozszerzenie schematu pod Załącznik nr 1 (sekcje I--III + tabele
+        \texttt{request\_task}, \texttt{request\_cost\_item}, \texttt{request\_funding}).
+  \item \texttt{V9} - dodanie jednostki \emph{Samorząd Doktorantów PB}.
+  \item \texttt{V10} - skrypt zasilania danymi demonstracyjnymi (6 użytkowników
+        z różnymi rolami oraz 3 przykładowe wnioski w różnych statusach).
+        Wszystkie wstawki idempotentne (\texttt{INSERT \ldots SELECT FROM dual
+        WHERE NOT EXISTS}) - skrypt może zostać uruchomiony wielokrotnie
+        bez naruszenia ograniczeń \texttt{UNIQUE}.
+\end{itemize}
+
+\section{Logika w bazie danych}
+\label{sec:plsql}
+
+\subsection{Maszyna stanów wniosku}
+Dozwolone przejścia statusów są egzekwowane na poziomie bazy (V7):
+
+\begin{center}
+\begin{tabular}{ll}
+  \toprule
+  \textbf{Status} & \textbf{Dozwolone przejścia} \\
+  \midrule
+  DRAFT & SUBMITTED \\
+  SUBMITTED & FORMAL\_EVALUATION, REJECTED, CORRECTION\_REQUIRED \\
+  FORMAL\_EVALUATION & UNDER\_REVIEW, REJECTED, CORRECTION\_REQUIRED \\
+  UNDER\_REVIEW & ACCEPTED, REJECTED, CORRECTION\_REQUIRED \\
+  CORRECTION\_REQUIRED & DRAFT, SUBMITTED \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Próba zmiany statusu na niedozwolony skutkuje błędem \texttt{ORA-20002}.
+
+\subsection{Pakiet \texttt{finansista\_pkg} (V5)}
+Logika domenowa wymagająca dostępu do wielu tabel lub stanu sesyjnego została
+zamknięta w pakiecie PL/SQL \texttt{finansista\_pkg}. Pakiet eksponuje trzy
+publiczne API:
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{PROCEDURE set\_actor(p\_user\_id)} oraz
+        \texttt{FUNCTION get\_actor RETURN NUMBER} - przechowują w zmiennej
+        pakietowej (\emph{per-session state}) identyfikator użytkownika,
+        który wykonuje aktualnie operację. Aplikacja Spring wywołuje
+        \texttt{set\_actor} przed każdą zmianą statusu, dzięki czemu trigger
+        audytowy zapisuje w \texttt{activity\_log} rzeczywistego \emph{aktora}
+        (np.\ pracownika Dziekanatu), a nie wnioskodawcę.
+  \item \texttt{FUNCTION department\_used\_budget(p\_dept\_id) RETURN NUMBER}
+        -- pole pochodne: zwraca łączną kwotę wniosków zaakceptowanych
+        (\texttt{status\_id = 5}) dla danego wydziału. Używana w raportach
+        bez konieczności ręcznego pisania agregacji po stronie aplikacji.
+  \item \texttt{PROCEDURE evaluate\_request(p\_req\_id, p\_evaluator\_id,
+        p\_new\_status\_id, p\_comment\_content)} - atomowa procedura oceny
+        wniosku: ustawia aktora, blokuje wiersz (\texttt{SELECT \ldots FOR UPDATE}),
+        weryfikuje że wniosek jest w fazie weryfikacji (\texttt{SUBMITTED /
+        FORMAL\_EVALUATION / UNDER\_REVIEW}, w przeciwnym razie
+        \texttt{ORA-20003}), zmienia status i opcjonalnie dopisuje komentarz.
+        Procedura świadomie \textbf{nie} wykonuje \texttt{COMMIT} --
+        transakcję zatwierdza warstwa aplikacji (\texttt{@Transactional}),
+        co pozwala wycofać całość w razie błędu po stronie Javy.
+\end{itemize}
+
+\subsection{Triggery (V4)}
+Na tabeli \texttt{requests} założono trzy triggery wierszowe:
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{T\_REQUESTS\_UPDATE\_NOW} (\emph{BEFORE UPDATE}) - automatycznie
+        ustawia \texttt{updated\_at = CURRENT\_TIMESTAMP}, gwarantując że pole
+        nie zostanie pominięte przy zapomnianej aktualizacji w kodzie aplikacji.
+  \item \texttt{T\_ACTIVITY} (\emph{AFTER UPDATE OF request\_status\_id},
+        \texttt{WHEN NEW != OLD}) - audyt zmian statusu. Wstawia do
+        \texttt{activity\_log} rekord ze starym i nowym statusem oraz aktorem
+        pobranym z \texttt{finansista\_pkg.get\_actor} (z fallbackiem na
+        wnioskodawcę, gdyby aplikacja nie ustawiła aktora).
+  \item \texttt{T\_BLOCK} (\emph{BEFORE UPDATE}) - zabezpieczenie integralności:
+        jeśli wniosek nie jest już w statusie \texttt{DRAFT} ani
+        \texttt{CORRECTION\_REQUIRED}, blokuje zmianę pól treściowych
+        (\texttt{title}, \texttt{amount}, \texttt{description},
+        \texttt{cost\_category\_id}) - próba kończy się błędem
+        \texttt{ORA-20001}. Porównanie pól \texttt{CLOB} odbywa się przez
+        \texttt{DBMS\_LOB.COMPARE} z obsługą \texttt{NULL} (\texttt{NVL}
+        na \texttt{EMPTY\_CLOB()}).
+\end{itemize}
+
+\subsection{Maszyna stanów (V7)}
+Funkcja \texttt{validate\_request\_status\_change(p\_old, p\_new)} oraz trigger
+\texttt{T\_REQUESTS\_TRANSITION} blokują niedozwolone przejścia statusów
+(tabela dozwolonych przejść w sekcji~\ref{sec:plsql}, podsekcja \emph{Maszyna stanów wniosku}).
+Każda nielegalna zmiana statusu kończy się błędem \texttt{ORA-20002} podnoszonym
+po stronie bazy, przez co aplikacja nie musi (i nie może) tej zasady obejść.
+
+\subsection{Widoki (V3)}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{v\_department\_requests\_summary} - podsumowanie ilościowe
+        i kosztowe wniosków w rozbiciu na wydziały. Dla każdego wydziału zwraca:
+        łączną liczbę wniosków i ich łączną kwotę, liczbę i sumę wniosków
+        zaakceptowanych (\texttt{status\_id = 5}) oraz odrzuconych
+        (\texttt{status\_id = 6}). Sumowanie warunkowe jest zrealizowane
+        przez \texttt{SUM(CASE WHEN \ldots)}, a \texttt{LEFT JOIN} z tabelą
+        \texttt{department} zapewnia, że na liście pojawiają się też
+        wydziały bez żadnego wniosku (z zerowymi licznikami).
+        Wykorzystywany w raporcie administracyjnym.
+  \item \texttt{v\_request\_details} - denormalizacja na potrzeby listingu
+        wniosków: każdy wiersz to wniosek wzbogacony o czytelne nazwy
+        powiązanych słowników (autor jako \texttt{name || ' ' || surname},
+        nazwa wydziału, nazwa kategorii kosztu, nazwa statusu). Pozwala
+        zwrócić tabelę listingową jednym zapytaniem zamiast czterech
+        \texttt{JOIN}-ów w warstwie aplikacji.
+\end{itemize}
+
+\subsection{Indeksy wydajnościowe (V6)}
+Po stronie bazy założono indeksy na kolumnach najczęściej używanych
+w filtrach i sortowaniach listingów wniosków:
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{IDX\_REQUESTS\_STATUS} na \texttt{request\_status\_id}
+        - filtrowanie po statusie (np.\ ,,wnioski do oceny''),
+  \item \texttt{IDX\_REQUESTS\_USER} na \texttt{user\_id}
+        - listing własnych wniosków wnioskodawcy,
+  \item \texttt{IDX\_REQUESTS\_CREATED\_AT} na \texttt{created\_at DESC}
+        - domyślne sortowanie listingu od najnowszych,
+  \item \texttt{IDX\_REQUESTS\_DEPT\_CREATED} na \texttt{(department\_id,
+        created\_at DESC)} - indeks złożony pod najczęstsze zapytanie:
+        ,,wnioski mojego wydziału, posortowane od najnowszych''.
+\end{itemize}
+
+\subsection{Wyniki testów wydajnościowych (1\,k -- 1\,M)}
+Testom poddano tabelę transakcyjną \texttt{requests} dla skali
+\textbf{1\,000 / 10\,000 / 100\,000 / 1\,000\,000} wierszy.
+Środowisko: Oracle Database 23ai Free (Docker \texttt{gvenzl/oracle-free}),
+schemat \texttt{ADMIN\_PB}. Dane testowe generowane skryptem
+\texttt{db/scripts/demo\_data\_load.sql} (set-based \texttt{INSERT \ldots SELECT}
+z \texttt{CONNECT BY}, kwoty z \texttt{DBMS\_RANDOM}, równomierny rozkład po
+użytkownikach/statusach/wydziałach). Po każdym zasileniu odświeżano statystyki
+optymalizatora (\texttt{DBMS\_STATS.GATHER\_TABLE\_STATS}). Pomiar czasu:
+\texttt{SET TIMING ON} w SQL*Plus.
+
+\paragraph{Mierzone zapytania}
+\begin{center}
+\begin{tabularx}{\textwidth}{l X X}
+  \toprule
+  \textbf{Nr} & \textbf{Zapytanie} & \textbf{Scenariusz w aplikacji} \\
+  \midrule
+  Q1 & \texttt{ORDER BY created\_at DESC OFFSET 40 FETCH NEXT 20}
+     & paginacja listy wniosków (3.\ strona) \\
+  Q2 & \texttt{WHERE department\_id = 1 ORDER BY created\_at DESC FETCH 20}
+     & przegląd wniosków własnego wydziału \\
+  Q3 & \texttt{SELECT * FROM v\_department\_requests\_summary}
+     & raport admina: ilości i koszty per wydział \\
+  Q4 & \texttt{WHERE external\_id = :uuid}
+     & pobranie wniosku po identyfikatorze z API / linku \\
+  \bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Czasy wykonania}
+\begin{center}
+\begin{tabular}{l r r r r}
+  \toprule
+  \textbf{Zapytanie} & \textbf{1 tys.} & \textbf{10 tys.} & \textbf{100 tys.} & \textbf{1 mln} \\
+  \midrule
+  Q1 -- paginacja listy        & 0{,}01 s & 0{,}01 s & 0{,}04 s & 0{,}27 s \\
+  Q2 -- filtr wydziału + sort  & 0{,}01 s & 0{,}00 s & 0{,}03 s & 0{,}17 s \\
+  Q3 -- raport agregowany      & 0{,}01 s & 0{,}01 s & 0{,}03 s & 0{,}31 s \\
+  Q4 -- wyszukanie po UUID     & 0{,}00 s & 0{,}00 s & 0{,}00 s & 0{,}00 s \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Plany wykonania (skala 1 mln)}
+Najważniejsze potwierdzenie skuteczności indeksów to plan wykonania
+zapytania Q2, przez co silnik wykorzystuje indeks złożony
+\texttt{IDX\_REQUESTS\_DEPT\_CREATED}, sortowanie odbywa się \emph{bez}
+operacji \texttt{SORT} (odczyt indeksu od końca, \texttt{DESCENDING}),
+a przetwarzanie przerywa się po pobraniu 20 wierszy
+(\texttt{WINDOW NOSORT STOPKEY}):
+
+\begin{lstlisting}[language={}, caption={Plan wykonania Q2 dla 1 mln wierszy}]
+| WINDOW NOSORT STOPKEY         |                            |  20 | 12 (0) |
+|  TABLE ACCESS BY INDEX ROWID  | REQUESTS                   |     |        |
+|   INDEX RANGE SCAN DESCENDING | IDX_REQUESTS_DEPT_CREATED  |  20 |  3 (0) |
+\end{lstlisting}
+
+Q4 - wyszukanie po \texttt{external\_id} - korzysta z unikalnego
+indeksu zakładanego przez ograniczenie \texttt{UNIQUE} na kolumnie:
+
+\begin{lstlisting}[language={}, caption={Plan wykonania Q4 dla 1 mln wierszy}]
+| TABLE ACCESS BY INDEX ROWID | REQUESTS    | 1 | 3 (0) |
+|  INDEX UNIQUE SCAN          | SYS_C008705 | 1 | 2 (0) |
+\end{lstlisting}
+
+\paragraph{Wnioski}
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Zaproponowane indeksy spełniają zadanie.} Kluczowe zapytania
+        listingowe (Q2, Q4) działają w czasie praktycznie stałym niezależnie
+        od skali, czyli koszt planu dla Q2 przy 1~mln wierszy to 12 jednostek
+        (20 wierszy z indeksu), a wyszukanie po UUID to pojedynczy
+        \texttt{INDEX UNIQUE SCAN}.
+  \item \textbf{Paginacja \texttt{OFFSET/FETCH} (Q1) skaluje się akceptowalnie}
+        (0{,}27 s przy 1 mln), ale jej koszt rośnie z głębokością strony --
+        baza musi policzyć i pominąć wcześniejsze wiersze. Przy bardzo głębokim
+        przewijaniu rekomendowana technika to \emph{keyset pagination}
+        (\texttt{WHERE created\_at < :ostatnia\_data ORDER BY created\_at DESC
+        FETCH NEXT 20}), korzystająca wprost z \texttt{IDX\_REQUESTS\_CREATED\_AT}
+        bez operacji \texttt{OFFSET}.
+  \item \textbf{Raport agregowany (Q3) czyta pełną tabelę} - 0{,}31 s przy
+        1~mln wierszy jest akceptowalne dla raportu administracyjnego.
+        Gdyby tabela istotnie urosła, naturalnym krokiem jest widok
+        zmaterializowany (\texttt{MATERIALIZED VIEW}) odświeżany cyklicznie
+        (np.\ co godzinę), zamiast wyliczania agregatów na żywo.
+  \item Wstawienie 900~tys.\ wierszy metodą set-based trwało pojedyncze
+        sekundy, co potwierdza przepustowość zapisu przy ładowaniu wsadowym, 
+        a pakiet \texttt{finansista\_pkg} mógłby być wykorzystywany
+        w hurtowej migracji wniosków archiwalnych bez modyfikacji.
+\end{enumerate}
+
+% ====================================================================
+\section{REST API}
+\label{sec:api}
+
+Frontend Thymeleaf komunikuje się z backendem wyłącznie poprzez REST API, co
+wymusza poprawną architekturę klient--serwer. Token JWT z ciasteczka przeglądarki
+jest przekazywany jako nagłówek \texttt{Authorization: Bearer}.
+
+\subsection{Najważniejsze endpointy}
+\begin{tabularx}{\textwidth}{l l X}
+  \toprule
+  \textbf{Metoda} & \textbf{Ścieżka} & \textbf{Opis} \\
+  \midrule
+  POST & /api/v1/auth/register & rejestracja konta \\
+  POST & /api/v1/auth/login & logowanie (ustawia ciasteczko JWT) \\
+  POST & /api/v1/auth/logout & wylogowanie (kasuje ciasteczko) \\
+  GET  & /api/v1/requests & lista wniosków (filtr po statusie/wydziale) \\
+  POST & /api/v1/requests & utworzenie wniosku (pełny Załącznik nr 1) \\
+  GET  & /api/v1/requests/\{id\} & szczegóły wniosku \\
+  PUT  & /api/v1/requests/\{id\} & edycja wniosku \\
+  PATCH & /api/v1/requests/\{id\}/status & zmiana statusu \\
+  GET  & /api/v1/requests/\{id\}/history & historia zmian statusu \\
+  POST & /api/v1/requests/\{id\}/comments & dodanie komentarza \\
+  GET  & /api/v1/requests/\{id\}/comments & komentarze \\
+  DELETE & /api/v1/requests/\{id\} & usunięcie wniosku (admin) \\
+  \bottomrule
+\end{tabularx}
+
+\subsection{Specyfikacja OpenAPI (Swagger UI)}
+W celu spełnienia wymagania \emph{,,Aplikacja typu Web API z obsługą Open API''}
+do projektu dołączono bibliotekę
+\texttt{org.springdoc:springdoc-openapi-starter-webmvc-ui} w wersji \texttt{2.8.9}.
+Biblioteka automatycznie skanuje wszystkie kontrolery oznaczone adnotacją
+\texttt{@RestController}, generuje specyfikację OpenAPI~3.1 i udostępnia
+interaktywne UI Swaggera bez dodatkowej konfiguracji.
+
+Publiczne punkty dostępu (dodane do listy \texttt{permitAll} w klasie
+\texttt{SecurityConfig}):
+\begin{itemize}[leftmargin=*]
+  \item \url{http://localhost:8080/swagger-ui.html} - interaktywna konsola
+        (umożliwia wykonywanie zapytań z przeglądarki),
+  \item \url{http://localhost:8080/swagger-ui/index.html} - bezpośredni adres UI,
+  \item \url{http://localhost:8080/v3/api-docs} - surowa specyfikacja JSON,
+        wykorzystywana m.in.\ przez generatory klientów REST.
+\end{itemize}
+
+Specyfikacja obejmuje wszystkie endpointy REST w przestrzeni
+\texttt{/api/v1/**} - uwierzytelnianie, wnioski, komentarze, historię,
+szablony, statusy, role oraz słowniki referencyjne.
+
+\subsection{Paginacja listy wniosków}
+Endpoint \texttt{GET /api/v1/requests} zwraca dane stronicowane przy pomocy
+mechanizmu \texttt{Pageable} z biblioteki Spring Data. Parametry zapytania:
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{page} - numer strony (domyślnie \texttt{0}),
+  \item \texttt{size} - liczba elementów na stronie (domyślnie \texttt{1000},
+        co zachowuje wsteczną kompatybilność z istniejącymi konsumentami REST),
+  \item \texttt{sort} - pole sortowania (domyślnie \texttt{createdAt,desc}).
+\end{itemize}
+
+Repozytorium \texttt{SpringDataJpaRequestRepository} implementuje interfejs
+\texttt{JpaSpecificationExecutor<Request>}, dzięki czemu paginacja działa
+łącznie ze specyfikacją autoryzacyjną \texttt{RequestAccessSpecificationFactory}.
+Użytkownik nigdy nie zobaczy wniosków poza zakresem swoich uprawnień,
+niezależnie od żądanej strony, przez co specyfikacja autoryzacyjna jest dołączana
+do każdego zapytania jako pierwszy warunek \texttt{WHERE}.
+
+Adnotacja \texttt{@EntityGraph} (z atrybutami \texttt{status}, \texttt{department},
+\texttt{costCategory}, \texttt{fundingSource}, \texttt{template}) jest powielona
+na obu wariantach \texttt{findAll}, co eliminuje problem N+1 na obu ścieżkach.
+
+W odpowiedzi HTTP zwracane są dodatkowe nagłówki:
+\begin{itemize}[leftmargin=*]
+  \item \texttt{X-Total-Count} - łączna liczba pasujących wniosków,
+  \item \texttt{X-Total-Pages} - liczba dostępnych stron.
+\end{itemize}
+Ciało odpowiedzi pozostaje płaską listą \texttt{List<RequestResponse>}
+(uzyskaną przez \texttt{page.getContent()}), co zachowuje wsteczną zgodność
+kontraktu REST z istniejącą warstwą frontową.
+
+\section{Bezpieczeństwo}
+\label{sec:bezp}
+
+\subsection{Uwierzytelnianie}
+Po poprawnym zalogowaniu backend wystawia token JWT podpisany kluczem HMAC SHA-256
+i zwraca go w bezpiecznym ciasteczku z atrybutami \texttt{HttpOnly}, \texttt{SameSite=Strict}.
+Token zawiera identyfikator użytkownika (e-mail) oraz jego rolę.
+
+\subsection{Autoryzacja oparta na rolach}
+\begin{itemize}[leftmargin=*]
+  \item \texttt{ROLE\_STUDENT} - składa wnioski, widzi własne;
+  \item \texttt{ROLE\_WRSS} - ocena merytoryczna w ramach Samorządu;
+  \item \texttt{ROLE\_LEGAL\_COMMISSION} - ocena merytoryczna w komisji;
+  \item \texttt{ROLE\_DEAN\_OFFICE} - ocena formalna (CSSDiR/Dziekanat);
+  \item \texttt{ROLE\_FINANCE\_OFFICE} - Kwestura (rozliczenie);
+  \item \texttt{ROLE\_ADMIN} -- decyzja Rektora, zarządzanie systemem.
+\end{itemize}
+
+\subsection{Zabezpieczenia formularzy}
+Rola użytkownika \emph{nigdy} nie jest pobierana z formularza rejestracji, tzn.
+każde nowe konto otrzymuje rolę bazową \texttt{ROLE\_STUDENT} wymuszoną po stronie
+serwera. Przypisanie wyższej roli jest wyłącznie aktem administracyjnym.
+Podobnie wydział wnioskodawcy nie jest wybierany przy składaniu wniosku, a
+pobierany jest z konta zalogowanego użytkownika.
+
+\section{Frontend i dostępność}
+\label{sec:front}
+
+Warstwa prezentacji oparta jest o szablony Thymeleaf z motywem Politechniki
+Białostockiej (kolorystyka zielona, flat design, Bootstrap 5). Każdy widok
+dziedziczy po wspólnym układzie \texttt{layout/base.html} zawierającym nawigację
+i stopkę.
+
+\subsection{Dostępność}
+\begin{itemize}[leftmargin=*]
+  \item Skip link na początku każdego widoku.
+  \item Semantyczne nagłówki i etykiety formularzy.
+  \item Kontrast kolorów zgodny z WCAG 2.1 AA.
+  \item Opublikowana \emph{Deklaracja dostępności} pod adresem \texttt{/accessibility}.
+  \item Strony błędów 400/403/404/500 w spójnym stylu HTML (nie JSON).
+\end{itemize}
+
+% ====================================================================
+\section{Testy wydajnościowe}
+\label{sec:wydajnosc}
+
+\subsection{Testy bazodanowe (SQL)}
+Wykonano testy wydajnościowe na zbiorach 1\,000, 10\,000, 100\,000 oraz
+1\,000\,000 wierszy w tabeli \texttt{requests}. Sprawdzano:
+\begin{itemize}[leftmargin=*]
+  \item czas pobrania pojedynczego wniosku po \texttt{external\_id},
+  \item czas listowania wniosków z paginacją,
+  \item czas zmiany statusu (kluczowa operacja transakcyjna),
+  \item plany wykonania zapytań przed i po dodaniu indeksów (V6).
+\end{itemize}
+
+Szczegółowe wyniki oraz porównanie planów wykonania zostały umieszczone w pliku
+\texttt{docs/testy-wydajnosciowe.md}.
+
+\subsection{Testy endpointów REST (k6) - punkt dodatkowy}
+Uzupełnieniem testów SQL są testy całych ścieżek HTTP, weryfikujące zachowanie
+warstwy aplikacji (Spring Boot + JPA + serializacja JSON) pod realnym,
+równoległym obciążeniem klientów. Wykorzystano narzędzie \textbf{k6} firmy
+Grafana Labs (skrypt \texttt{docs/k6/get-requests.k6.js}).
+
+\paragraph{Profil obciążenia}
+Symulacja narastającego ruchu w czterech fazach:
+\begin{enumerate}[leftmargin=*]
+  \item rozgrzewka - ramp-up do \textbf{100 VU} przez 30~s,
+  \item narastanie - do \textbf{500 VU} przez 1~min,
+  \item szczyt - \textbf{1000 VU} utrzymywane przez 2~min,
+  \item wygaszanie - ramp-down do 0~VU przez 30~s.
+\end{enumerate}
+
+\paragraph{Kryteria akceptacji}
+Progi \texttt{thresholds} k6: \texttt{p95~<~800~ms}, \texttt{p99~<~1500~ms},
+poziom błędów \texttt{<~1\%}. Ich przekroczenie generuje exit code różny od zera
+i wpis \texttt{ERRO} w stdout, dzięki czemu identyfikacja wąskich gardeł jest
+obiektywna.
+
+\paragraph{Wyniki dla 1000 VU (test trwał 4 min)}
+Test powtórzono dla czterech wartości parametru zapytania \texttt{size},
+żeby zweryfikować skuteczność paginacji.
+
+\begin{center}
+\begin{tabular}{c r r r r r r}
+  \toprule
+  \textbf{size} & \textbf{żądań} & \textbf{avg} & \textbf{p95} & \textbf{p99} & \textbf{HTTP fail} & \textbf{checks} \\
+  \midrule
+  10   & 74\,700 & 675 ms & 1481 ms & 1624 ms & 0\% & 4\% \\
+  50   & 75\,145 & 665 ms & 1477 ms & 1628 ms & 0\% & 4\% \\
+  500  & 71\,852 & 742 ms & 1599 ms & 1727 ms & 0\% & 9\% \\
+  1000 & 72\,438 & 730 ms & 1777 ms & --      & 0\% & 9\% \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Analiza wąskich gardeł}
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Warstwa HTTP jest stabilna} - współczynnik \texttt{http\_req\_failed}
+        wyniósł 0\% we wszystkich przebiegach. Backend nie zwrócił żadnego błędu 5xx,
+        nie wystąpiły timeouty ani zerwane połączenia.
+  \item \textbf{Rozmiary stron 10 i 50 dają niemal identyczne wyniki}
+        (avg 675 vs 665 ms, p95 1481 vs 1477 ms). Oznacza to, że dominującym
+        kosztem nie jest serializacja JSON ani rozmiar payloadu, lecz koszt
+        stały per-request. Główne podejrzenia: pula \texttt{HikariCP}
+        (domyślnie 10) wysycona przez 1000 współbieżnych żądań, narzut filtra
+        JWT (parsowanie tokena), koszt deserializacji \texttt{RequestResponse}
+        z zagnieżdżonymi listami.
+  \item \textbf{Skok kosztów przy \texttt{size=500} i \texttt{size=1000}}
+        (błędy 4\% \(\to\) 9\%, p95 +20\%) - dopiero duże strony zaczynają
+        obciążać CPU serializacją i pamięć (większy working set per request).
+        Wynik potwierdza tezę, że rekomendowana domyślna strona dla tego
+        endpointu to \texttt{size~\(\le\)~50}.
+  \item \textbf{Próg \texttt{p95~<~800~ms} jest nieosiągalny przy 1000 VU
+        na tym sprzęcie} niezależnie od rozmiaru strony. Realny SLO dla
+        aplikacji uniwersyteckiej (kilkaset jednoczesnych użytkowników)
+        \texttt{p95~<~500~ms} przy \texttt{size~\(\le\)~50} wymagałby
+        zwiększenia rozmiaru puli HikariCP do \(\sim\)50 oraz rozważenia
+        \emph{keyset pagination} dla głębokich stron (analogicznie do
+        rekomendacji z testów SQL).
+  \item \textbf{Przepustowość ustabilizowała się na \(\sim\)300 RPS} niezależnie
+        od \texttt{size} (71-75 tys.\ żądań / 4 min). Bezpośrednio potwierdza
+        to, że wąskim gardłem jest dostępność wątku/połączenia, a nie objętość
+        pojedynczej odpowiedzi.
+\end{enumerate}
+
+Szczegółowy raport (czterokrotny przebieg, pełne podsumowania w JSON oraz
+przepis odtworzenia) znajduje się w pliku \texttt{docs/testy-wydajnosciowe.md}
+oraz \texttt{docs/k6/get-requests.summary.json}.
+
+% ====================================================================
+\section{Uruchomienie systemu}
+\label{sec:uruchomienie}
+
+\subsection{Wymagania}
+\begin{itemize}[leftmargin=*]
+  \item Java 25, Maven 3.9+
+  \item Docker (do uruchomienia Oracle Database 23 Free)
+\end{itemize}
+
+\subsection{Krok po kroku}
+\begin{lstlisting}[language=bash, caption={Uruchomienie aplikacji}]
+# 1. Uruchomienie bazy Oracle w Dockerze
+docker run -d --name oracle-pb -p 1521:1521 \
+  -e ORACLE_PASSWORD=paw1ewjav1e \
+  gvenzl/oracle-free:23-slim
+
+# 2. Utworzenie schematu admin_pb (z hasłem zgodnym z application.yaml)
+#    - skrypt w docs/install/create_schema.sql lub recznie w SQL Developer
+
+# 3. Uruchomienie aplikacji
+./mvnw spring-boot:run
+
+# 4. Aplikacja dostępna pod:
+#    http://localhost:8080
+\end{lstlisting}
+
+\subsection{Konta testowe}
+Aplikacja przygotowuje konta demonstracyjne z dwóch niezależnych źródeł.
+Oba źródła współistnieją bez konfliktu: \texttt{DataSeeder} sprawdza
+\texttt{existsByEmail} przed zapisem, a migracja \texttt{V10} używa
+warunku \texttt{WHERE NOT EXISTS} -- każde uruchomienie jest idempotentne.
+
+\paragraph{Konta z \texttt{DataSeeder.java} (warstwa aplikacji)}
+Tworzone w runtime przy starcie aplikacji, hasła hashowane BCryptem
+przez \texttt{PasswordEncoder}.
+
+\begin{tabularx}{\textwidth}{l l X}
+  \toprule
+  \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
+  \midrule
+  j.wnioskodawca@student.pb.edu.pl & student123 & STUDENT / Wydział Informatyki \\
+  k.samorzad@pb.edu.pl & wrss123 & WRSS / Samorząd Studentów \\
+  a.zgodna@pb.edu.pl & komisja123 & LEGAL\_COMMISSION / Wydział Mechaniczny \\
+  e.dziekan@pb.edu.pl & dziekanat123 & DEAN\_OFFICE / Dziekanat WI \\
+  j.matusiewicz@student.pb.edu.pl & admin123 & ADMIN / Wydział Mechaniczny \\
+  j.borkowski@student.pb.edu.pl & admin123 & ADMIN / Wydział Informatyki \\
+  \bottomrule
+\end{tabularx}
+
+\paragraph{Konta z migracji \texttt{V10\_\_demo\_data.sql} (warstwa bazy)}
+Wstawiane przez Flyway w ramach skryptu zasilania danymi demo. Hasła zapisane
+w formacie \texttt{\{noop\}} (rozpoznawany przez \texttt{DelegatingPasswordEncoder}
+jako plain text -- świadoma decyzja, by nie liczyć BCryptu po stronie SQL).
+Identyfikatory wewnętrzne (\texttt{id}) zaczynają się od \texttt{9001}, aby
+nie kolidować z auto-inkrementacją kont z \texttt{DataSeeder}.
+
+\begin{tabularx}{\textwidth}{l l X}
+  \toprule
+  \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
+  \midrule
+  demo-admin@pb.edu.pl     & demo123 & ADMIN / Wydział Informatyki \\
+  demo-student@pb.edu.pl   & demo123 & STUDENT / Wydział Informatyki \\
+  demo-wrss@pb.edu.pl      & demo123 & STUDENT\_COUNCIL / Samorząd Studentów \\
+  demo-komisja@pb.edu.pl   & demo123 & LEGAL\_COMMISSION / Rektorat \\
+  demo-dziekanat@pb.edu.pl & demo123 & DEAN\_OFFICE / Dziekanat WI \\
+  demo-kwestura@pb.edu.pl  & demo123 & FINANCE\_OFFICE / Kwestura \\
+  \bottomrule
+\end{tabularx}
+
+\paragraph{Przykładowe wnioski z \texttt{V10}}
+Razem z kontami migracja \texttt{V10} wstawia trzy wnioski demonstracyjne,
+po jednym w różnym statusie obiegu:
+\begin{itemize}[leftmargin=*]
+  \item \emph{Juwenalia 2026} -- status \texttt{DRAFT}, autor: demo-student,
+        kwota 12\,500{,}00 zł,
+  \item \emph{Konferencja koła naukowego} -- status \texttt{SUBMITTED},
+        autor: demo-student, kwota 4\,800{,}00 zł,
+  \item \emph{Hackathon studencki} -- status \texttt{ACCEPTED},
+        autor: demo-wrss, kwota 7\,600{,}00 zł.
+\end{itemize}
+
+% ====================================================================
+\section{Podsumowanie}
+\label{sec:podsumowanie}
+
+% TODO: 4-6 zdań - co udało się zrealizować, czego nie, czego nauczyliśmy się
+% przy projekcie. Można wspomnieć o trudnościach (Spring Boot 4 jako swiezynka,
+% Oracle, integracja PL/SQL z JPA itp.).
+
+\end{document}

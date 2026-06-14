@@ -3,6 +3,9 @@ package pl.pb.finansista.request.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,9 +49,11 @@ public class RequestController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) String search,
+            @PageableDefault(size = 1000, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Authentication authentication
     ) {
-        log.info("Fetching requests for user: {}", authentication.getName());
+        log.info("Fetching requests for user: {} (page={}, size={})",
+                authentication.getName(), pageable.getPageNumber(), pageable.getPageSize());
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
@@ -61,14 +66,19 @@ public class RequestController {
                 search
         );
 
-        List<Request> requests = getRequestsUseCase.execute(query);
-        log.info("Found {} requests for user: {}", requests.size(), authentication.getName());
+        var page = getRequestsUseCase.execute(query, pageable);
+        log.info("Found {} requests on page {} (total elements={}) for user: {}",
+                page.getNumberOfElements(), page.getNumber(), page.getTotalElements(),
+                authentication.getName());
 
-        List<RequestResponse> response = requests.stream()
+        List<RequestResponse> response = page.getContent().stream()
                 .map(RequestResponse::of)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .header("X-Total-Count", String.valueOf(page.getTotalElements()))
+                .header("X-Total-Pages", String.valueOf(page.getTotalPages()))
+                .body(response);
     }
 
     @GetMapping("/{id}")

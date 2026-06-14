@@ -82,3 +82,104 @@ sqlplus admin_pb/...@//localhost:1521/FREEPDB1 @db/scripts/performance_test.sql
 # 3. Sprzątanie danych testowych
 #    DELETE FROM requests WHERE title LIKE 'Wniosek testowy #%'; COMMIT;
 ```
+
+---
+
+# Testy wydajnościowe endpointów REST (bonus SBD)
+
+## Cel i metodologia
+
+Uzupełnieniem testów na poziomie SQL są testy całych ścieżek HTTP — sprawdzają,
+jak warstwa aplikacji (Spring Boot + JPA + serializacja JSON) zachowuje się
+pod realnym, równoległym obciążeniem klientów. Mierzony jest endpoint
+**`GET /api/v1/requests`**, który zwraca paginowaną listę wniosków
+z eager-fetchem pięciu asocjacji (`status`, `department`, `costCategory`,
+`fundingSource`, `template`).
+
+- Narzędzie: **k6 v2.0.0** (Grafana Labs), skrypt `docs/k6/get-requests.k6.js`.
+- Profil obciążenia: ramp-up 0 → 100 → 500 → **1000 VU**, plateau 2 min na szczycie,
+  ramp-down 30 s. Łączny czas testu: 4 min.
+- Sygnalizacja błędów: progi (`thresholds`) `p95 < 800 ms`, `errors < 1%` —
+  przekroczenie generuje exit code ≠ 0 i wpis `ERRO` w stdout, co pozwala
+  obiektywnie udokumentować wąskie gardło.
+- Środowisko: backend i baza Oracle 23ai uruchomione lokalnie na tym samym
+  hoście (Windows 11, 16 GB RAM); brak osobnej maszyny generującej obciążenie,
+  co ma niewielki wpływ na bezwzględne wartości latencji, ale nie wpływa na
+  porównanie wariantów.
+
+Test powtórzono dla czterech wartości parametru zapytania **`size`**
+(liczba elementów na stronie), żeby zweryfikować skuteczność paginacji
+i odnaleźć wąskie gardło.
+
+## Wyniki — 1000 VU, 4 minuty, GET /api/v1/requests
+
+| `size` | Łącznie żądań | Avg | p95 | p99 | HTTP fail | Checks fail (>1500 ms) |
+|--------|---------------|-----|-----|-----|-----------|------------------------|
+| 10     | 74 700        | 675 ms | 1481 ms | 1624 ms | 0% | 4% |
+| 50     | 75 145        | 665 ms | 1477 ms | 1628 ms | 0% | 4% |
+| 500    | 71 852        | 742 ms | 1599 ms | 1727 ms | 0% | 9% |
+| 1000   | 72 438        | 730 ms | 1777 ms | n/a*    | 0% | 9% |
+
+\* p99 nie zostało wystawione w pierwszym przebiegu — przed kolejnymi
+testami dodano `summaryTrendStats` do konfiguracji k6.
+
+## Analiza wąskich gardeł
+
+1. **HTTP layer jest stabilny** — `http_req_failed = 0%` we wszystkich
+   przebiegach. Backend nie zwrócił ani jednego 5xx, nie było timeoutów
+   ani zerwanych połączeń. Latencja jest problemem, dostępność — nie.
+
+2. **Rozmiar strony 10 vs 50 daje niemal identyczne wyniki**
+   (avg 675 vs 665 ms, p95 1481 vs 1477 ms). Oznacza to, że **dominującym
+   kosztem nie jest serializacja JSON ani rozmiar payloadu**, tylko coś
+   stałego per-request. Najpewniejsze podejrzenia:
+   - **pula HikariCP (default 10)** — przy 1000 współbieżnych VU jest
+     to gardło numer jeden; większość czasu request spędza w kolejce na
+     połączenie do bazy,
+   - narzut Spring Security + filtra JWT (parsowanie tokena na każdy request),
+   - serializacja `RequestResponse` z zagnieżdżonymi listami (Task / CostItem
+     / Funding) — koszt fixed nawet dla małej strony.
+
+3. **Skok przy `size=500` i `size=1000`** (errors 4% → 9%, p95 +20%).
+   Dopiero duże strony zaczynają obciążać CPU serializacją i pamięć (większy
+   working set per request). To zgadza się z teorią — **rekomendowana
+   domyślna strona dla tego endpointu to `size ≤ 50`**.
+
+4. **Próg `p95 < 800 ms` jest nieosiągalny przy 1000 VU na tym sprzęcie**
+   niezależnie od rozmiaru strony. Realny SLO dla aplikacji uniwersyteckiej
+   (kilkaset jednoczesnych użytkowników) — `p95 < 500 ms` przy
+   `size ≤ 50` — wymagałby:
+   - zwiększenia `spring.datasource.hikari.maximum-pool-size` do ~50,
+   - cache'owania uprawnień JWT na request (uniknięcie powtórnego parsowania),
+   - rozważenia **keyset pagination** dla głębokich stron (analogicznie do
+     rekomendacji z testów SQL, sekcja Q1).
+
+5. **Throughput stabilizuje się na ~300 RPS** niezależnie od `size`
+   (71–75 tys. żądań / 4 min = ~300/s). To bezpośrednio potwierdza tezę
+   z punktu 2: gardłem jest dostępność wątku/connection, nie objętość
+   pojedynczej odpowiedzi.
+
+## Odtworzenie testów
+
+```powershell
+# 1. Uruchom backend (osobny terminal)
+.\mvnw spring-boot:run
+
+# 2. Zaloguj się REST-em i przechwyć JWT z cookie
+$resp = Invoke-WebRequest -Uri "http://localhost:8080/api/v1/auth/login" `
+        -Method POST -ContentType "application/json" `
+        -Body '{"email":"j.matusiewicz@student.pb.edu.pl","password":"admin123"}' `
+        -SessionVariable s
+$env:K6_JWT = ($s.Cookies.GetCookies("http://localhost:8080") | ? Name -eq "jwt").Value
+
+# 3. Cztery przebiegi (po ~4 min każdy)
+k6 run --env PAGE_SIZE=10   docs/k6/get-requests.k6.js
+k6 run --env PAGE_SIZE=50   docs/k6/get-requests.k6.js
+k6 run --env PAGE_SIZE=500  docs/k6/get-requests.k6.js
+k6 run --env PAGE_SIZE=1000 docs/k6/get-requests.k6.js
+```
+
+Pełny raport JSON z ostatniego przebiegu trafia do
+`docs/k6/get-requests.summary.json` (umożliwia dalszą analizę
+i porównania w czasie).
+

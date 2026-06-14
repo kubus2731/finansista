@@ -1,6 +1,8 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,15 @@ public class GetRequestsUseCase {
 
     @Transactional(readOnly = true)
     public List<Request> execute(GetRequestsQuery query) {
+        return requestRepository.findAll(buildSpec(query));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Request> execute(GetRequestsQuery query, Pageable pageable) {
+        return requestRepository.findAll(buildSpec(query), pageable);
+    }
+
+    private Specification<Request> buildSpec(GetRequestsQuery query) {
         User currentUser = userRepository.findByEmail(query.userEmail())
                 .orElseThrow(UserNotFoundException::new);
 
@@ -41,6 +52,6 @@ public class GetRequestsUseCase {
             specs.add(RequestSpecifications.containsText(query.search()));
         }
 
-        return requestRepository.findAll(Specification.allOf(specs));
+        return Specification.allOf(specs);
     }
 }

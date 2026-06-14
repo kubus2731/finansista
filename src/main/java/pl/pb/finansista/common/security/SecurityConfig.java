@@ -42,7 +42,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/","/login", "/register", "/accessibility", "/error",
                                 "/css/**", "/js/**", "/img/**", "/favicon.ico",
-                                "/api/v1/auth/**").permitAll()
+                                "/api/v1/auth/**",
+                                "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))

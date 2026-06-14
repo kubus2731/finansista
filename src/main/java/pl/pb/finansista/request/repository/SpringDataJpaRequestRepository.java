@@ -2,6 +2,8 @@ package pl.pb.finansista.request.repository;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +22,10 @@ interface SpringDataJpaRequestRepository extends JpaRepository<Request, Long>, J
     @NonNull
     @EntityGraph(attributePaths = {"status", "department", "costCategory", "fundingSource", "template"})
     List<Request> findAll(@Nullable Specification<Request> spec);
+
+    @NonNull
+    @EntityGraph(attributePaths = {"status", "department", "costCategory", "fundingSource", "template"})
+    Page<Request> findAll(@Nullable Specification<Request> spec, @NonNull Pageable pageable);
 
     java.util.Optional<Request> findByExternalId(UUID externalId);
 }

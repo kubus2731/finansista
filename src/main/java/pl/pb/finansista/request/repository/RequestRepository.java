@@ -1,5 +1,7 @@
 package pl.pb.finansista.request.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import pl.pb.finansista.request.Request;
 
@@ -16,6 +18,8 @@ public interface RequestRepository {
     Optional<Request> findOne(Specification<Request> spec);
 
     List<Request> findAll(Specification<Request> spec);
+
+    Page<Request> findAll(Specification<Request> spec, Pageable pageable);
 
     Request save(Request request);
 
