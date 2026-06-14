@@ -1,4 +1,4 @@
-package pl.pb.finansista.user.view;
+package pl.pb.finansista.frontend.user.view;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package pl.pb.finansista.web;
+package pl.pb.finansista.frontend.web;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

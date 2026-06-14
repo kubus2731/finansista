@@ -1,4 +1,4 @@
-package pl.pb.finansista.web;
+package pl.pb.finansista.frontend.web;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

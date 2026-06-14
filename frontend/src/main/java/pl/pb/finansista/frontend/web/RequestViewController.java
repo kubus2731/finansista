@@ -1,4 +1,4 @@
-package pl.pb.finansista.web;
+package pl.pb.finansista.frontend.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.pb.finansista.common.security.JwtService;
-import pl.pb.finansista.request.view.CreateRequestForm;
-import pl.pb.finansista.request.view.RequestView;
+import pl.pb.finansista.frontend.request.view.CreateRequestForm;
+import pl.pb.finansista.frontend.request.view.RequestView;
 import pl.pb.finansista.request.web.CreateRequestRequest;
 import pl.pb.finansista.request.web.RequestResponse;
-import pl.pb.finansista.user.UserNotFoundException;
+import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
 import java.math.BigDecimal;

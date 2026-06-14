@@ -1,4 +1,4 @@
-package pl.pb.finansista.common.config;
+package pl.pb.finansista.frontend.common.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package pl.pb.finansista.web;
+package pl.pb.finansista.frontend.web;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
-import pl.pb.finansista.user.view.RegisterForm;
+import pl.pb.finansista.frontend.user.view.RegisterForm;
 import pl.pb.finansista.user.web.LoginUserRequest;
 import pl.pb.finansista.user.web.RegisterUserRequest;
 

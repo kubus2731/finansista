@@ -1,4 +1,4 @@
-package pl.pb.finansista.request.view;
+package pl.pb.finansista.frontend.request.view;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

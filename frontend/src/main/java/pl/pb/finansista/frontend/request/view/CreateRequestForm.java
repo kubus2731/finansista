@@ -1,4 +1,4 @@
-package pl.pb.finansista.request.view;
+package pl.pb.finansista.frontend.request.view;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
