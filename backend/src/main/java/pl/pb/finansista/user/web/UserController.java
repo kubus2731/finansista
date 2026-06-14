@@ -60,7 +60,6 @@ public class UserController {
             @PathVariable UUID id,
             @RequestBody @Valid ChangeUserRoleRequest request,
             Authentication authentication) {
-
         log.info("Admin user {} is changing role for user ID: {}", authentication.getName(), id);
         changeUserRoleUseCase.execute(request.toCommand(id));
         log.info("Successfully updated role for user ID: {}", id);

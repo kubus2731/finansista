@@ -30,5 +30,20 @@ class JpaRoleRepository implements RoleRepository {
     public List<Role> findAll() {
         return repository.findAll();
     }
+
+    @Override
+    public boolean existsByName(String name) {
+        return repository.existsByName(name);
+    }
+
+    @Override
+    public Role save(Role role) {
+        return repository.save(role);
+    }
+
+    @Override
+    public void delete(Role role) {
+        repository.delete(role);
+    }
 }
 
