@@ -119,7 +119,9 @@ CREATE TABLE attachments (
     external_id RAW(16) NOT NULL UNIQUE,
     request_id NUMBER(15) NOT NULL,
     file_name VARCHAR2(255) NOT NULL,
-    file_url VARCHAR2(500) NOT NULL,
+    storage_key VARCHAR2(500) NOT NULL,
+    content_type VARCHAR2(150) NOT NULL,
+    size_bytes NUMBER(19) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_attachments_request FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE
 );

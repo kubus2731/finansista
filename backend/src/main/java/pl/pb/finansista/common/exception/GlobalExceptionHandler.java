@@ -14,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -93,6 +94,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         pd.setProperty("traceId", getTraceId());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(
+            MaxUploadSizeExceededException ex, @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+        log.warn("Upload exceeded the maximum allowed size: {}", ex.getMessage());
+
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.PAYLOAD_TOO_LARGE,
+                "The uploaded file exceeds the maximum allowed size.");
+        pd.setTitle("Payload Too Large");
+
+        return handleExceptionInternal(ex, pd, headers, HttpStatus.PAYLOAD_TOO_LARGE, request);
     }
 
     private String codeFor(Exception ex) {

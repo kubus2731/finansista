@@ -7,7 +7,8 @@ public record AddAttachmentCommand(
         UUID requestExternalId,
         String userEmail,
         String fileName,
-        String fileUrl,
+        String contentType,
+        byte[] content,
         List<String> userAuthorities
 ) {
 }

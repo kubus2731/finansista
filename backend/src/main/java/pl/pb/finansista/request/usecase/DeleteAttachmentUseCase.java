@@ -3,6 +3,9 @@ package pl.pb.finansista.request.usecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import pl.pb.finansista.common.storage.FileStorage;
 import pl.pb.finansista.request.Attachment;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
@@ -15,21 +18,22 @@ import pl.pb.finansista.user.RoleName;
 import java.util.Collection;
 import java.util.UUID;
 
-/**
- * Removing an attachment is gated like editing the request: author (or admin),
- * and only while the request is in DRAFT / CORRECTION_REQUIRED.
- */
 @Service
 @RequiredArgsConstructor
 public class DeleteAttachmentUseCase {
 
     private final AttachmentRepository attachmentRepository;
+    private final FileStorage fileStorage;
 
     @Transactional
-    public void execute(UUID attachmentExternalId, String userEmail, Collection<String> userAuthorities) {
+    public void execute(UUID requestExternalId, UUID attachmentExternalId, String userEmail, Collection<String> userAuthorities) {
         Attachment attachment = attachmentRepository.findByExternalId(attachmentExternalId)
                 .orElseThrow(AttachmentNotFoundException::new);
         Request request = attachment.getRequest();
+
+        if (!request.getExternalId().equals(requestExternalId)) {
+            throw new AttachmentNotFoundException();
+        }
 
         boolean isAdmin = userAuthorities.contains(RoleName.ROLE_ADMIN.name());
         boolean isAuthor = request.getUser().getEmail().equals(userEmail);
@@ -44,6 +48,14 @@ public class DeleteAttachmentUseCase {
             throw InvalidRequestStateException.withStatusName(status);
         }
 
+        String storageKey = attachment.getStorageKey();
         attachmentRepository.delete(attachment);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                fileStorage.delete(storageKey);
+            }
+        });
     }
 }
