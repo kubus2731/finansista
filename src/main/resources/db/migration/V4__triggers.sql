@@ -1,10 +1,3 @@
--- =====================================================================
--- V4: Triggery na tabeli requests
--- Statusy (z V2): 1 DRAFT, 2 SUBMITTED, 3 FORMAL_EVALUATION,
--- 4 UNDER_REVIEW, 5 ACCEPTED, 6 REJECTED, 7 CORRECTION_REQUIRED.
--- (Maszyna stanów: patrz V7.)
--- =====================================================================
-
 -- 1. Automatyczna aktualizacja czasu modyfikacji
 CREATE OR REPLACE TRIGGER t_requests_update_now
     BEFORE UPDATE ON requests
@@ -15,10 +8,6 @@ END;
 /
 
 -- 2. Trigger audytowy: zapisuje rzeczywistego autora zmiany statusu.
---    Aktora dostarcza pakiet finansista_pkg (ustawiany przez evaluate_request
---    lub bezpośrednio przez aplikację); awaryjnie loguje wnioskodawcę.
---    UWAGA: trigger odwołuje się do pakietu z V5 - po starcie Flyway
---    skompiluje się jako VALID dopiero po utworzeniu pakietu (V5). To poprawne.
 CREATE OR REPLACE TRIGGER t_activity
     AFTER UPDATE OF request_status_id ON requests
     FOR EACH ROW

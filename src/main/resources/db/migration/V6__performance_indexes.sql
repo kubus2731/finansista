@@ -14,9 +14,8 @@ CREATE INDEX idx_activity_user ON activity_log(user_id);
 CREATE INDEX idx_comments_request ON comments(request_id);
 CREATE INDEX idx_attachments_request ON attachments(request_id);
 
--- Ograniczenie wartości w tabeli request: kwota wniosku musi być dodatnia
 ALTER TABLE requests ADD CONSTRAINT chk_requests_amount_positive CHECK (amount > 0);
 
--- Wskazówka do testów wydajnościowych (uruchom po załadowaniu danych demo):
+-- Wskazówka do testów wydajnościowych:
 --   EXEC DBMS_STATS.GATHER_TABLE_STATS(USER, 'REQUESTS');
 --   EXEC DBMS_STATS.GATHER_TABLE_STATS(USER, 'ACTIVITY_LOG');

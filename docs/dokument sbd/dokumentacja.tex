@@ -728,11 +728,11 @@ nie kolidować z auto-inkrementacją kont z \texttt{DataSeeder}.
 Razem z kontami migracja \texttt{V10} wstawia trzy wnioski demonstracyjne,
 po jednym w różnym statusie obiegu:
 \begin{itemize}[leftmargin=*]
-  \item \emph{Juwenalia 2026} -- status \texttt{DRAFT}, autor: demo-student,
+  \item \emph{Juwenalia 2026} - status \texttt{DRAFT}, autor: demo-student,
         kwota 12\,500{,}00 zł,
-  \item \emph{Konferencja koła naukowego} -- status \texttt{SUBMITTED},
+  \item \emph{Konferencja koła naukowego} - status \texttt{SUBMITTED},
         autor: demo-student, kwota 4\,800{,}00 zł,
-  \item \emph{Hackathon studencki} -- status \texttt{ACCEPTED},
+  \item \emph{Hackathon studencki} - status \texttt{ACCEPTED},
         autor: demo-wrss, kwota 7\,600{,}00 zł.
 \end{itemize}
 
@@ -740,8 +740,6 @@ po jednym w różnym statusie obiegu:
 \section{Podsumowanie}
 \label{sec:podsumowanie}
 
-% TODO: 4-6 zdań - co udało się zrealizować, czego nie, czego nauczyliśmy się
-% przy projekcie. Można wspomnieć o trudnościach (Spring Boot 4 jako swiezynka,
-% Oracle, integracja PL/SQL z JPA itp.).
+Projekt \textbf{Finansista PB} z powodzeniem zrealizował kluczowe założenia architektoniczne, koncentrując się przede wszystkim na solidnej warstwie serwerowej oraz zaawansowanej logice bazodanowej. Udało się zaimplementować wydajne REST API, zintegrowaną maszynę stanów w Oracle PL/SQL, a także kompleksowe mechanizmy autoryzacji oparte na rolach, jednakże ze względu na wysoki stopień skomplikowania backendu i ograniczone ramy czasowe, warstwa prezentacji (frontend) została zrealizowana w wariancie podstawowym, co stanowi obecnie fundament wymagający dalszej rozbudowy o brakujące widoki i pełne ścieżki użytkownika. Mimo tych braków interfejsowych, realizacja systemu pozwoliła na zdobycie cennego, praktycznego doświadczenia z zakresu optymalizacji zapytań SQL, zarządzania transakcjami oraz integracji nowoczesnego frameworka Spring Boot z relacyjną bazą danych.
 
 \end{document}

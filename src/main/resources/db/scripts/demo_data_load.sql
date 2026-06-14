@@ -1,16 +1,3 @@
--- =====================================================================
--- Skrypt generowania danych demo do testów wydajnościowych (SBD pkt 1 i 6)
--- URUCHAMIAĆ RĘCZNIE (sqlplus / SQL Developer) — to NIE jest migracja Flyway.
---
--- Użycie:  sqlplus user/pass@db @demo_data_load.sql <liczba_rekordow>
--- np.      @demo_data_load.sql 100000
--- Skrypt DOCIĄŻA tabelę do zadanej liczby wierszy testowych (przyrostowo),
--- więc można wołać kolejno: 1000, 10000, 100000, 1000000.
---
--- Zależności: dane słownikowe z V2 (użytkownicy 1-4, departamenty 1-15,
--- statusy 1-7, kategorie 1-2).
--- =====================================================================
-
 SET VERIFY OFF
 SET SERVEROUTPUT ON
 
@@ -49,13 +36,7 @@ BEGIN
 END;
 /
 
--- Statystyki dla optymalizatora (kluczowe, żeby używał indeksów z V6)
 EXEC DBMS_STATS.GATHER_TABLE_STATS(USER, 'REQUESTS');
 
 SELECT COUNT(*) AS wierszy_w_requests FROM requests;
 
--- =====================================================================
--- Czyszczenie danych testowych (zostawia dane słownikowe z V2):
---   DELETE FROM requests WHERE title LIKE 'Wniosek testowy #%';
---   COMMIT;
--- =====================================================================

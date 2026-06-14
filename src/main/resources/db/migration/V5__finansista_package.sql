@@ -1,9 +1,7 @@
--- =====================================================================
--- V5: Pakiet finansista_pkg
+-- Pakiet finansista_pkg
 --   - śledzenie aktora (kto wykonuje zmianę) na potrzeby audytu w t_activity
 --   - funkcja pola pochodnego: wykorzystany budżet wydziału
 --   - procedura oceny wniosku (przejście statusu + komentarz)
--- =====================================================================
 
 -- Specyfikacja pakietu
 CREATE OR REPLACE PACKAGE finansista_pkg AS
@@ -60,7 +58,6 @@ CREATE OR REPLACE PACKAGE BODY finansista_pkg AS
     ) IS
         v_current_status NUMBER(16);
     BEGIN
-        -- ustaw aktora, aby trigger audytowy zapisał właściwego użytkownika
         set_actor(p_evaluator_id);
 
         SELECT request_status_id INTO v_current_status

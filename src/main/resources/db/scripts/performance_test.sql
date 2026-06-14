@@ -1,11 +1,3 @@
--- =====================================================================
--- Testy wydajnościowe tabeli transakcyjnej REQUESTS (SBD pkt 6)
--- Uruchamiać po każdym poziomie zasilenia (1k / 10k / 100k / 1M):
---   sqlplus user/pass@db @performance_test.sql
--- Mierzy czas 4 zapytań reprezentujących realne użycie aplikacji
--- oraz pokazuje plany wykonania (wykorzystanie indeksów z V6).
--- =====================================================================
-
 SET TIMING ON
 SET LINESIZE 200
 SET PAGESIZE 50

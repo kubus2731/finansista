@@ -1,16 +1,13 @@
--- V8: Rozszerzenie wniosku do pełnego wzoru z Załącznika nr 1 (Zarządzenie 13/2025).
--- Nowe kolumny opisowe na requests (sekcje I-III) + tabele-dzieci na
--- harmonogram (IV), kosztorys (IV) i źródła finansowania (VI).
--- Wszystkie nowe kolumny NULLABLE, żeby nie wywrócić istniejących wierszy.
+-- Rozszerzenie wniosku do pełnego wzoru z Załącznika nr 1 (Zarządzenie 13/2025).
 
 -- Sekcja I: dane przedsięwzięcia
 ALTER TABLE requests ADD (
-    realizer_type          VARCHAR2(30),   -- SSPB / SDPB / KOLO_NAUKOWE / ORGANIZACJA / AZS
-    project_kind           VARCHAR2(30),   -- kulturalny / naukowy / dydaktyczny / sportowy / spoleczny / artystyczny / inny
+    realizer_type          VARCHAR2(30),
+    project_kind           VARCHAR2(30),
     project_kind_other     VARCHAR2(200),
-    project_scope          VARCHAR2(30),   -- wydzialowy / uczelniany / srodowiskowy / ogolnopolski / miedzynarodowy / inny
+    project_scope          VARCHAR2(30),
     project_scope_other    VARCHAR2(200),
-    project_nature         VARCHAR2(30),   -- jednorazowe / cykliczne / inny
+    project_nature         VARCHAR2(30),
     project_nature_other   VARCHAR2(200),
     planned_date_from      DATE,
     planned_date_to        DATE,
