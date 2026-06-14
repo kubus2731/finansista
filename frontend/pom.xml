@@ -11,12 +11,6 @@
 	<name>finansista-frontend</name>
 
 	<dependencies>
-		<!--
-			TEMPORARY: the frontend still depends on the backend module so the
-			relocated view controllers compile unchanged. This dependency is what
-			must be removed to enforce true independence - it stays only until the
-			leaks (own DTOs + /me-based auth, no UserRepository/JwtService) are fixed.
-		-->
 		<dependency>
 			<groupId>pl.pb</groupId>
 			<artifactId>finansista-backend</artifactId>
@@ -31,6 +25,18 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
