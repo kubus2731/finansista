@@ -11,6 +11,7 @@
 	<name>finansista-frontend</name>
 
 	<dependencies>
+		<!-- finansista-backend jest TYMCZASOWE! -->
 		<dependency>
 			<groupId>pl.pb</groupId>
 			<artifactId>finansista-backend</artifactId>
