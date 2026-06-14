@@ -1,4 +1,4 @@
--- V7: Maszyna stanów wniosku
+-- Maszyna stanów wniosku
 -- Funkcja walidująca przejścia statusu + trigger ją egzekwujący.
 
 -- Funkcja: czy przejście ze statusu p_old do p_new jest dozwolone (1 = tak, 0 = nie)

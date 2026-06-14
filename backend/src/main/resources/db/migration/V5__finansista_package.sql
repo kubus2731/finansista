@@ -1,9 +1,7 @@
--- =====================================================================
--- V5: Pakiet finansista_pkg
+-- Pakiet finansista_pkg
 --   - śledzenie aktora (kto wykonuje zmianę) na potrzeby audytu w t_activity
 --   - funkcja pola pochodnego: wykorzystany budżet wydziału
 --   - procedura oceny wniosku (przejście statusu + komentarz)
--- =====================================================================
 
 -- Specyfikacja pakietu
 CREATE OR REPLACE PACKAGE finansista_pkg AS

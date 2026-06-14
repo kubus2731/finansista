@@ -7,46 +7,50 @@
 \contentsline {subsection}{\numberline {2.1}Wymagania funkcjonalne}{3}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2}Wymagania niefunkcjonalne}{4}{subsection.2.2}%
 \contentsline {section}{\numberline {3}Architektura systemu}{4}{section.3}%
+\contentsline {paragraph}{Struktura Maven}{5}{paragraph*.1}%
 \contentsline {subsection}{\numberline {3.1}Stos technologiczny}{5}{subsection.3.1}%
-\contentsline {section}{\numberline {4}Model danych}{5}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Diagram encji}{5}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Główne tabele}{5}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Klucze hybrydowe}{6}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Migracje Flyway}{6}{subsection.4.4}%
-\contentsline {section}{\numberline {5}Logika w bazie danych}{6}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Maszyna stanów wniosku}{6}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Pakiet \texttt {finansista\_pkg} (V5)}{7}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Triggery (V4)}{7}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Maszyna stanów (V7)}{8}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Widoki (V3)}{8}{subsection.5.5}%
-\contentsline {subsection}{\numberline {5.6}Indeksy wydajnościowe (V6)}{8}{subsection.5.6}%
-\contentsline {subsection}{\numberline {5.7}Wyniki testów wydajnościowych (1\,k -- 1\,M)}{8}{subsection.5.7}%
-\contentsline {paragraph}{Mierzone zapytania}{9}{paragraph*.1}%
-\contentsline {paragraph}{Czasy wykonania}{9}{paragraph*.2}%
-\contentsline {paragraph}{Plany wykonania (skala 1 mln)}{9}{paragraph*.3}%
-\contentsline {paragraph}{Wnioski}{9}{paragraph*.4}%
-\contentsline {section}{\numberline {6}REST API}{10}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Najważniejsze endpointy}{10}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Specyfikacja OpenAPI (Swagger UI)}{10}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Paginacja listy wniosków}{11}{subsection.6.3}%
-\contentsline {section}{\numberline {7}Bezpieczeństwo}{11}{section.7}%
-\contentsline {subsection}{\numberline {7.1}Uwierzytelnianie}{11}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}Autoryzacja oparta na rolach}{11}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3}Zabezpieczenia formularzy}{12}{subsection.7.3}%
-\contentsline {section}{\numberline {8}Frontend i dostępność}{12}{section.8}%
-\contentsline {subsection}{\numberline {8.1}Dostępność}{12}{subsection.8.1}%
-\contentsline {section}{\numberline {9}Testy wydajnościowe}{12}{section.9}%
-\contentsline {subsection}{\numberline {9.1}Testy bazodanowe (SQL)}{12}{subsection.9.1}%
-\contentsline {subsection}{\numberline {9.2}Testy endpointów REST (k6) - punkt dodatkowy}{13}{subsection.9.2}%
-\contentsline {paragraph}{Profil obciążenia}{13}{paragraph*.5}%
-\contentsline {paragraph}{Kryteria akceptacji}{13}{paragraph*.6}%
-\contentsline {paragraph}{Wyniki dla 1000 VU (test trwał 4 min)}{13}{paragraph*.7}%
-\contentsline {paragraph}{Analiza wąskich gardeł}{13}{paragraph*.8}%
-\contentsline {section}{\numberline {10}Uruchomienie systemu}{14}{section.10}%
-\contentsline {subsection}{\numberline {10.1}Wymagania}{14}{subsection.10.1}%
-\contentsline {subsection}{\numberline {10.2}Krok po kroku}{14}{subsection.10.2}%
-\contentsline {subsection}{\numberline {10.3}Konta testowe}{14}{subsection.10.3}%
-\contentsline {paragraph}{Konta z \texttt {DataSeeder.java} (warstwa aplikacji)}{14}{paragraph*.9}%
-\contentsline {paragraph}{Konta z migracji \texttt {V10\_\_demo\_data.sql} (warstwa bazy)}{15}{paragraph*.10}%
-\contentsline {paragraph}{Przykładowe wnioski z \texttt {V10}}{15}{paragraph*.11}%
-\contentsline {section}{\numberline {11}Podsumowanie}{15}{section.11}%
+\contentsline {section}{\numberline {4}Model danych}{6}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Diagram encji}{6}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Główne tabele}{6}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Wartości osadzone (\emph {JPA Embeddables})}{7}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Klucze hybrydowe}{7}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Migracje Flyway}{7}{subsection.4.5}%
+\contentsline {section}{\numberline {5}Logika w bazie danych}{8}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Maszyna stanów wniosku}{8}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Pakiet \texttt {finansista\_pkg} (V5)}{8}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Triggery (V4)}{8}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Maszyna stanów (V7)}{9}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Widoki (V3)}{9}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Indeksy wydajnościowe (V6)}{9}{subsection.5.6}%
+\contentsline {subsection}{\numberline {5.7}Wyniki testów wydajnościowych (1\,k -- 1\,M)}{10}{subsection.5.7}%
+\contentsline {paragraph}{Mierzone zapytania}{10}{paragraph*.2}%
+\contentsline {paragraph}{Czasy wykonania}{10}{paragraph*.3}%
+\contentsline {paragraph}{Plany wykonania (skala 1 mln)}{10}{paragraph*.4}%
+\contentsline {paragraph}{Wnioski}{11}{paragraph*.5}%
+\contentsline {section}{\numberline {6}REST API}{11}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Najważniejsze endpointy}{12}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Specyfikacja OpenAPI (Swagger UI)}{12}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Paginacja listy wniosków}{13}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Bezpieczeństwo}{13}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Uwierzytelnianie}{13}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Autoryzacja oparta na rolach}{14}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3}Zabezpieczenia formularzy}{14}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4}Dostęp publiczny do słowników}{14}{subsection.7.4}%
+\contentsline {subsection}{\numberline {7.5}Optymistyczna kontrola współbieżności}{14}{subsection.7.5}%
+\contentsline {section}{\numberline {8}Frontend i dostępność}{14}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Dostępność}{15}{subsection.8.1}%
+\contentsline {section}{\numberline {9}Testy wydajnościowe}{15}{section.9}%
+\contentsline {subsection}{\numberline {9.1}Testy bazodanowe (SQL)}{15}{subsection.9.1}%
+\contentsline {subsection}{\numberline {9.2}Testy endpointów REST (k6) - punkt dodatkowy}{15}{subsection.9.2}%
+\contentsline {paragraph}{Profil obciążenia}{15}{paragraph*.6}%
+\contentsline {paragraph}{Kryteria akceptacji}{15}{paragraph*.7}%
+\contentsline {paragraph}{Wyniki dla 1000 VU (test trwał 4 min)}{16}{paragraph*.8}%
+\contentsline {paragraph}{Analiza wąskich gardeł}{16}{paragraph*.9}%
+\contentsline {section}{\numberline {10}Uruchomienie systemu}{16}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Wymagania}{16}{subsection.10.1}%
+\contentsline {subsection}{\numberline {10.2}Krok po kroku}{17}{subsection.10.2}%
+\contentsline {subsection}{\numberline {10.3}Konta testowe}{17}{subsection.10.3}%
+\contentsline {paragraph}{Konta z \texttt {DataSeeder.java} (warstwa aplikacji)}{17}{paragraph*.10}%
+\contentsline {paragraph}{Konta z migracji \texttt {V8\_\_demo\_data.sql} (warstwa bazy)}{17}{paragraph*.11}%
+\contentsline {paragraph}{Przykładowe wnioski z \texttt {V8}}{18}{paragraph*.12}%
+\contentsline {section}{\numberline {11}Podsumowanie}{18}{section.11}%

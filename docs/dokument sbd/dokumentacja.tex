@@ -147,8 +147,10 @@ System obejmuje:
 
 \subsection{Wymagania niefunkcjonalne}
 \begin{itemize}[leftmargin=*]
-  \item \textbf{Architektura}: klient--serwer; frontend działa niezależnie od backendu
-        i komunikuje się z nim wyłącznie poprzez REST API.
+  \item \textbf{Architektura}: klient--serwer; frontend i backend to
+        \emph{osobne moduły Maven} uruchamiane jako niezależne procesy
+        Spring Boot (frontend port 8081, backend port 8080). Komunikacja
+        wyłącznie poprzez REST API z tokenem JWT.
   \item \textbf{Wydajność}: poprawna praca przy zbiorach 1\,000--1\,000\,000 wniosków
         (z paginacją i odpowiednimi indeksami).
   \item \textbf{Bezpieczeństwo}: uwierzytelnianie tokenem JWT przechowywanym w bezpiecznym
@@ -161,19 +163,41 @@ System obejmuje:
 \section{Architektura systemu}
 \label{sec:architektura}
 
-System jest aplikacją monolityczną logicznie podzieloną na trzy warstwy:
+System jest aplikacją o architekturze \textbf{multi-module} -- frontend
+i backend są \emph{osobnymi modułami Maven}, uruchamianymi jako dwa
+niezależne procesy Spring Boot na różnych portach. To fizyczna realizacja
+wymagania ,,frontend działa niezależnie od backendu'' z deklaracji projektowej.
 
 \begin{itemize}[leftmargin=*]
-  \item \textbf{Warstwa prezentacji (frontend)} -- kontrolery Spring MVC zwracające
-        widoki Thymeleaf renderowane po stronie serwera. Frontend \emph{nie woła}
-        warstwy biznesowej bezpośrednio -- komunikuje się z backendem wyłącznie
-        przez REST API z użyciem \texttt{RestClient}, przekazując token JWT.
-  \item \textbf{Warstwa REST API (backend)} -- kontrolery \texttt{@RestController}
-        wystawiające usługi pod ścieżką \texttt{/api/v1/...} (JSON). Stanowi
-        kontrakt komunikacyjny niezależny od użytego klienta.
-  \item \textbf{Warstwa danych} -- baza Oracle z migracjami Flyway, logiką
-        składowaną (PL/SQL) oraz dostępem przez JPA/Hibernate.
+  \item \textbf{Moduł \texttt{frontend}} (port \texttt{8081}) -- aplikacja
+        Spring Boot z kontrolerami Spring MVC zwracającymi widoki Thymeleaf,
+        spakowana jako uruchamialny JAR (\texttt{finansista-frontend}).
+        Frontend \emph{nie korzysta} z warstwy biznesowej ani repozytoriów
+        backendu -- komunikuje się z nim wyłącznie przez HTTP poprzez
+        \texttt{RestClient} (klasa \texttt{RestClientConfig}, baseUrl
+        \texttt{app.backend.url}), przekazując token JWT pobrany z ciasteczka
+        przeglądarki jako nagłówek \texttt{Authorization: Bearer}.
+  \item \textbf{Moduł \texttt{backend}} (port \texttt{8080}) -- aplikacja
+        Spring Boot wystawiająca REST API pod \texttt{/api/v1/**} (JSON).
+        Zawiera całą logikę domenową (use case'y), warstwę dostępu do bazy
+        (Spring Data JPA), bezpieczeństwo (Spring Security + JWT) oraz
+        specyfikację OpenAPI (Swagger UI).
+  \item \textbf{Warstwa danych} -- Oracle Database 23ai Free z migracjami
+        Flyway, logiką składowaną (PL/SQL: pakiety, widoki, wyzwalacze)
+        i dostępem przez JPA/Hibernate.
 \end{itemize}
+
+\paragraph{Struktura Maven}
+Root projektu (\texttt{pom.xml} w katalogu głównym) ma typ \texttt{pom}
+(\emph{parent}) i agreguje dwa moduły:
+\texttt{<module>backend</module>} i \texttt{<module>frontend</module>}.
+Frontend ma w \texttt{pom.xml} zależność na \texttt{finansista-backend}
+oznaczoną komentarzem \emph{,,TYMCZASOWE''} -- pozwala współdzielić klasy DTO
+(\texttt{CreateRequestRequest}, \texttt{RequestResponse} itp.) zamiast je
+duplikować. Docelowo planowane wydzielenie wspólnych DTO do trzeciego
+modułu \texttt{common} lub kontraktów generowanych z OpenAPI -- po
+osiągnięciu czego frontend będzie mógł stać się w pełni niezależnym
+projektem (np.\ aplikacją SPA).
 
 \subsection{Stos technologiczny}
 \begin{itemize}[leftmargin=*]
@@ -202,15 +226,46 @@ System jest aplikacją monolityczną logicznie podzieloną na trzy warstwy:
 \begin{itemize}[leftmargin=*]
   \item \texttt{users} - konta użytkowników; powiązane z \texttt{roles} i \texttt{department}.
   \item \texttt{requests} - główna encja wniosku (sekcje I--III Załącznika nr 1).
+        Tabela zawiera komplet pól Załącznika (typ realizatora, rodzaj/zakres/charakter
+        projektu wraz z polami \emph{,,inne''}, daty planowanego przedsięwzięcia,
+        liczby uczestników, dane opiekuna naukowego).
   \item \texttt{request\_task} - pozycje harmonogramu (sekcja IV).
   \item \texttt{request\_cost\_item} - pozycje kosztorysu (sekcja IV).
-  \item \texttt{request\_funding} - źródła finansowania z kwotą wnioskowaną i przyznaną (sekcja VI).
+  \item \texttt{request\_funding} - \textbf{multi-source funding}: wniosek może
+        być finansowany z \emph{wielu} źródeł równocześnie (Samorząd, Inicjatywy,
+        Środki Wydziału\ldots), każde z osobną kwotą wnioskowaną
+        (\texttt{amount\_requested}) i przyznaną (\texttt{amount\_granted}).
+        Para (\texttt{request\_id}, \texttt{funding\_source\_id}) jest unikalna.
+        Wcześniejsze pole \texttt{funding\_source\_id} na tabeli \texttt{requests}
+        zostało usunięte na rzecz tej relacji.
   \item \texttt{request\_status} - słownik statusów wniosku.
-  \item \texttt{activity\_log} - historia zmian statusu.
+  \item \texttt{activity\_log} - historia zmian statusu (zasilana przez trigger \texttt{T\_ACTIVITY}).
   \item \texttt{comments}, \texttt{attachments} -- komentarze i załączniki do wniosków.
   \item Słowniki: \texttt{roles}, \texttt{department}, \texttt{cost\_category},
         \texttt{funding\_source}, \texttt{request\_templates}.
 \end{itemize}
+
+\subsection{Wartości osadzone (\emph{JPA Embeddables})}
+Pola Załącznika nr 1 fizycznie żyją w tabeli \texttt{requests} (płaski schemat),
+ale w warstwie obiektowej zostały zgrupowane w \textbf{value objects} przy
+pomocy adnotacji \texttt{@Embeddable} -- wzorzec znany z \emph{Domain-Driven
+Design}. Zapewnia to czytelność modelu (mniej pól w \texttt{Request}, jasna
+semantyka), zachowując wydajność (brak dodatkowych \texttt{JOIN}-ów):
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{ProjectDetails} - sekcja I Załącznika: \texttt{realizerType},
+        \texttt{projectKind}/\texttt{projectKindOther},
+        \texttt{projectScope}/\texttt{projectScopeOther},
+        \texttt{projectNature}/\texttt{projectNatureOther},
+        \texttt{plannedDateFrom}/\texttt{plannedDateTo}, \texttt{location},
+        \texttt{participantsInvolved}, \texttt{participantsBenefiting}.
+  \item \texttt{SupervisorInfo} -- sekcja III Załącznika: dane opiekuna
+        merytorycznego (imię i nazwisko, e-mail, telefon, jednostka).
+\end{itemize}
+
+Klasy te są niemutowalne (\texttt{@NoArgsConstructor(access = PROTECTED)} +
+konstruktor z wszystkimi polami), eksponują jedynie gettery i mają fabrykę
+\texttt{empty()} dla wniosku w trakcie tworzenia.
 
 \subsection{Klucze hybrydowe}
 Każda eksponowana encja używa dwóch identyfikatorów:
@@ -220,22 +275,35 @@ który jest jedynym identyfikatorem wystawianym w REST API i adresach URL.
 Zapobiega to wycieksowi informacji o liczności rekordów i utrudnia enumerację zasobów.
 
 \subsection{Migracje Flyway}
+Pierwotne migracje \texttt{V8} (pola Załącznika 1) oraz \texttt{V9} (jednostka
+\emph{Samorząd Doktorantów}) zostały \emph{zwinięte do baseline'u}
+(\texttt{V1}/\texttt{V2}) w ramach refaktoryzacji PR \#12. W bazie pozostaje
+spójny ciąg migracji od V1 do V8:
+
 \begin{itemize}[leftmargin=*]
-  \item \texttt{V1} - inicjalny schemat (11 tabel: users, roles, department, requests, \ldots).
-  \item \texttt{V2} - wypełnienie słowników (role, działy, statusy, kategorie).
-  \item \texttt{V3} - widoki bazodanowe (m.in. \texttt{v\_department\_requests\_summary}).
-  \item \texttt{V4} - wyzwalacze (audyt, walidacje).
-  \item \texttt{V5} - pakiet PL/SQL \texttt{pkg\_finansista} (procedury domenowe).
-  \item \texttt{V6} - indeksy wydajnościowe.
-  \item \texttt{V7} - maszyna stanów wniosku (funkcja + trigger blokujący niedozwolone przejścia).
-  \item \texttt{V8} - rozszerzenie schematu pod Załącznik nr 1 (sekcje I--III + tabele
-        \texttt{request\_task}, \texttt{request\_cost\_item}, \texttt{request\_funding}).
-  \item \texttt{V9} - dodanie jednostki \emph{Samorząd Doktorantów PB}.
-  \item \texttt{V10} - skrypt zasilania danymi demonstracyjnymi (6 użytkowników
-        z różnymi rolami oraz 3 przykładowe wnioski w różnych statusach).
-        Wszystkie wstawki idempotentne (\texttt{INSERT \ldots SELECT FROM dual
-        WHERE NOT EXISTS}) - skrypt może zostać uruchomiony wielokrotnie
-        bez naruszenia ograniczeń \texttt{UNIQUE}.
+  \item \texttt{V1} -- inicjalny schemat: 11 tabel (users, roles, department,
+        requests z pełnym Załącznikiem nr 1, request\_task, request\_cost\_item,
+        request\_funding, request\_status, request\_templates, cost\_category,
+        funding\_source, comments, attachments, activity\_log).
+  \item \texttt{V2} -- wypełnienie słowników: 7 ról, 15 wydziałów (w tym
+        Samorząd Studentów i Samorząd Doktorantów), 7 statusów, 2 szablony
+        wniosków, 2 kategorie kosztów, 4 źródła finansowania.
+  \item \texttt{V3} -- widoki bazodanowe (\texttt{v\_department\_requests\_summary},
+        \texttt{v\_request\_details}).
+  \item \texttt{V4} -- wyzwalacze (\texttt{T\_REQUESTS\_UPDATE\_NOW},
+        \texttt{T\_ACTIVITY} audytowy, \texttt{T\_BLOCK} blokada edycji wysłanych wniosków).
+  \item \texttt{V5} -- pakiet PL/SQL \texttt{finansista\_pkg}
+        (\texttt{set\_actor}/\texttt{get\_actor}, \texttt{department\_used\_budget},
+        \texttt{evaluate\_request}).
+  \item \texttt{V6} -- indeksy wydajnościowe.
+  \item \texttt{V7} -- maszyna stanów wniosku (funkcja walidująca + trigger
+        blokujący niedozwolone przejścia, ORA-20002).
+  \item \texttt{V8} -- skrypt zasilania danymi demonstracyjnymi (6 użytkowników
+        z różnymi rolami, 3 przykładowe wnioski w różnych statusach, wpisy
+        do \texttt{request\_funding}). Wszystkie wstawki idempotentne
+        (\texttt{INSERT \ldots SELECT FROM dual WHERE NOT EXISTS}) --
+        skrypt może zostać uruchomiony wielokrotnie bez naruszenia
+        ograniczeń \texttt{UNIQUE}.
 \end{itemize}
 
 \section{Logika w bazie danych}
@@ -458,15 +526,25 @@ jest przekazywany jako nagłówek \texttt{Authorization: Bearer}.
   POST & /api/v1/auth/register & rejestracja konta \\
   POST & /api/v1/auth/login & logowanie (ustawia ciasteczko JWT) \\
   POST & /api/v1/auth/logout & wylogowanie (kasuje ciasteczko) \\
-  GET  & /api/v1/requests & lista wniosków (filtr po statusie/wydziale) \\
+  GET  & /api/v1/requests & lista wniosków (filtr, paginacja \texttt{Pageable}) \\
   POST & /api/v1/requests & utworzenie wniosku (pełny Załącznik nr 1) \\
-  GET  & /api/v1/requests/\{id\} & szczegóły wniosku \\
-  PUT  & /api/v1/requests/\{id\} & edycja wniosku \\
+  GET  & /api/v1/requests/\{id\} & szczegóły wniosku (zwraca ETag z wersją) \\
+  PUT  & /api/v1/requests/\{id\} & edycja wniosku (wymaga \texttt{If-Match}) \\
+  DELETE & /api/v1/requests/\{id\} & usunięcie wniosku (admin) \\
   PATCH & /api/v1/requests/\{id\}/status & zmiana statusu \\
+  POST & /api/v1/requests/\{id\}/funding & przyznanie kwoty per źródło finansowania \\
   GET  & /api/v1/requests/\{id\}/history & historia zmian statusu \\
   POST & /api/v1/requests/\{id\}/comments & dodanie komentarza \\
   GET  & /api/v1/requests/\{id\}/comments & komentarze \\
-  DELETE & /api/v1/requests/\{id\} & usunięcie wniosku (admin) \\
+  GET  & /api/v1/request-templates & lista aktywnych szablonów (publiczne) \\
+  POST/PUT/DELETE & /api/v1/request-templates/\{id\} & CRUD szablonów (admin) \\
+  GET  & /api/v1/request-statuses & słownik statusów (publiczne) \\
+  GET  & /api/v1/reference/departments & lista wydziałów (publiczne) \\
+  POST/PUT/DELETE & /api/v1/reference/departments/\{id\} & CRUD wydziałów (admin) \\
+  GET  & /api/v1/reference/cost-categories & kategorie kosztów (publiczne) \\
+  GET  & /api/v1/reference/funding-sources & źródła finansowania (publiczne) \\
+  GET  & /api/v1/user/roles & słownik ról (publiczne) \\
+  POST/PUT/DELETE & /api/v1/user/roles/\{id\} & CRUD ról (admin) \\
   \bottomrule
 \end{tabularx}
 
@@ -547,6 +625,33 @@ każde nowe konto otrzymuje rolę bazową \texttt{ROLE\_STUDENT} wymuszoną po s
 serwera. Przypisanie wyższej roli jest wyłącznie aktem administracyjnym.
 Podobnie wydział wnioskodawcy nie jest wybierany przy składaniu wniosku, a
 pobierany jest z konta zalogowanego użytkownika.
+
+\subsection{Dostęp publiczny do słowników}
+Po refaktoryzacji PR \#12 endpointy \texttt{GET} dla danych referencyjnych
+(\texttt{/api/v1/reference/departments}, \texttt{/api/v1/reference/cost-categories},
+\texttt{/api/v1/reference/funding-sources}, \texttt{/api/v1/user/roles},
+\texttt{/api/v1/request-templates}, \texttt{/api/v1/request-statuses})
+są dostępne anonimowo. Umożliwia to zasilenie list rozwijanych w formularzu
+rejestracji (np.\ wybór wydziału) bez konieczności wcześniejszego logowania.
+Operacje modyfikujące (\texttt{POST}/\texttt{PUT}/\texttt{DELETE}) na tych samych
+zasobach wymagają roli \texttt{ROLE\_ADMIN} (egzekwowane przez \texttt{@PreAuthorize}).
+
+\subsection{Optymistyczna kontrola współbieżności}
+Edycja wniosku oraz zmiana statusu wymagają nagłówka
+\texttt{If-Match} z bieżącą wersją encji (zwracaną w nagłówku \texttt{ETag}
+poprzedniego \texttt{GET}). Mechanizm jest realizowany przez:
+\begin{itemize}[leftmargin=*]
+  \item kolumnę \texttt{version} (\texttt{@Version} w JPA) na encjach
+        \texttt{Request} i \texttt{User},
+  \item helper \texttt{ETags} parsujący/formatujący wartość ETag,
+  \item \texttt{assertVersion} guard w use case'ach \texttt{EditRequestUseCase}
+        i \texttt{ChangeRequestStatusUseCase} -- niezgodność wersji kończy
+        się odpowiedzią HTTP \texttt{412 Precondition Failed}, zły format
+        nagłówka -- \texttt{400 Bad Request} przez
+        \texttt{InvalidIfMatchHeaderException}.
+\end{itemize}
+Zapobiega to klasycznemu wyścigowi, gdy dwóch pracowników jednocześnie ocenia
+ten sam wniosek (deklaracja: \emph{,,współbieżność bazy danych''}).
 
 \section{Frontend i dostępność}
 \label{sec:front}
@@ -664,7 +769,7 @@ oraz \texttt{docs/k6/get-requests.summary.json}.
 \end{itemize}
 
 \subsection{Krok po kroku}
-\begin{lstlisting}[language=bash, caption={Uruchomienie aplikacji}]
+\begin{lstlisting}[language=bash, caption={Uruchomienie aplikacji (multi-module)}]
 # 1. Uruchomienie bazy Oracle w Dockerze
 docker run -d --name oracle-pb -p 1521:1521 \
   -e ORACLE_PASSWORD=paw1ewjav1e \
@@ -673,18 +778,26 @@ docker run -d --name oracle-pb -p 1521:1521 \
 # 2. Utworzenie schematu admin_pb (z hasłem zgodnym z application.yaml)
 #    - skrypt w docs/install/create_schema.sql lub recznie w SQL Developer
 
-# 3. Uruchomienie aplikacji
-./mvnw spring-boot:run
+# 3. Zbudowanie obu modułów (uruchamia Flyway na backendzie)
+./mvnw clean install -DskipTests
 
-# 4. Aplikacja dostępna pod:
-#    http://localhost:8080
+# 4. Uruchomienie BACKENDU (REST API, port 8080) - w osobnym terminalu
+cd backend && ../mvnw spring-boot:run
+
+# 5. Uruchomienie FRONTENDU (Thymeleaf, port 8081) - w drugim terminalu
+cd frontend && ../mvnw spring-boot:run
+
+# 6. Aplikacja dostępna pod:
+#    - frontend (UI):        http://localhost:8081
+#    - backend (REST API):   http://localhost:8080/api/v1/...
+#    - Swagger UI:           http://localhost:8080/swagger-ui.html
 \end{lstlisting}
 
 \subsection{Konta testowe}
 Aplikacja przygotowuje konta demonstracyjne z dwóch niezależnych źródeł.
 Oba źródła współistnieją bez konfliktu: \texttt{DataSeeder} sprawdza
-\texttt{existsByEmail} przed zapisem, a migracja \texttt{V10} używa
-warunku \texttt{WHERE NOT EXISTS} - każde uruchomienie jest idempotentne.
+\texttt{existsByEmail} przed zapisem, a migracja \texttt{V8} używa
+warunku \texttt{WHERE NOT EXISTS} -- każde uruchomienie jest idempotentne.
 
 \paragraph{Konta z \texttt{DataSeeder.java} (warstwa aplikacji)}
 Tworzone w runtime przy starcie aplikacji, hasła hashowane BCryptem
@@ -703,7 +816,7 @@ przez \texttt{PasswordEncoder}.
   \bottomrule
 \end{tabularx}
 
-\paragraph{Konta z migracji \texttt{V10\_\_demo\_data.sql} (warstwa bazy)}
+\paragraph{Konta z migracji \texttt{V8\_\_demo\_data.sql} (warstwa bazy)}
 Wstawiane przez Flyway w ramach skryptu zasilania danymi demo. Hasła zapisane
 w formacie \texttt{\{noop\}} (rozpoznawany przez \texttt{DelegatingPasswordEncoder}
 jako plain text -- świadoma decyzja, by nie liczyć BCryptu po stronie SQL).
@@ -723,8 +836,10 @@ nie kolidować z auto-inkrementacją kont z \texttt{DataSeeder}.
   \bottomrule
 \end{tabularx}
 
-\paragraph{Przykładowe wnioski z \texttt{V10}}
-Razem z kontami migracja \texttt{V10} wstawia trzy wnioski demonstracyjne,
+\paragraph{Przykładowe wnioski z \texttt{V8}}
+Razem z kontami migracja \texttt{V8} wstawia trzy wnioski demonstracyjne
+(z odpowiadającymi rekordami w \texttt{request\_funding}, demonstrując
+multi-source finansowanie),
 po jednym w różnym statusie obiegu:
 \begin{itemize}[leftmargin=*]
   \item \emph{Juwenalia 2026} - status \texttt{DRAFT}, autor: demo-student,

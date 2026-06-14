@@ -1,4 +1,3 @@
--- =====================================================================
 -- Skrypt generowania danych demo do testów wydajnościowych (SBD pkt 1 i 6)
 -- URUCHAMIAĆ RĘCZNIE (sqlplus / SQL Developer) — to NIE jest migracja Flyway.
 --
@@ -9,7 +8,6 @@
 --
 -- Zależności: dane słownikowe z V2 (użytkownicy 1-4, departamenty 1-15,
 -- statusy 1-7, kategorie 1-2).
--- =====================================================================
 
 SET VERIFY OFF
 SET SERVEROUTPUT ON
@@ -54,8 +52,7 @@ EXEC DBMS_STATS.GATHER_TABLE_STATS(USER, 'REQUESTS');
 
 SELECT COUNT(*) AS wierszy_w_requests FROM requests;
 
--- =====================================================================
 -- Czyszczenie danych testowych (zostawia dane słownikowe z V2):
 --   DELETE FROM requests WHERE title LIKE 'Wniosek testowy #%';
 --   COMMIT;
--- =====================================================================
+
