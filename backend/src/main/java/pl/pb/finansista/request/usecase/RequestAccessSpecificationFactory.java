@@ -24,10 +24,19 @@ public class RequestAccessSpecificationFactory {
 
         allowedSpecs.add(RequestSpecifications.hasUserEmail(user.getEmail()));
 
+        // CSSDiR (central student-affairs office): formal check + prorektor opinion → sees everything submitted onward.
+        if (userAuthorities.contains(RoleName.ROLE_STUDENT_AFFAIRS.name())) {
+            allowedSpecs.add(RequestSpecifications.hasStatusIn(List.of(
+                    RequestStatusName.SUBMITTED.name(), RequestStatusName.FORMAL_EVALUATION.name(),
+                    RequestStatusName.UNDER_REVIEW.name(), RequestStatusName.ACCEPTED.name(),
+                    RequestStatusName.REJECTED.name(), RequestStatusName.CORRECTION_REQUIRED.name())));
+        }
+
+        // Dziekan: only the dysponent for faculty funds, in their own department.
         if (userAuthorities.contains(RoleName.ROLE_DEAN_OFFICE.name())) {
             allowedSpecs.add(RequestSpecifications.hasDepartment(user.getDepartment().getId())
+                    .and(RequestSpecifications.hasFundingSource(FundingSourceName.FACULTY_FUNDS.name()))
                     .and(RequestSpecifications.hasStatusIn(List.of(
-                            RequestStatusName.SUBMITTED.name(), RequestStatusName.FORMAL_EVALUATION.name(),
                             RequestStatusName.UNDER_REVIEW.name(), RequestStatusName.ACCEPTED.name(),
                             RequestStatusName.REJECTED.name(), RequestStatusName.CORRECTION_REQUIRED.name()))));
         }

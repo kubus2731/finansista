@@ -28,6 +28,7 @@ public class RequestController {
     private final GetSingleRequestUseCase getSingleRequestUseCase;
     private final EditRequestUseCase editRequestUseCase;
     private final DeleteRequestUseCase deleteRequestUseCase;
+    private final GrantFundingUseCase grantFundingUseCase;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -105,6 +106,23 @@ public class RequestController {
         return ResponseEntity.ok()
                 .eTag(ETags.format(request.getVersion()))
                 .body(RequestResponse.of(request));
+    }
+
+    @PutMapping("/{id}/fundings/{fundingSourceId}/grant")
+    public ResponseEntity<Void> grantFunding(
+            @PathVariable UUID id,
+            @PathVariable Long fundingSourceId,
+            @Valid @RequestBody GrantFundingRequest payload,
+            Authentication authentication
+    ) {
+        log.info("Granting funding source {} on request {} by user: {}", fundingSourceId, id, authentication.getName());
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        grantFundingUseCase.execute(new GrantFundingCommand(
+                id, fundingSourceId, payload.amountGranted(), authentication.getName(), authorities));
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

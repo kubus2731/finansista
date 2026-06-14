@@ -2,7 +2,6 @@ package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.request.Comment;
@@ -16,7 +15,7 @@ import pl.pb.finansista.request.repository.CommentRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.request.repository.RequestStatusRepository;
 import pl.pb.finansista.user.User;
-import pl.pb.finansista.user.UserNotFoundException;
+import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
 @Service
@@ -43,14 +42,12 @@ public class ChangeRequestStatusUseCase {
         Request request = requestRepository.findOne(spec)
                 .orElseThrow(RequestNotFoundException::new);
 
-        if (!request.getVersion().equals(command.version())) {
-            throw new ObjectOptimisticLockingFailureException(Request.class, request.getId());
-        }
+        request.assertVersion(command.version());
 
         RequestStatus newStatus = requestStatusRepository.findByName(command.newStatusName())
                 .orElseThrow(() -> InvalidRequestStateException.withStatusName(command.newStatusName()));
 
-        if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name()) && request.getFundingSource() == null) {
+        if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name()) && request.getFundings().isEmpty()) {
             throw new MissingFundingSourceException();
         }
 

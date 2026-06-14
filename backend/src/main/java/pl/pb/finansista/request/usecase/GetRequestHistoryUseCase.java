@@ -10,7 +10,7 @@ import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.repository.ActivityLogRepository;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.user.User;
-import pl.pb.finansista.user.UserNotFoundException;
+import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
 import java.util.List;

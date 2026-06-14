@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import pl.pb.finansista.user.InvalidCredentialsException;
+import pl.pb.finansista.user.exception.InvalidCredentialsException;
 import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.repository.UserRepository;
 

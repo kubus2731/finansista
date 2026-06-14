@@ -1,4 +1,4 @@
-package pl.pb.finansista.user;
+package pl.pb.finansista.user.exception;
 
 import pl.pb.finansista.common.exception.BusinessException;
 

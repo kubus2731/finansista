@@ -14,7 +14,17 @@ public record EditRequestCommand(
         UUID templateId,
         Long departmentId,
         Long costCategoryId,
-        Long fundingSourceId,
+        ProjectDetailsData projectDetails,
+        SupervisorData supervisor,
+        List<TaskData> tasks,
+        List<CostItemData> costItems,
+        List<FundingData> fundings,
         Long version
 ) {
+
+    public EditRequestCommand {
+        tasks = tasks == null ? List.of() : tasks;
+        costItems = costItems == null ? List.of() : costItems;
+        fundings = fundings == null ? List.of() : fundings;
+    }
 }

@@ -18,7 +18,7 @@ interface SpringDataJpaRequestRepository extends JpaRepository<Request, Long>, J
     void setActor(Long userId);
 
     @NonNull
-    @EntityGraph(attributePaths = {"status", "department", "costCategory", "fundingSource", "template"})
+    @EntityGraph(attributePaths = {"status", "department", "costCategory", "template"})
     List<Request> findAll(@Nullable Specification<Request> spec);
 
     java.util.Optional<Request> findByExternalId(UUID externalId);

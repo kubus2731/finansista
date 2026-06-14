@@ -35,8 +35,16 @@ public class RequestSpecifications {
     }
 
     public static Specification<Request> hasFundingSource(String fundingSourceCode) {
-        return (root, query, cb) ->
-                fundingSourceCode == null ? null : cb.equal(root.join("fundingSource").get("name"), fundingSourceCode);
+        return (root, query, cb) -> {
+            if (fundingSourceCode == null) {
+                return null;
+            }
+            // A request now has many funding rows; match if ANY row uses this source.
+            if (query != null) {
+                query.distinct(true);
+            }
+            return cb.equal(root.join("fundings").join("source").get("name"), fundingSourceCode);
+        };
     }
 
     public static Specification<Request> containsText(String keyword) {

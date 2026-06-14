@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "requests")
@@ -50,10 +51,6 @@ public class Request extends ExposableModificationAuditedEntity {
     @JoinColumn(name = "cost_category_id", nullable = false)
     private CostCategory costCategory;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "funding_source_id")
-    private FundingSource fundingSource;
-
     @Embedded
     private ProjectDetails projectDetails;
 
@@ -72,7 +69,7 @@ public class Request extends ExposableModificationAuditedEntity {
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RequestFunding> fundings = new ArrayList<>();
 
-    public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory, FundingSource fundingSource) {
+    public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory) {
         this.title = title;
         this.description = description;
         this.amount = amount;
@@ -81,17 +78,15 @@ public class Request extends ExposableModificationAuditedEntity {
         this.template = template;
         this.department = department;
         this.costCategory = costCategory;
-        this.fundingSource = fundingSource;
     }
 
-    public void update(String title, String description, BigDecimal amount, RequestTemplate template, Department department, CostCategory costCategory, FundingSource fundingSource) {
+    public void update(String title, String description, BigDecimal amount, RequestTemplate template, Department department, CostCategory costCategory) {
         this.title = title;
         this.description = description;
         this.amount = amount;
         this.template = template;
         this.department = department;
         this.costCategory = costCategory;
-        this.fundingSource = fundingSource;
     }
 
     public void changeStatus(RequestStatus newStatus) {
@@ -113,7 +108,29 @@ public class Request extends ExposableModificationAuditedEntity {
         this.costItems.add(new RequestCostItem(this, taskNo, itemName, quantity, unitCost, notes));
     }
 
-    public void addFunding(String sourceName, BigDecimal amountRequested, BigDecimal amountGranted) {
-        this.fundings.add(new RequestFunding(this, sourceName, amountRequested, amountGranted));
+    public void addFunding(FundingSource source, BigDecimal amountRequested) {
+        this.fundings.add(new RequestFunding(this, source, amountRequested));
+    }
+
+    public Optional<RequestFunding> fundingFor(Long fundingSourceId) {
+        return fundings.stream()
+                .filter(f -> f.getSource().getId().equals(fundingSourceId))
+                .findFirst();
+    }
+
+    public boolean allFundingsGranted() {
+        return !fundings.isEmpty() && fundings.stream().allMatch(RequestFunding::isGranted);
+    }
+
+    public void clearTasks() {
+        this.tasks.clear();
+    }
+
+    public void clearCostItems() {
+        this.costItems.clear();
+    }
+
+    public void clearFundings() {
+        this.fundings.clear();
     }
 }

@@ -1,7 +1,6 @@
 package pl.pb.finansista.request.usecase;
 
 import org.springframework.stereotype.Component;
-import pl.pb.finansista.reference.FundingSourceName;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
@@ -12,37 +11,29 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Request-level status pipeline. Per-source granting is NOT a transition — it
+ * happens via {@link GrantFundingUseCase} while UNDER_REVIEW. The request can
+ * only reach ACCEPTED once every funding row has been signed by its dysponent.
+ *
+ * <ul>
+ *   <li>SUBMITTED → FORMAL_EVALUATION: CSSDiR (ROLE_STUDENT_AFFAIRS) — ocena formalna</li>
+ *   <li>FORMAL_EVALUATION → UNDER_REVIEW: CSSDiR — opinia prorektora (merit)</li>
+ *   <li>UNDER_REVIEW → ACCEPTED: Rektor (ROLE_FINANCE_OFFICE), gated on all rows granted</li>
+ * </ul>
+ */
 @Component
 public class RequestTransitionValidator {
 
-    private static boolean canEvaluate(Collection<String> roles, String fundingSource, boolean isSameDepartment) {
-        if (fundingSource.equals(FundingSourceName.FACULTY_FUNDS.name()) || fundingSource.equals(FundingSourceName.INITIATIVE_FUNDS.name())) {
-            return roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment;
-        } else if (fundingSource.equals(FundingSourceName.STUDENT_COUNCIL.name())) {
-            return roles.contains(RoleName.ROLE_STUDENT_COUNCIL.name()) || roles.contains(RoleName.ROLE_LEGAL_COMMISSION.name());
-        } else if (fundingSource.equals(FundingSourceName.DOCTORAL_COUNCIL.name())) {
-            return roles.contains(RoleName.ROLE_DOCTORAL_COUNCIL.name()) || roles.contains(RoleName.ROLE_LEGAL_COMMISSION.name());
-        }
-
-        return false;
-    }
-
-    private static boolean canAccept(Collection<String> roles, String fundingSource, boolean isSameDepartment) {
-        if (fundingSource.equals(FundingSourceName.FACULTY_FUNDS.name())) {
-            return roles.contains(RoleName.ROLE_FINANCE_OFFICE.name()) || (roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment);
-        }
-
-        return roles.contains(RoleName.ROLE_FINANCE_OFFICE.name());
-    }
-
     public List<RequestStatusName> getAvailableTransitions(Request request, User actor, Collection<String> roles) {
         RequestStatusName oldStatus = RequestStatusName.valueOf(request.getStatus().getName());
+
         boolean isAdmin = roles.contains(RoleName.ROLE_ADMIN.name());
+        boolean isAuthor = request.getUser().getId().equals(actor.getId());
+        boolean isStudentAffairs = roles.contains(RoleName.ROLE_STUDENT_AFFAIRS.name());
+        boolean isFinance = roles.contains(RoleName.ROLE_FINANCE_OFFICE.name());
 
         List<RequestStatusName> available = new ArrayList<>();
-        String fundingSource = request.getFundingSource() != null ? request.getFundingSource().getName() : "";
-        boolean isAuthor = request.getUser().getId().equals(actor.getId());
-        boolean isSameDepartment = request.getDepartment().getId().equals(actor.getDepartment().getId());
 
         switch (oldStatus) {
             case DRAFT -> {
@@ -51,26 +42,24 @@ public class RequestTransitionValidator {
                 }
             }
             case SUBMITTED -> {
-                if (isAdmin || (roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment)) {
+                if (isAdmin || isStudentAffairs) {
                     available.add(RequestStatusName.FORMAL_EVALUATION);
                     available.add(RequestStatusName.REJECTED);
                     available.add(RequestStatusName.CORRECTION_REQUIRED);
                 }
             }
             case FORMAL_EVALUATION -> {
-                boolean isDean = roles.contains(RoleName.ROLE_DEAN_OFFICE.name()) && isSameDepartment;
-                if (isAdmin || canEvaluate(roles, fundingSource, isSameDepartment)) {
+                if (isAdmin || isStudentAffairs) {
                     available.add(RequestStatusName.UNDER_REVIEW);
-                }
-
-                if (isAdmin || isDean || canEvaluate(roles, fundingSource, isSameDepartment)) {
                     available.add(RequestStatusName.REJECTED);
                     available.add(RequestStatusName.CORRECTION_REQUIRED);
                 }
             }
             case UNDER_REVIEW -> {
-                if (isAdmin || canAccept(roles, fundingSource, isSameDepartment)) {
-                    available.add(RequestStatusName.ACCEPTED);
+                if (isAdmin || isFinance) {
+                    if (request.allFundingsGranted()) {
+                        available.add(RequestStatusName.ACCEPTED);
+                    }
                     available.add(RequestStatusName.REJECTED);
                     available.add(RequestStatusName.CORRECTION_REQUIRED);
                 }

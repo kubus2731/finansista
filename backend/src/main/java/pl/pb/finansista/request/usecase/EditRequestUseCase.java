@@ -1,16 +1,20 @@
 package pl.pb.finansista.request.usecase;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.reference.*;
+import pl.pb.finansista.reference.exception.CostCategoryNotFoundException;
+import pl.pb.finansista.reference.exception.DepartmentNotFoundException;
+import pl.pb.finansista.reference.exception.FundingSourceNotFoundException;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
+import pl.pb.finansista.request.ProjectDetails;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.RequestTemplate;
+import pl.pb.finansista.request.SupervisorInfo;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
@@ -34,9 +38,7 @@ public class EditRequestUseCase {
         Request request = requestRepository.findByExternalId(command.externalId())
                 .orElseThrow(RequestNotFoundException::new);
 
-        if (!request.getVersion().equals(command.version())) {
-            throw new ObjectOptimisticLockingFailureException(Request.class, request.getId());
-        }
+        request.assertVersion(command.version());
 
         boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
         boolean isAuthor = request.getUser().getEmail().equals(command.userEmail());
@@ -57,10 +59,6 @@ public class EditRequestUseCase {
         CostCategory costCategory = costCategoryRepository.findById(command.costCategoryId())
                 .orElseThrow(CostCategoryNotFoundException::new);
 
-        FundingSource fundingSource = command.fundingSourceId() != null
-                ? fundingSourceRepository.findById(command.fundingSourceId()).orElseThrow(FundingSourceNotFoundException::new)
-                : null;
-
         RequestTemplate template = command.templateId() != null
                 ? requestTemplateRepository.findByExternalId(command.templateId()).orElseThrow(RequestTemplateNotFoundException::new)
                 : null;
@@ -71,9 +69,25 @@ public class EditRequestUseCase {
                 command.amount(),
                 template,
                 department,
-                costCategory,
-                fundingSource
+                costCategory
         );
+
+        request.fillDetails(
+                command.projectDetails() != null ? command.projectDetails().toDomain() : ProjectDetails.empty(),
+                command.supervisor() != null ? command.supervisor().toDomain() : SupervisorInfo.empty());
+
+        request.clearTasks();
+        command.tasks().forEach(t ->
+                request.addTask(t.taskNo(), t.name(), t.dateFrom(), t.dateTo(), t.plannedCost(), t.actions()));
+        request.clearCostItems();
+        command.costItems().forEach(c ->
+                request.addCostItem(c.taskNo(), c.itemName(), c.quantity(), c.unitCost(), c.notes()));
+        request.clearFundings();
+        command.fundings().forEach(f -> {
+            FundingSource fundingSource = fundingSourceRepository.findById(f.fundingSourceId())
+                    .orElseThrow(FundingSourceNotFoundException::new);
+            request.addFunding(fundingSource, f.amountRequested());
+        });
 
         return requestRepository.save(request);
     }

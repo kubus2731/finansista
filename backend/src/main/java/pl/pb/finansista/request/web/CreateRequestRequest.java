@@ -4,7 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import pl.pb.finansista.common.web.ExternalIdEncoder;
+import pl.pb.finansista.request.usecase.CostItemData;
 import pl.pb.finansista.request.usecase.CreateRequestCommand;
+import pl.pb.finansista.request.usecase.FundingData;
+import pl.pb.finansista.request.usecase.ProjectDetailsData;
+import pl.pb.finansista.request.usecase.SupervisorData;
+import pl.pb.finansista.request.usecase.TaskData;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,7 +22,6 @@ public record CreateRequestRequest(
         String templateId,
         @NotNull Long departmentId,
         @NotNull Long costCategoryId,
-        Long fundingSourceId,
         String realizerType,
         String projectKind,
         String projectKindOther,
@@ -42,33 +46,33 @@ public record CreateRequestRequest(
         return new CreateRequestCommand(
                 title, description, amount, userEmail,
                 templateId != null ? ExternalIdEncoder.decode(templateId) : null,
-                departmentId, costCategoryId, fundingSourceId,
-                realizerType, projectKind, projectKindOther,
-                projectScope, projectScopeOther, projectNature, projectNatureOther,
-                plannedDateFrom, plannedDateTo, location,
-                participantsInvolved, participantsBenefiting,
-                supervisorName, supervisorEmail, supervisorPhone, supervisorDepartment,
+                departmentId, costCategoryId,
+                new ProjectDetailsData(realizerType, projectKind, projectKindOther,
+                        projectScope, projectScopeOther, projectNature, projectNatureOther,
+                        plannedDateFrom, plannedDateTo, location,
+                        participantsInvolved, participantsBenefiting),
+                new SupervisorData(supervisorName, supervisorEmail, supervisorPhone, supervisorDepartment),
                 mapTasks(), mapCostItems(), mapFundings()
         );
     }
 
-    private List<CreateRequestCommand.TaskData> mapTasks() {
+    private List<TaskData> mapTasks() {
         return tasks == null ? List.of() : tasks.stream()
-                .map(t -> new CreateRequestCommand.TaskData(t.taskNo(), t.name(), t.dateFrom(),
+                .map(t -> new TaskData(t.taskNo(), t.name(), t.dateFrom(),
                         t.dateTo(), t.plannedCost(), t.actions()))
                 .toList();
     }
 
-    private List<CreateRequestCommand.CostItemData> mapCostItems() {
+    private List<CostItemData> mapCostItems() {
         return costItems == null ? List.of() : costItems.stream()
-                .map(c -> new CreateRequestCommand.CostItemData(c.taskNo(), c.itemName(),
+                .map(c -> new CostItemData(c.taskNo(), c.itemName(),
                         c.quantity(), c.unitCost(), c.notes()))
                 .toList();
     }
 
-    private List<CreateRequestCommand.FundingData> mapFundings() {
+    private List<FundingData> mapFundings() {
         return fundings == null ? List.of() : fundings.stream()
-                .map(f -> new CreateRequestCommand.FundingData(f.sourceName(), f.amountRequested(), f.amountGranted()))
+                .map(f -> new FundingData(f.fundingSourceId(), f.amountRequested()))
                 .toList();
     }
 
@@ -78,5 +82,5 @@ public record CreateRequestRequest(
     public record CostItemEntry(Integer taskNo, String itemName, Integer quantity,
                                 BigDecimal unitCost, String notes) {}
 
-    public record FundingEntry(String sourceName, BigDecimal amountRequested, BigDecimal amountGranted) {}
+    public record FundingEntry(Long fundingSourceId, BigDecimal amountRequested) {}
 }

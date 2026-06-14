@@ -1,4 +1,4 @@
-package pl.pb.finansista.user;
+package pl.pb.finansista.user.exception;
 
 import org.springframework.http.HttpStatus;
 import pl.pb.finansista.common.exception.BusinessException;

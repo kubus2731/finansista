@@ -11,7 +11,7 @@ import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.user.RoleName;
 import pl.pb.finansista.user.User;
-import pl.pb.finansista.user.UserNotFoundException;
+import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
 @Service
