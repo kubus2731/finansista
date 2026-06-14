@@ -16,11 +16,9 @@ public class Attachment extends ExposableCreationAuditedEntity {
     @JoinColumn(name = "request_id", nullable = false)
     private Request request;
 
-    /** Original upload name, kept for display only. */
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    /** Opaque identifier owned by the FileStorage implementation. */
     @Column(name = "storage_key", nullable = false, length = 500, updatable = false)
     private String storageKey;
 
