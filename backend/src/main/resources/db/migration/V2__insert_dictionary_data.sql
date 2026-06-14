@@ -6,6 +6,7 @@ INSERT INTO roles (id, name) VALUES (4, 'ROLE_DOCTORAL_COUNCIL');
 INSERT INTO roles (id, name) VALUES (5, 'ROLE_LEGAL_COMMISSION');
 INSERT INTO roles (id, name) VALUES (6, 'ROLE_DEAN_OFFICE');
 INSERT INTO roles (id, name) VALUES (7, 'ROLE_FINANCE_OFFICE');
+INSERT INTO roles (id, name) VALUES (8, 'ROLE_STUDENT_AFFAIRS');
 
 -- 2. Domyślne departamenty
 INSERT INTO department (id, name) VALUES (1, 'Wydział Informatyki PB');
@@ -23,6 +24,7 @@ INSERT INTO department (id, name) VALUES (12, 'Dziekanat Wydziału Budownictwa i
 INSERT INTO department (id, name) VALUES (13, 'Samorząd Studentów PB');
 INSERT INTO department (id, name) VALUES (14, 'Kwestura');
 INSERT INTO department (id, name) VALUES (15, 'Rektorat');
+INSERT INTO department (id, name) VALUES (16, 'Samorząd Doktorantów PB');
 
 -- 3. Statusy wniosków
 INSERT INTO request_status (id, name) VALUES (1, 'DRAFT');
