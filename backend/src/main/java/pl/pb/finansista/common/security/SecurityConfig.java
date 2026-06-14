@@ -43,6 +43,9 @@ public class SecurityConfig {
                         .requestMatchers("/","/login", "/register", "/accessibility", "/error",
                                 "/css/**", "/js/**", "/img/**", "/favicon.ico",
                                 "/api/v1/auth/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET,
+                                "/api/v1/reference/**",
+                                "/api/v1/roles").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")))
