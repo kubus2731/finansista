@@ -43,7 +43,7 @@ BEGIN
 
     COMMIT;
     DBMS_OUTPUT.PUT_LINE('Dodano ' || GREATEST(v_missing, 0) ||
-                         ' wierszy, stan testowych: ' || GREATEST(v_target, v_existing));
+    ' wierszy, stan testowych: ' || GREATEST(v_target, v_existing));
 END;
 /
 

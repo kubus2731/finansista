@@ -119,8 +119,9 @@ public class RequestViewController {
 
         List<CreateRequestRequest.FundingEntry> fundings = form.getFundings().stream()
                 .filter(f -> f.getAmountRequested() != null)
-                .map(f -> new CreateRequestRequest.FundingEntry(f.getSourceName(),
-                        f.getAmountRequested(), f.getAmountGranted()))
+                .map(f -> new CreateRequestRequest.FundingEntry(
+                        fundingSourceIdFromName(f.getSourceName()),
+                        f.getAmountRequested()))
                 .toList();
 
         CreateRequestRequest payload = new CreateRequestRequest(
@@ -128,7 +129,6 @@ public class RequestViewController {
                 null,
                 user.getDepartment().getId(),
                 form.getCostCategoryId(),
-                null,
                 form.getRealizerType(), form.getProjectKind(), form.getProjectKindOther(),
                 form.getProjectScope(), form.getProjectScopeOther(),
                 form.getProjectNature(), form.getProjectNatureOther(),
@@ -171,6 +171,21 @@ public class RequestViewController {
                 r.applicantName(),
                 r.createdAt().toLocalDate()
         );
+    }
+
+    /**
+     * Mapuje wyświetlaną nazwę źródła finansowania na ID ze słownika funding_source (V2).
+     * Tymczasowe rozwiązanie - docelowo formularz powinien przechowywać ID wprost.
+     */
+    private Long fundingSourceIdFromName(String sourceName) {
+        if (sourceName == null) return null;
+        return switch (sourceName) {
+            case "Samorząd Studentów PB" -> 1L;
+            case "Samorząd Doktorantów PB" -> 2L;
+            case "Inicjatywy kół naukowych / organizacji" -> 3L;
+            case "Środki Wydziału" -> 4L;
+            default -> null;
+        };
     }
 
     private String bearer(HttpServletRequest request) {

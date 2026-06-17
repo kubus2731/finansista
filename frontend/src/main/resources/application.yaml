@@ -3,6 +3,17 @@ spring:
     name: finansista-frontend
   thymeleaf:
     cache: false
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/FREEPDB1
+    username: admin_pb
+    password: paw1ewjav1e
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+  flyway:
+    enabled: false
 
 server:
   port: 8081

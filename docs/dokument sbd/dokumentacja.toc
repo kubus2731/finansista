@@ -37,20 +37,20 @@
 \contentsline {subsection}{\numberline {7.3}Zabezpieczenia formularzy}{14}{subsection.7.3}%
 \contentsline {subsection}{\numberline {7.4}Dostęp publiczny do słowników}{14}{subsection.7.4}%
 \contentsline {subsection}{\numberline {7.5}Optymistyczna kontrola współbieżności}{14}{subsection.7.5}%
-\contentsline {section}{\numberline {8}Frontend i dostępność}{14}{section.8}%
+\contentsline {section}{\numberline {8}Frontend i dostępność}{15}{section.8}%
 \contentsline {subsection}{\numberline {8.1}Dostępność}{15}{subsection.8.1}%
 \contentsline {section}{\numberline {9}Testy wydajnościowe}{15}{section.9}%
 \contentsline {subsection}{\numberline {9.1}Testy bazodanowe (SQL)}{15}{subsection.9.1}%
 \contentsline {subsection}{\numberline {9.2}Testy endpointów REST (k6) - punkt dodatkowy}{15}{subsection.9.2}%
-\contentsline {paragraph}{Profil obciążenia}{15}{paragraph*.6}%
-\contentsline {paragraph}{Kryteria akceptacji}{15}{paragraph*.7}%
+\contentsline {paragraph}{Profil obciążenia}{16}{paragraph*.6}%
+\contentsline {paragraph}{Kryteria akceptacji}{16}{paragraph*.7}%
 \contentsline {paragraph}{Wyniki dla 1000 VU (test trwał 4 min)}{16}{paragraph*.8}%
 \contentsline {paragraph}{Analiza wąskich gardeł}{16}{paragraph*.9}%
-\contentsline {section}{\numberline {10}Uruchomienie systemu}{16}{section.10}%
-\contentsline {subsection}{\numberline {10.1}Wymagania}{16}{subsection.10.1}%
+\contentsline {section}{\numberline {10}Uruchomienie systemu}{17}{section.10}%
+\contentsline {subsection}{\numberline {10.1}Wymagania}{17}{subsection.10.1}%
 \contentsline {subsection}{\numberline {10.2}Krok po kroku}{17}{subsection.10.2}%
 \contentsline {subsection}{\numberline {10.3}Konta testowe}{17}{subsection.10.3}%
 \contentsline {paragraph}{Konta z \texttt {DataSeeder.java} (warstwa aplikacji)}{17}{paragraph*.10}%
-\contentsline {paragraph}{Konta z migracji \texttt {V8\_\_demo\_data.sql} (warstwa bazy)}{17}{paragraph*.11}%
+\contentsline {paragraph}{Konta z migracji \texttt {V8\_\_demo\_data.sql} (warstwa bazy)}{18}{paragraph*.11}%
 \contentsline {paragraph}{Przykładowe wnioski z \texttt {V8}}{18}{paragraph*.12}%
 \contentsline {section}{\numberline {11}Podsumowanie}{18}{section.11}%

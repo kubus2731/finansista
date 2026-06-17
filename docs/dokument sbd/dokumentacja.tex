@@ -76,9 +76,11 @@
 		\vspace{0.2cm}
 		{\large Jakub Matusiewicz \par}
 		{\large Jakub Borkowski \par}
-		
+		{\large \textbf{Prowadzący:} \par}
+		\vspace{0.2cm}
+		{\large Kamil Duda \par}
 		\vspace{0.8cm}
-		{\small Przedmioty: Programowanie aplikacji WWW w języku Java, Systemy Baz Danych \par}
+		{\small Przedmiot: Systemy Baz Danych \par}
 		
 		\vfill
 		
@@ -207,7 +209,7 @@ projektem (np.\ aplikacją SPA).
   \item Hibernate / Spring Data JPA
   \item Flyway (migracje)
   \item Oracle Database 23 Free (kontener Docker)
-  \item Lombok, springdoc-openapi 2.8.9 (Swagger UI / OpenAPI 3.1)
+  \item Lombok, springdoc-openapi 3.0.3 (Swagger UI / OpenAPI 3.1)
   \item Build: Maven
 \end{itemize}
 
@@ -551,7 +553,8 @@ jest przekazywany jako nagłówek \texttt{Authorization: Bearer}.
 \subsection{Specyfikacja OpenAPI (Swagger UI)}
 W celu spełnienia wymagania \emph{,,Aplikacja typu Web API z obsługą Open API''}
 do projektu dołączono bibliotekę
-\texttt{org.springdoc:springdoc-openapi-starter-webmvc-ui} w wersji \texttt{2.8.9}.
+\texttt{org.springdoc:springdoc-openapi-starter-webmvc-ui} w wersji \texttt{3.0.3}
+(wersja linii 3.x jest pierwszą oficjalnie kompatybilną ze Spring Boot 4).
 Biblioteka automatycznie skanuje wszystkie kontrolery oznaczone adnotacją
 \texttt{@RestController}, generuje specyfikację OpenAPI~3.1 i udostępnia
 interaktywne UI Swaggera bez dodatkowej konfiguracji.
@@ -610,13 +613,16 @@ i zwraca go w bezpiecznym ciasteczku z atrybutami \texttt{HttpOnly}, \texttt{Sam
 Token zawiera identyfikator użytkownika (e-mail) oraz jego rolę.
 
 \subsection{Autoryzacja oparta na rolach}
+Słownik ról zdefiniowany w migracji \texttt{V2} (osiem ról):
 \begin{itemize}[leftmargin=*]
-  \item \texttt{ROLE\_STUDENT} - składa wnioski, widzi własne;
-  \item \texttt{ROLE\_WRSS} - ocena merytoryczna w ramach Samorządu;
-  \item \texttt{ROLE\_LEGAL\_COMMISSION} - ocena merytoryczna w komisji;
-  \item \texttt{ROLE\_DEAN\_OFFICE} - ocena formalna (CSSDiR/Dziekanat);
-  \item \texttt{ROLE\_FINANCE\_OFFICE} - Kwestura (rozliczenie);
-  \item \texttt{ROLE\_ADMIN} -- decyzja Rektora, zarządzanie systemem.
+  \item \texttt{ROLE\_ADMIN} -- decyzja Rektora, zarządzanie systemem (CRUD słowników, ról, departamentów);
+  \item \texttt{ROLE\_STUDENT} -- składa wnioski, widzi i edytuje własne (w fazie DRAFT / CORRECTION\_REQUIRED);
+  \item \texttt{ROLE\_STUDENT\_COUNCIL} -- Samorząd Studentów, ocena merytoryczna i opinia ws.\ finansowania ze źródła studenckiego;
+  \item \texttt{ROLE\_DOCTORAL\_COUNCIL} -- Samorząd Doktorantów, analogicznie do Samorządu Studentów dla wniosków doktoranckich;
+  \item \texttt{ROLE\_LEGAL\_COMMISSION} -- komisja prawno-organizacyjna Rektora, ocena formalno-prawna;
+  \item \texttt{ROLE\_DEAN\_OFFICE} -- Dziekanat / CSSDiR, ocena formalna na poziomie wydziału;
+  \item \texttt{ROLE\_FINANCE\_OFFICE} -- Kwestura, kontrola finansowa i rozliczenie środków;
+  \item \texttt{ROLE\_STUDENT\_AFFAIRS} -- Centrum Spraw Studenckich i Doktoranckich, koordynacja obiegu między jednostkami.
 \end{itemize}
 
 \subsection{Zabezpieczenia formularzy}
@@ -808,7 +814,7 @@ przez \texttt{PasswordEncoder}.
   \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
   \midrule
   j.wnioskodawca@student.pb.edu.pl & student123 & STUDENT / Wydział Informatyki \\
-  k.samorzad@pb.edu.pl & wrss123 & WRSS / Samorząd Studentów \\
+  k.samorzad@pb.edu.pl & wrss123 & STUDENT\_COUNCIL / Samorząd Studentów \\
   a.zgodna@pb.edu.pl & komisja123 & LEGAL\_COMMISSION / Wydział Mechaniczny \\
   e.dziekan@pb.edu.pl & dziekanat123 & DEAN\_OFFICE / Dziekanat WI \\
   j.matusiewicz@student.pb.edu.pl & admin123 & ADMIN / Wydział Mechaniczny \\

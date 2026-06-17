@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.26)  14 JUN 2026 21:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.26)  16 JUN 2026 12:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -606,7 +606,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.50 ...line {10.1}Wymagania}{16}{subsection.10.1}
+l.50 ...line {10.1}Wymagania}{17}{subsection.10.1}
                                                   % [1])
 \tf@toc=\write4
 \openout4 = `dokumentacja.toc'.
@@ -615,7 +615,7 @@ l.50 ...line {10.1}Wymagania}{16}{subsection.10.1}
 
 [2]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
-08.
+10.
  (C:\Users\kubam\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -623,9 +623,9 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 [3{C:/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1.enc}{
 C:/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-mathsy.enc}]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 172.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 174.
 
-Overfull \hbox (4.3344pt too wide) in paragraph at lines 172--180
+Overfull \hbox (4.3344pt too wide) in paragraph at lines 174--182
 \T1/lmr/m/n/12 (-20) ca-j¡-cymi wi-doki Thy-me-leaf, spa-ko-wana jako uru-cha-m
 ialny JAR (\T1/lmtt/m/n/12 finansista-frontend\T1/lmr/m/n/12 (-20) ).
  []
@@ -633,7 +633,7 @@ ialny JAR (\T1/lmtt/m/n/12 finansista-frontend\T1/lmr/m/n/12 (-20) ).
 
 
 [4]
-Overfull \hbox (8.60724pt too wide) in paragraph at lines 191--201
+Overfull \hbox (8.60724pt too wide) in paragraph at lines 193--203
 \T1/lmr/m/it/12 (-20) CZA-SOWE'' \T1/lmr/m/n/12 (-20) -- po-zwala wspóª-dzie-li
 ¢ klasy DTO (\T1/lmtt/m/n/12 CreateRequestRequest\T1/lmr/m/n/12 (-20) , \T1/lmt
 t/m/n/12 RequestResponse
@@ -642,21 +642,21 @@ t/m/n/12 RequestResponse
 <diagram_encji.png, id=259, 1159.33125pt x 570.13pt>
 File: diagram_encji.png Graphic file (type png)
 <use diagram_encji.png>
-Package pdftex.def Info: diagram_encji.png  used on input line 220.
+Package pdftex.def Info: diagram_encji.png  used on input line 222.
 (pdftex.def)             Requested size: 455.24411pt x 223.87221pt.
 
 
 [5]
 
 [6 <./diagram_encji.png (PNG copy)>]
-Overfull \hbox (8.31544pt too wide) in paragraph at lines 256--262
+Overfull \hbox (8.31544pt too wide) in paragraph at lines 258--264
 []\T1/lmtt/m/n/12 ProjectDetails \T1/lmr/m/n/12 (-20) - sek-cja I Za-ª¡cz-nika:
  \T1/lmtt/m/n/12 realizerType\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 projectKind
 \T1/lmr/m/n/12 (-20) /\T1/lmtt/m/n/12 projectKindOther\T1/lmr/m/n/12 (-20) ,
  []
 
 
-Overfull \hbox (133.62764pt too wide) in paragraph at lines 256--262
+Overfull \hbox (133.62764pt too wide) in paragraph at lines 258--264
 \T1/lmtt/m/n/12 projectScope\T1/lmr/m/n/12 (-20) /\T1/lmtt/m/n/12 projectScopeO
 ther\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 projectNature\T1/lmr/m/n/12 (-20) /\
 T1/lmtt/m/n/12 projectNatureOther\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 planned
@@ -665,7 +665,7 @@ DateFrom\T1/lmr/m/n/12 (-20) /\T1/lmtt/m/n/12 plannedDateTo\T1/lmr/m/n/12 (-20)
  []
 
 
-Overfull \hbox (16.04523pt too wide) in paragraph at lines 295--298
+Overfull \hbox (16.04523pt too wide) in paragraph at lines 297--300
 []\T1/lmtt/m/n/12 V5 \T1/lmr/m/n/12 (-20) -- pa-kiet PL/SQL \T1/lmtt/m/n/12 fin
 ansista_pkg \T1/lmr/m/n/12 (-20) (\T1/lmtt/m/n/12 set_actor\T1/lmr/m/n/12 (-20)
  /\T1/lmtt/m/n/12 get_actor\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 department_us
@@ -675,26 +675,26 @@ ed_budget\T1/lmr/m/n/12 (-20) ,
 
 
 [7]
-Overfull \hbox (98.18181pt too wide) in paragraph at lines 316--327
+Overfull \hbox (98.18181pt too wide) in paragraph at lines 318--329
  [] 
  []
 
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 331.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 333.
 
-Overfull \hbox (0.99838pt too wide) in paragraph at lines 337--344
+Overfull \hbox (0.99838pt too wide) in paragraph at lines 339--346
 []\T1/lmtt/m/n/12 PROCEDURE set_actor(p_user_id) \T1/lmr/m/n/12 (-20) oraz \T1/
 lmtt/m/n/12 FUNCTION get_actor RETURN NUMBER \T1/lmr/m/n/12 (-20) - prze-
  []
 
 
-Overfull \hbox (101.9351pt too wide) in paragraph at lines 349--357
+Overfull \hbox (101.9351pt too wide) in paragraph at lines 351--359
 []\T1/lmtt/m/n/12 PROCEDURE evaluate_request(p_req_id, p_evaluator_id, p_new_st
 atus_id, p_comment_content)
  []
 
 
-Overfull \hbox (12.16301pt too wide) in paragraph at lines 349--357
+Overfull \hbox (12.16301pt too wide) in paragraph at lines 351--359
 \T1/lmtt/m/n/12 UPDATE\T1/lmr/m/n/12 (-20) ), we-ry-fi-kuje »e wnio-sek jest w 
 fa-zie we-ry-fi-ka-cji (\T1/lmtt/m/n/12 SUBMITTED / FORMAL_EVALUATION
  []
@@ -702,7 +702,7 @@ fa-zie we-ry-fi-ka-cji (\T1/lmtt/m/n/12 SUBMITTED / FORMAL_EVALUATION
 
 
 [8]
-Overfull \hbox (50.5722pt too wide) in paragraph at lines 382--387
+Overfull \hbox (50.5722pt too wide) in paragraph at lines 384--389
 \T1/lmr/m/n/12 (-20) Funkcja \T1/lmtt/m/n/12 validate_request_status_change(p_o
 ld, p_new) \T1/lmr/m/n/12 (-20) oraz trig-ger \T1/lmtt/m/n/12 T_REQUESTS_TRANSI
 TION
@@ -710,24 +710,24 @@ TION
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 423.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 425.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 1.95836pt
-(hyperref)                removed on input line 423.
+(hyperref)                removed on input line 425.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `\leavevmode@ifvmode' on input line 423.
+(hyperref)                removing `\leavevmode@ifvmode' on input line 425.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                \kern 1.95836pt
-(hyperref)                removed on input line 423.
+(hyperref)                removed on input line 425.
 
 
-Overfull \hbox (0.37935pt too wide) in paragraph at lines 424--433
+Overfull \hbox (0.37935pt too wide) in paragraph at lines 426--435
 \T1/lmr/m/n/12 (-20) sche-mat \T1/lmtt/m/n/12 ADMIN_PB\T1/lmr/m/n/12 (-20) . Da
 ne te-stowe ge-ne-ro-wane skryp-tem \T1/lmtt/m/n/12 db/scripts/demo_data_load.s
 ql
@@ -736,64 +736,64 @@ ql
 
 
 [9]
-Underfull \hbox (badness 10000) in paragraph at lines 449--449
+Underfull \hbox (badness 10000) in paragraph at lines 451--451
 []|\T1/lmtt/m/n/12 ORDER BY created_at DESC OFFSET
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 449--449
+Underfull \hbox (badness 10000) in paragraph at lines 451--451
 []|\T1/lmtt/m/n/12 WHERE department_id = 1 ORDER BY
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 449--449
+Underfull \hbox (badness 10000) in paragraph at lines 451--451
 []|\T1/lmtt/m/n/12 SELECT * FROM
  []
 
 
-Overfull \hbox (67.44623pt too wide) in paragraph at lines 467--473
+Overfull \hbox (67.44623pt too wide) in paragraph at lines 469--475
 \T1/lmr/m/n/12 (-20) plan wy-ko-na-nia za-py-ta-nia Q2, przez co sil-nik wy-ko-
 rzy-stuje in-deks zªo-»ony \T1/lmtt/m/n/12 IDX_REQUESTS_DEPT_CREATED\T1/lmr/m/n
 /12 (-20) ,
  []
 
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 474.
+nput line 476.
 
 
 [10]
-Overfull \hbox (6.6654pt too wide) in paragraph at lines 495--502
+Overfull \hbox (6.6654pt too wide) in paragraph at lines 497--504
 \T1/lmtt/m/n/12 created_at < :ostatnia_data ORDER BY created_at DESC FETCH NEXT
  20\T1/lmr/m/n/12 (-20) ), ko-rzy-
  []
 
 
-Underfull \hbox (badness 3514) in paragraph at lines 549--549
+Underfull \hbox (badness 3514) in paragraph at lines 551--551
 []|\T1/lmr/m/n/12 (+20) wylogowanie (ka-suje
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 549--549
+Underfull \hbox (badness 10000) in paragraph at lines 551--551
 []|\T1/lmr/m/n/12 (+20) utworzenie wnio-sku
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 549--549
+Underfull \hbox (badness 10000) in paragraph at lines 551--551
 []|\T1/lmr/m/n/12 (+20) szczegóªy wnio-sku
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 549--549
+Underfull \hbox (badness 10000) in paragraph at lines 551--551
 \T1/lmr/m/n/12 (+20) (zwraca ETag z
  []
 
 
-Underfull \hbox (badness 1117) in paragraph at lines 549--549
+Underfull \hbox (badness 1117) in paragraph at lines 551--551
 []|\T1/lmr/m/n/12 (+20) lista wy-dzia-ªów (pu-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 549--549
+Underfull \hbox (badness 10000) in paragraph at lines 551--551
 []|\T1/lmr/m/n/12 (+20) ¹ródªa fi-nan-so-wa-nia
  []
 
@@ -802,21 +802,21 @@ Underfull \hbox (badness 10000) in paragraph at lines 549--549
 [11]
 
 [12]
-Overfull \hbox (142.49081pt too wide) in paragraph at lines 584--590
+Overfull \hbox (142.49081pt too wide) in paragraph at lines 587--593
 []\T1/lmr/m/n/12 (-20) Repozytorium \T1/lmtt/m/n/12 SpringDataJpaRequestReposit
 ory \T1/lmr/m/n/12 (-20) im-ple-men-tuje in-ter-fejs \T1/lmtt/m/n/12 JpaSpecifi
 cationExecutor<Request>\T1/lmr/m/n/12 (-20) ,
  []
 
 
-Overfull \hbox (84.08089pt too wide) in paragraph at lines 584--590
+Overfull \hbox (84.08089pt too wide) in paragraph at lines 587--593
 \T1/lmr/m/n/12 (-20) dzi¦ki czemu pa-gi-na-cja dziaªa ª¡cz-nie ze spe-cy-fi-ka-
 cj¡ au-to-ry-za-cyjn¡ \T1/lmtt/m/n/12 RequestAccessSpecificationFactory\T1/lmr/
 m/n/12 (-20) .
  []
 
 
-Overfull \hbox (36.93962pt too wide) in paragraph at lines 591--594
+Overfull \hbox (36.93962pt too wide) in paragraph at lines 594--597
 []\T1/lmr/m/n/12 (-20) Adnotacja \T1/lmtt/m/n/12 @EntityGraph \T1/lmr/m/n/12 (-
 20) (z atry-bu-tami \T1/lmtt/m/n/12 status\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/1
 2 department\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 costCategory\T1/lmr/m/n/12 (
@@ -824,7 +824,7 @@ Overfull \hbox (36.93962pt too wide) in paragraph at lines 591--594
  []
 
 
-Overfull \hbox (66.8754pt too wide) in paragraph at lines 600--603
+Overfull \hbox (66.8754pt too wide) in paragraph at lines 603--606
 \T1/lmr/m/n/12 (-20) Ciaªo od-po-wie-dzi po-zo-staje pªa-sk¡ li-st¡ \T1/lmtt/m/
 n/12 List<RequestResponse> \T1/lmr/m/n/12 (-20) (uzy-skan¡ przez \T1/lmtt/m/n/1
 2 page.getContent()\T1/lmr/m/n/12 (-20) ),
@@ -833,28 +833,28 @@ n/12 List<RequestResponse> \T1/lmr/m/n/12 (-20) (uzy-skan¡ przez \T1/lmtt/m/n/1
 
 
 [13]
-Overfull \hbox (64.1525pt too wide) in paragraph at lines 630--638
+Overfull \hbox (64.1525pt too wide) in paragraph at lines 636--644
 \T1/lmr/m/n/12 (-20) Po re-fak-to-ry-za-cji PR #12 end-po-inty \T1/lmtt/m/n/12 
 GET \T1/lmr/m/n/12 (-20) dla da-nych re-fe-ren-cyj-nych (\T1/lmtt/m/n/12 /api/v
 1/reference/departments\T1/lmr/m/n/12 (-20) ,
  []
 
 
-Overfull \hbox (76.0237pt too wide) in paragraph at lines 630--638
+Overfull \hbox (76.0237pt too wide) in paragraph at lines 636--644
 \T1/lmtt/m/n/12 /api/v1/reference/cost-categories\T1/lmr/m/n/12 (-20) , \T1/lmt
 t/m/n/12 /api/v1/reference/funding-sources\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/1
 2 /api/v1/user/roles\T1/lmr/m/n/12 (-20) ,
  []
 
 
-Overfull \hbox (12.41081pt too wide) in paragraph at lines 630--638
+Overfull \hbox (12.41081pt too wide) in paragraph at lines 636--644
 \T1/lmtt/m/n/12 /api/v1/request-templates\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12
  /api/v1/request-statuses\T1/lmr/m/n/12 (-20) ) s¡ do-st¦pne ano-ni-mowo. Umo»-
 
  []
 
 
-Overfull \hbox (27.11884pt too wide) in paragraph at lines 647--652
+Overfull \hbox (27.11884pt too wide) in paragraph at lines 653--658
 []\T1/lmtt/m/n/12 assertVersion \T1/lmr/m/n/12 (-20) gu-ard w use case'ach \T1/
 lmtt/m/n/12 EditRequestUseCase \T1/lmr/m/n/12 (-20) i \T1/lmtt/m/n/12 ChangeReq
 uestStatusUseCase
@@ -865,40 +865,41 @@ uestStatusUseCase
 [14]
 
 [15]
-Overfull \hbox (109.53078pt too wide) in paragraph at lines 758--761
+Overfull \hbox (109.53078pt too wide) in paragraph at lines 764--767
 \T1/lmr/m/n/12 (-20) od-two-rze-nia) znaj-duje si¦ w pliku \T1/lmtt/m/n/12 docs
 /testy-wydajnosciowe.md \T1/lmr/m/n/12 (-20) oraz \T1/lmtt/m/n/12 docs/k6/get-r
 equests.summary.json\T1/lmr/m/n/12 (-20) . 
  []
 
-(C:\Users\kubam\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2024/09/23 1.10c listings language file
-)
-(C:\Users\kubam\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
-File: lstlang1.sty 2024/09/23 1.10c listings language file
-)
+
 
 [16]
+(C:\Users\kubam\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+File: lstlang1.sty 2024/09/23 1.10c listings language file
+)
+(C:\Users\kubam\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
+File: lstlang1.sty 2024/09/23 1.10c listings language file
+)
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 785.
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 791.
 
-Underfull \hbox (badness 2057) in paragraph at lines 817--817
+Underfull \hbox (badness 2057) in paragraph at lines 823--823
 []|\T1/lmr/m/n/12 (+20) LEGAL_COMMISSION / Wy-
  []
 
 
-Overfull \hbox (17.62482pt too wide) in paragraph at lines 817--818
-[][] 
- []
-
-
-Overfull \hbox (17.62482pt too wide) in paragraph at lines 837--838
+Overfull \hbox (17.62482pt too wide) in paragraph at lines 823--824
 [][] 
  []
 
 
 
 [17]
+Overfull \hbox (17.62482pt too wide) in paragraph at lines 843--844
+[][] 
+ []
+
+
 
 [18] (dokumentacja.aux)
  ***********
@@ -909,13 +910,13 @@ Package rerunfilecheck Info: File `dokumentacja.out' has not changed.
 (rerunfilecheck)             Checksum: BD2C6C67AA7BFA85950BB28A89BBA5B5;6895.
  ) 
 Here is how much of TeX's memory you used:
- 15913 strings out of 468080
- 251678 string characters out of 5425771
- 1088700 words of memory out of 5000000
+ 15915 strings out of 468080
+ 251698 string characters out of 5425771
+ 1085710 words of memory out of 5000000
  44094 multiletter control sequences out of 15000+600000
- 691336 words of font info for 152 fonts, out of 8000000 for 9000
+ 691427 words of font info for 153 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,8n,79p,1011b,2158s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,8n,79p,1011b,1353s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbx12.pf
 b><C:/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmbxi10.p
 fb><C:/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr10.pf
@@ -928,7 +929,7 @@ b><C:/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmr12.pfb
 :/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C
 :/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt12.pfb><C
 :/Users/kubam/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtti10.pfb>
-Output written on dokumentacja.pdf (19 pages, 468098 bytes).
+Output written on dokumentacja.pdf (19 pages, 465907 bytes).
 PDF statistics:
  466 PDF objects out of 1000 (max. 8388607)
  129 named destinations out of 1000 (max. 500000)

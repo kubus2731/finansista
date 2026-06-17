@@ -116,7 +116,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.5.0</version>
+			<version>3.0.3</version>
 		</dependency>
 	</dependencies>
 
@@ -126,6 +126,16 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<!--
+					    classifier=exec sprawia, że spring-boot-maven-plugin
+					    pakuje fat-jar jako finansista-backend-...-exec.jar
+					    (uruchamialny), a zwykły finansista-backend-...jar
+					    pozostaje normalną biblioteką, którą moduł frontend
+					    może importować i kompilować się przeciwko niej.
+					    Bez tego frontend dostaje ClassNotFound przy compile,
+					    bo klasy backendu są w BOOT-INF/classes/ fat-jara.
+					-->
+					<classifier>exec</classifier>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

@@ -27,10 +27,6 @@ public class ModificationAuditedEntity extends CreationAuditedEntity {
     @Column(name = "version", nullable = false)
     private Long version = 0L;
 
-    /**
-     * Guards the optimistic-locking precondition: the caller's expected version
-     * must match the persisted one, otherwise the edit is acting on stale data.
-     */
     public void assertVersion(Long expectedVersion) {
         if (!version.equals(expectedVersion)) {
             throw new ObjectOptimisticLockingFailureException(getClass(), getId());
