@@ -39,6 +39,10 @@ public class User extends ExposableModificationAuditedEntity {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
+    /** Soft delete: false = konto dezaktywowane (nie loguje się, ukryte na listach). */
+    @Column(nullable = false)
+    private boolean active = true;
+
     public User(String name, String surname, String email, String phoneNumber, String password, Role role, Department department) {
         this.name = name;
         this.surname = surname;
@@ -47,6 +51,7 @@ public class User extends ExposableModificationAuditedEntity {
         this.password = password;
         this.role = role;
         this.department = department;
+        this.active = true;
     }
 
     public void changeRole(Role newRole) {
@@ -55,5 +60,9 @@ public class User extends ExposableModificationAuditedEntity {
 
     public void changeDepartment(Department newDepartment) {
         this.department = newDepartment;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

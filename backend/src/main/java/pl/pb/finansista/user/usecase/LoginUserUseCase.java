@@ -25,6 +25,12 @@ public class LoginUserUseCase {
             throw new InvalidCredentialsException();
         }
 
+        // Konto dezaktywowane (soft delete) - traktujemy jak błędne dane logowania,
+        // żeby nie ujawniać, czy konto o danym e-mailu istnieje.
+        if (!user.isActive()) {
+            throw new InvalidCredentialsException();
+        }
+
         return user;
     }
 }

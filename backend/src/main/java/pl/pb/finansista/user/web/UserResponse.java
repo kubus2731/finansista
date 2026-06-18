@@ -10,7 +10,8 @@ public record UserResponse(
         String email,
         String phoneNumber,
         String roleName,
-        String departmentName
+        String departmentName,
+        boolean active
 ) {
     public static UserResponse of(User user) {
         return new UserResponse(
@@ -20,7 +21,8 @@ public record UserResponse(
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getRole().getName(),
-                user.getDepartment().getName()
+                user.getDepartment().getName(),
+                user.isActive()
         );
     }
 }

@@ -14,6 +14,26 @@
     <a th:href="@{/requests/new}" class="btn btn-primary mb-3">Złóż wniosek</a>
     <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
 
+    <!-- Filtrowanie i wyszukiwanie (status + tekst w tytule/opisie) -->
+    <form method="get" th:action="@{/requests}" class="row g-2 mb-3 align-items-center">
+        <div class="col-sm-5">
+            <input type="text" name="search" class="form-control"
+                   placeholder="Szukaj w tytule wniosku…" th:value="${searchTerm}">
+        </div>
+        <div class="col-sm-4">
+            <select name="status" class="form-select">
+                <option value="">Wszystkie statusy</option>
+                <option th:each="st : ${statuses}" th:value="${st}"
+                        th:text="#{'status.' + ${st}}"
+                        th:selected="${st == selectedStatus}">Status</option>
+            </select>
+        </div>
+        <div class="col-sm-3 d-flex gap-2">
+            <button type="submit" class="btn btn-success">Filtruj</button>
+            <a th:href="@{/requests}" class="btn btn-outline-secondary">Wyczyść</a>
+        </div>
+    </form>
+
     <div class="table-responsive">
         <table class="table table-striped align-middle">
             <thead>

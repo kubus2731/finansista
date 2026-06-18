@@ -34,3 +34,6 @@ build/
 
 ### HTTP Client ###
 requests.http
+
+### Logi z lokalnego uruchamiania aplikacji ###
+*-debug.log

@@ -13,7 +13,24 @@
         <a class="link-success" th:href="@{/requests}">&larr; Wróć do listy</a>
     </nav>
 
-    <h1 class="h3 mb-4" th:text="${request.title}">Tytuł wniosku</h1>
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <h1 class="h3 mb-0" th:text="${request.title}">Tytuł wniosku</h1>
+        <div class="d-flex gap-2 flex-shrink-0">
+            <a th:href="@{/requests/{id}/duplicate(id=${request.id})}"
+               class="btn btn-outline-secondary btn-sm">Złóż ponownie</a>
+            <a th:if="${request.status == 'DRAFT' or request.status == 'CORRECTION_REQUIRED'}"
+               th:href="@{/requests/{id}/edit(id=${request.id})}"
+               class="btn btn-outline-primary btn-sm">Edytuj wniosek</a>
+            <form th:if="${canDelete}" method="post"
+                  th:action="@{/requests/{id}/delete(id=${request.id})}"
+                  onsubmit="return confirm('Czy na pewno usunąć ten wniosek? Operacja jest nieodwracalna.');">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Usuń wniosek</button>
+            </form>
+        </div>
+    </div>
 
     <div class="card mb-4">
         <div class="card-body">
@@ -163,12 +180,99 @@
                 </thead>
                 <tbody>
                     <tr th:each="f : ${req.fundings}">
-                        <td th:text="${f.sourceName}">—</td>
+                        <td th:text="#{'funding.' + ${f.sourceName}}">—</td>
                         <td class="text-end" th:text="${f.amountRequested != null ? #numbers.formatDecimal(f.amountRequested,1,2) + ' zł' : '—'}">—</td>
                         <td class="text-end" th:text="${f.amountGranted != null ? #numbers.formatDecimal(f.amountGranted,1,2) + ' zł' : '—'}">—</td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Akcje: zmiana statusu (wysłanie wniosku / procesowanie przez jednostki) -->
+    <div class="card mb-4" th:if="${!#lists.isEmpty(transitions)}">
+        <div class="card-header fw-semibold">Akcje</div>
+        <div class="card-body">
+            <form th:action="@{/requests/{id}/status(id=${request.id})}" method="post">
+                <div class="mb-3">
+                    <label for="statusDescription" class="form-label">
+                        Uzasadnienie / uwagi <span class="text-muted">(opcjonalne, zalecane przy odrzuceniu lub zwrocie)</span>
+                    </label>
+                    <textarea class="form-control" id="statusDescription" name="description" rows="2"></textarea>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button th:each="t : ${transitions}"
+                            type="submit" name="status" th:value="${t}"
+                            class="btn"
+                            th:classappend="${t == 'ACCEPTED'} ? 'btn-success'
+                                : (${t == 'REJECTED'} ? 'btn-danger'
+                                : (${t == 'CORRECTION_REQUIRED'} ? 'btn-warning'
+                                : (${t == 'SUBMITTED'} ? 'btn-success'
+                                : 'btn-outline-primary')))"
+                            th:text="#{'action.' + ${t}}">Akcja</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Historia zmian statusu (activity log) -->
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Historia zmian statusu</div>
+        <div class="card-body">
+            <p class="text-muted mb-0" th:if="${#lists.isEmpty(history)}">Brak zarejestrowanych zmian statusu.</p>
+            <div class="table-responsive" th:unless="${#lists.isEmpty(history)}">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr><th>Data</th><th>Zmiana</th><th>Autor</th><th>Uwagi</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="h : ${history}">
+                            <td th:text="${h.createdAt != null ? #temporals.format(h.createdAt, 'dd.MM.yyyy HH:mm') : '—'}">data</td>
+                            <td>
+                                <span th:if="${h.oldStatus != null}" th:text="#{'status.' + ${h.oldStatus}}">stary</span>
+                                <span th:if="${h.oldStatus != null}">&rarr;</span>
+                                <span class="fw-semibold" th:text="#{'status.' + ${h.newStatus}}">nowy</span>
+                            </td>
+                            <td th:text="${h.userFullName}">autor</td>
+                            <td th:text="${h.description} ?: '—'">—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Komentarze / uwagi -->
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Komentarze i uwagi</div>
+        <div class="card-body">
+            <p class="text-muted" th:if="${#lists.isEmpty(comments)}">Brak komentarzy.</p>
+
+            <ul class="list-group list-group-flush mb-3" th:unless="${#lists.isEmpty(comments)}">
+                <li class="list-group-item px-0" th:each="c : ${comments}">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-semibold" th:text="${c.userFullName}">Autor</span>
+                        <span class="text-muted small"
+                              th:text="${c.createdAt != null ? #temporals.format(c.createdAt, 'dd.MM.yyyy HH:mm') : ''}">data</span>
+                    </div>
+                    <p class="mb-0" style="white-space: pre-wrap" th:text="${c.content}">treść</p>
+                </li>
+            </ul>
+
+            <!-- Komentowanie tylko gdy wniosek nie jest w stanie terminalnym
+                 (po zaakceptowaniu/odrzuceniu obieg jest zamknięty). -->
+            <form th:if="${request.status != 'ACCEPTED' and request.status != 'REJECTED'}"
+                  th:action="@{/requests/{id}/comments(id=${request.id})}" method="post">
+                <div class="mb-2">
+                    <label for="commentContent" class="form-label">Dodaj komentarz</label>
+                    <textarea class="form-control" id="commentContent" name="content" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline-success">Dodaj komentarz</button>
+            </form>
+            <p class="text-muted mb-0"
+               th:if="${request.status == 'ACCEPTED' or request.status == 'REJECTED'}">
+                Wniosek został zamknięty &ndash; dodawanie komentarzy jest niedostępne.
+            </p>
         </div>
     </div>
 

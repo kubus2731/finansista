@@ -12,6 +12,7 @@ import pl.pb.finansista.user.usecase.ChangeUserRoleUseCase;
 import pl.pb.finansista.user.usecase.GetMyProfileUseCase;
 import pl.pb.finansista.user.usecase.GetUserByIdUseCase;
 import pl.pb.finansista.user.usecase.GetUsersUseCase;
+import pl.pb.finansista.user.usecase.SetUserActiveUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class UserController {
     private final GetUserByIdUseCase getUserByIdUseCase;
     private final ChangeUserRoleUseCase changeUserRoleUseCase;
     private final ChangeUserDepartmentUseCase changeUserDepartmentUseCase;
+    private final SetUserActiveUseCase setUserActiveUseCase;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -77,6 +79,21 @@ public class UserController {
         log.info("Admin user {} is changing department for user ID: {}", authentication.getName(), id);
         changeUserDepartmentUseCase.execute(request.toCommand(id));
         log.info("Successfully updated department for user ID: {}", id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /** Soft delete: aktywacja / dezaktywacja konta użytkownika (zamiast fizycznego DELETE). */
+    @PatchMapping("/{id}/active")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Void> setUserActive(
+            @PathVariable UUID id,
+            @RequestBody @Valid ChangeUserActiveRequest request,
+            Authentication authentication) {
+
+        log.info("Admin user {} is setting active={} for user ID: {}", authentication.getName(), request.active(), id);
+        setUserActiveUseCase.execute(request.toCommand(id, authentication.getName()));
+        log.info("Successfully updated active flag for user ID: {}", id);
 
         return ResponseEntity.noContent().build();
     }

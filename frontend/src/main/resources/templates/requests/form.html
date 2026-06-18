@@ -6,9 +6,13 @@
 </head>
 <body>
 <section th:fragment="content">
-    <h1 class="h3 mb-1">Wniosek o finansowanie przedsięwzięcia</h1>
+    <h1 class="h3 mb-1" th:text="${editMode} ? 'Edycja wniosku' : 'Wniosek o finansowanie przedsięwzięcia'">Wniosek o finansowanie przedsięwzięcia</h1>
     <p class="text-secondary">w ramach działalności studenckiej i doktoranckiej (Załącznik nr 1)</p>
     <p class="text-secondary">Składasz wniosek z: <strong th:text="${departmentName}">Wydział</strong></p>
+
+    <div class="alert alert-info col-lg-10" th:if="${duplicateNotice}">
+        Tworzysz nowy wniosek na podstawie istniejącego &ndash; sprawdź i dostosuj dane, a następnie zapisz jako nową wersję roboczą.
+    </div>
 
     <div class="alert alert-danger col-lg-10" th:if="${validationErrors}">
         <strong>Popraw przed zapisaniem:</strong>
@@ -17,7 +21,7 @@
         </ul>
     </div>
 
-    <form th:action="@{/requests}" th:object="${form}" method="post" class="col-lg-10" novalidate>
+    <form th:action="@{${formAction != null ? formAction : '/requests'}}" th:object="${form}" method="post" class="col-lg-10" novalidate>
 
         <!-- I. DANE DOTYCZĄCE PRZEDSIĘWZIĘCIA -->
         <div class="card mb-4">
@@ -233,6 +237,10 @@
                                 <td>
                                     <input type="hidden" th:field="*{fundings[__${stat.index}__].sourceName}">
                                     <span th:text="${fund.sourceName}">Źródło</span>
+                                    <!-- "Środki Wydziału" dotyczą wydziału wnioskodawcy (z konta) - pokazujemy jego nazwę. -->
+                                    <span class="text-muted"
+                                          th:if="${fund.sourceName == 'Środki Wydziału' and departmentName != null}"
+                                          th:text="|(${departmentName})|"> (Wydział)</span>
                                 </td>
                                 <td style="max-width:200px">
                                     <input type="number" step="0.01" class="form-control form-control-sm" th:field="*{fundings[__${stat.index}__].amountRequested}">

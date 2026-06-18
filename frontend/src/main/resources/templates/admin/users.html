@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: page(~{::title}, ~{::content})}">
+<head>
+    <meta charset="UTF-8">
+    <title th:fragment="title">Użytkownicy &ndash; Finansista PB</title>
+</head>
+<body>
+<section th:fragment="content">
+
+    <h1 class="h3 mb-4">Zarządzanie użytkownikami</h1>
+
+    <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="card">
+        <div class="card-body table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Użytkownik</th>
+                        <th>E-mail</th>
+                        <th>Rola</th>
+                        <th>Dział</th>
+                        <th>Konto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="u : ${users}" th:classappend="${!u.active} ? 'table-secondary'">
+                        <td>
+                            <span class="fw-semibold" th:text="${u.name + ' ' + u.surname}">Imię Nazwisko</span>
+                            <span class="badge text-bg-secondary ms-1" th:if="${!u.active}">nieaktywny</span>
+                        </td>
+                        <td th:text="${u.email}">email</td>
+
+                        <td style="min-width: 16rem">
+                            <form class="d-flex gap-2" method="post"
+                                  th:action="@{/admin/users/{id}/role(id=${u.id})}">
+                                <select class="form-select form-select-sm" name="roleId">
+                                    <option th:each="r : ${roles}"
+                                            th:value="${r.id}"
+                                            th:text="#{'role.' + ${r.name}}"
+                                            th:selected="${r.name == u.roleName}">ROLE</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-success">Zmień</button>
+                            </form>
+                        </td>
+
+                        <td style="min-width: 20rem">
+                            <form class="d-flex gap-2" method="post"
+                                  th:action="@{/admin/users/{id}/department(id=${u.id})}">
+                                <select class="form-select form-select-sm" name="departmentId">
+                                    <option th:each="d : ${departments}"
+                                            th:value="${d.id}"
+                                            th:text="${d.name}"
+                                            th:selected="${d.name == u.departmentName}">Dział</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-success">Zmień</button>
+                            </form>
+                        </td>
+
+                        <td>
+                            <!-- Nie można dezaktywować konta, na którym jesteś zalogowany. -->
+                            <span class="text-muted small" th:if="${u.email == #authentication.name}">to Ty</span>
+                            <form method="post" th:unless="${u.email == #authentication.name}"
+                                  th:action="@{/admin/users/{id}/active(id=${u.id})}">
+                                <input type="hidden" name="active" th:value="${!u.active}">
+                                <button type="submit" class="btn btn-sm"
+                                        th:classappend="${u.active} ? 'btn-outline-danger' : 'btn-outline-success'"
+                                        th:text="${u.active} ? 'Dezaktywuj' : 'Aktywuj'">Dezaktywuj</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>
