@@ -22,3 +22,10 @@ server:
 app:
   backend:
     url: http://localhost:8080
+
+# TEMPORARY: only needed because the frontend currently component-scans backend
+# beans (LocalFileStorage). Remove once the frontend stops booting backend infra.
+storage:
+  type: local
+  local:
+    base-dir: ./data/attachments
