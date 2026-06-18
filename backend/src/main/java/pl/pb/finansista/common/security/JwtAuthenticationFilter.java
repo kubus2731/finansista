@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -44,22 +45,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwt = authHeader.substring(7);
         }
 
-        final String userEmail;
+        final String subject;
         try {
-            userEmail = jwtService.extractEmail(jwt);
+            subject = jwtService.extractSubject(jwt);
         } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (io.micrometer.common.util.StringUtils.isNotEmpty(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (StringUtils.isNotEmpty(subject) && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtService.isTokenValid(jwt)) {
+                final UUID userExternalId;
+                try {
+                    userExternalId = UUID.fromString(subject);
+                } catch (IllegalArgumentException e) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
                 String role = jwtService.extractRole(jwt);
-                
+
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userEmail,
+                        userExternalId,
                         null,
                         List.of(new SimpleGrantedAuthority(role))
                 );

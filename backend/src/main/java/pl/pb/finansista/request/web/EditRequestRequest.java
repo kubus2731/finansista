@@ -43,10 +43,10 @@ public record EditRequestRequest(
         List<CostItemEntry> costItems,
         List<FundingEntry> fundings
 ) {
-    public EditRequestCommand toCommand(UUID externalId, String userEmail, List<String> userAuthorities, Long version) {
+    public EditRequestCommand toCommand(UUID externalId, UUID userExternalId, List<String> userAuthorities, Long version) {
         return new EditRequestCommand(
                 externalId,
-                userEmail,
+                userExternalId,
                 userAuthorities,
                 title,
                 description,

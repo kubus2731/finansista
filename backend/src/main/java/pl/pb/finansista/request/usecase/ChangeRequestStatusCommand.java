@@ -7,7 +7,7 @@ public record ChangeRequestStatusCommand(
         UUID externalId,
         String newStatusName,
         String description,
-        String userEmail,
+        UUID userExternalId,
         List<String> userAuthorities,
         Long version
 ) {

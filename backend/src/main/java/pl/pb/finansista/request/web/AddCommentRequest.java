@@ -9,10 +9,10 @@ import java.util.UUID;
 public record AddCommentRequest(
         @NotBlank String content
 ) {
-    public AddCommentCommand toCommand(UUID requestExternalId, String userEmail, List<String> userAuthorities) {
+    public AddCommentCommand toCommand(UUID requestExternalId, UUID userExternalId, List<String> userAuthorities) {
         return new AddCommentCommand(
                 requestExternalId,
-                userEmail,
+                userExternalId,
                 content,
                 userAuthorities
         );

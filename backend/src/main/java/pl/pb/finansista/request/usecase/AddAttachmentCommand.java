@@ -1,14 +1,16 @@
 package pl.pb.finansista.request.usecase;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
 public record AddAttachmentCommand(
         UUID requestExternalId,
-        String userEmail,
+        UUID userExternalId,
         String fileName,
         String contentType,
-        byte[] content,
+        InputStream content,
+        long sizeBytes,
         List<String> userAuthorities
 ) {
 }

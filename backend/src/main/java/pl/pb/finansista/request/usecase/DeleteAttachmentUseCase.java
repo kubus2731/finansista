@@ -3,9 +3,8 @@ package pl.pb.finansista.request.usecase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import pl.pb.finansista.common.storage.FileStorage;
+import pl.pb.finansista.common.AfterTransaction;
 import pl.pb.finansista.request.Attachment;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
@@ -26,7 +25,7 @@ public class DeleteAttachmentUseCase {
     private final FileStorage fileStorage;
 
     @Transactional
-    public void execute(UUID requestExternalId, UUID attachmentExternalId, String userEmail, Collection<String> userAuthorities) {
+    public void execute(UUID requestExternalId, UUID attachmentExternalId, UUID userExternalId, Collection<String> userAuthorities) {
         Attachment attachment = attachmentRepository.findByExternalId(attachmentExternalId)
                 .orElseThrow(AttachmentNotFoundException::new);
         Request request = attachment.getRequest();
@@ -36,7 +35,7 @@ public class DeleteAttachmentUseCase {
         }
 
         boolean isAdmin = userAuthorities.contains(RoleName.ROLE_ADMIN.name());
-        boolean isAuthor = request.getUser().getEmail().equals(userEmail);
+        boolean isAuthor = request.getUser().getExternalId().equals(userExternalId);
         if (!isAdmin && !isAuthor) {
             throw UnauthorizedRequestAccessException.forAction("delete attachment");
         }
@@ -51,11 +50,6 @@ public class DeleteAttachmentUseCase {
         String storageKey = attachment.getStorageKey();
         attachmentRepository.delete(attachment);
 
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                fileStorage.delete(storageKey);
-            }
-        });
+        AfterTransaction.onCommit(() -> fileStorage.delete(storageKey));
     }
 }

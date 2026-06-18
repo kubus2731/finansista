@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.pb.finansista.request.Attachment;
 import pl.pb.finansista.request.usecase.AddAttachmentCommand;
 import pl.pb.finansista.request.usecase.AddAttachmentUseCase;
@@ -22,6 +23,7 @@ import pl.pb.finansista.request.usecase.GetAttachmentsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -44,26 +46,24 @@ public class RequestAttachmentController {
     public ResponseEntity<AttachmentResponse> addAttachment(
             @PathVariable UUID id,
             @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Adding attachment to request ID: {} by user: {}", id, authentication.getName());
+        log.info("Adding attachment to request ID: {} by user: {}", id, userId);
 
-        AddAttachmentCommand command = new AddAttachmentCommand(
-                id,
-                authentication.getName(),
-                file.getOriginalFilename(),
-                file.getContentType(),
-                readBytes(file),
-                authorities(authentication));
+        try (InputStream content = file.getInputStream()) {
+            AddAttachmentCommand command = new AddAttachmentCommand(
+                    id,
+                    userId,
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    content,
+                    file.getSize(),
+                    authorities(authentication));
 
-        Attachment attachment = addAttachmentUseCase.execute(command);
-        log.info("Successfully added attachment with ID: {}", attachment.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(AttachmentResponse.of(attachment));
-    }
-
-    private byte[] readBytes(MultipartFile file) {
-        try {
-            return file.getBytes();
+            Attachment attachment = addAttachmentUseCase.execute(command);
+            log.info("Successfully added attachment with ID: {}", attachment.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(AttachmentResponse.of(attachment));
         } catch (IOException e) {
             throw new UncheckedIOException("Could not read uploaded file", e);
         }
@@ -72,10 +72,11 @@ public class RequestAttachmentController {
     @GetMapping("/{id}/attachments")
     public ResponseEntity<List<AttachmentResponse>> getAttachments(
             @PathVariable UUID id,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Fetching attachments for request ID: {} by user: {}", id, authentication.getName());
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities(authentication));
+        log.info("Fetching attachments for request ID: {} by user: {}", id, userId);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities(authentication));
 
         List<AttachmentResponse> attachments = getAttachmentsUseCase.execute(query).stream()
                 .map(AttachmentResponse::of)
@@ -88,10 +89,11 @@ public class RequestAttachmentController {
     public ResponseEntity<Resource> downloadAttachment(
             @PathVariable UUID id,
             @PathVariable UUID attachmentId,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Downloading attachment {} of request {} by user: {}", attachmentId, id, authentication.getName());
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities(authentication));
+        log.info("Downloading attachment {} of request {} by user: {}", attachmentId, id, userId);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities(authentication));
 
         AttachmentDownload download = getAttachmentContentUseCase.execute(query, attachmentId);
 
@@ -110,10 +112,11 @@ public class RequestAttachmentController {
     public ResponseEntity<Void> deleteAttachment(
             @PathVariable UUID id,
             @PathVariable UUID attachmentId,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Deleting attachment {} from request {} by user: {}", attachmentId, id, authentication.getName());
-        deleteAttachmentUseCase.execute(id, attachmentId, authentication.getName(), authorities(authentication));
+        log.info("Deleting attachment {} from request {} by user: {}", attachmentId, id, userId);
+        deleteAttachmentUseCase.execute(id, attachmentId, userId, authorities(authentication));
         return ResponseEntity.noContent().build();
     }
 

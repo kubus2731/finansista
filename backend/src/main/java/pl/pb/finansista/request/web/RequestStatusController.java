@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.pb.finansista.common.web.ETags;
 import pl.pb.finansista.request.usecase.ChangeRequestStatusUseCase;
 import pl.pb.finansista.request.usecase.GetAllRequestStatusesUseCase;
@@ -40,14 +41,15 @@ public class RequestStatusController {
     @GetMapping("/{id}/status/available-transitions")
     public ResponseEntity<List<String>> getAvailableTransitions(
             @PathVariable UUID id,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Fetching available transitions for request ID: {} by user: {}", id, authentication.getName());
+        log.info("Fetching available transitions for request ID: {} by user: {}", id, userId);
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities);
         List<String> available = getAvailableTransitionsUseCase.execute(query);
         return ResponseEntity.ok(available);
     }
@@ -57,15 +59,16 @@ public class RequestStatusController {
             @PathVariable UUID id,
             @RequestHeader(value = HttpHeaders.IF_MATCH) String ifMatch,
             @Valid @RequestBody ChangeRequestStatusRequest payload,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Changing status for request ID: {} to {} by user: {}", id, payload.status(), authentication.getName());
+        log.info("Changing status for request ID: {} to {} by user: {}", id, payload.status(), userId);
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         Long version = ETags.parseIfMatch(ifMatch);
-        changeRequestStatusUseCase.execute(payload.toCommand(id, authentication.getName(), authorities, version));
+        changeRequestStatusUseCase.execute(payload.toCommand(id, userId, authorities, version));
         log.info("Successfully changed status for request ID: {}", id);
         return ResponseEntity.noContent().build();
     }

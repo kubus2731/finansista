@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record EditRequestCommand(
         UUID externalId,
-        String userEmail,
+        UUID userExternalId,
         List<String> userAuthorities,
         String title,
         String description,

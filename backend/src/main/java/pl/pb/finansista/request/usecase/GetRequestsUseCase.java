@@ -25,7 +25,7 @@ public class GetRequestsUseCase {
 
     @Transactional(readOnly = true)
     public Page<Request> execute(GetRequestsQuery query, Pageable pageable) {
-        User currentUser = userRepository.findByEmail(query.userEmail())
+        User currentUser = userRepository.findByExternalId(query.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         List<Specification<Request>> specs = new ArrayList<>();

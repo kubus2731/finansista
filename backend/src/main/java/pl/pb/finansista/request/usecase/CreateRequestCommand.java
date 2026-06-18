@@ -8,7 +8,7 @@ public record CreateRequestCommand(
         String title,
         String description,
         BigDecimal amount,
-        String userEmail,
+        UUID userExternalId,
         UUID templateId,
         Long departmentId,
         Long costCategoryId,

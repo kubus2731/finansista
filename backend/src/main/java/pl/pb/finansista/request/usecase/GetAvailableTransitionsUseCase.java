@@ -24,7 +24,7 @@ public class GetAvailableTransitionsUseCase {
 
     @Transactional(readOnly = true)
     public List<String> execute(GetSingleRequestQuery query) {
-        User actor = userRepository.findByEmail(query.userEmail())
+        User actor = userRepository.findByExternalId(query.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         Specification<Request> spec = Specification.allOf(

@@ -30,7 +30,7 @@ public class GetAttachmentContentUseCase {
 
     @Transactional(readOnly = true)
     public AttachmentDownload execute(GetSingleRequestQuery query, UUID attachmentExternalId) {
-        User user = userRepository.findByEmail(query.userEmail())
+        User user = userRepository.findByExternalId(query.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         Specification<Request> spec = Specification.allOf(

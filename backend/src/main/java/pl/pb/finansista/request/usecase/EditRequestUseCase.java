@@ -10,11 +10,9 @@ import pl.pb.finansista.reference.exception.FundingSourceNotFoundException;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
-import pl.pb.finansista.request.ProjectDetails;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.RequestTemplate;
-import pl.pb.finansista.request.SupervisorInfo;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
 import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
@@ -41,7 +39,7 @@ public class EditRequestUseCase {
         request.assertVersion(command.version());
 
         boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
-        boolean isAuthor = request.getUser().getEmail().equals(command.userEmail());
+        boolean isAuthor = request.getUser().getExternalId().equals(command.userExternalId());
         boolean statusAllowsEdit = request.getStatus().getName().equals(RequestStatusName.DRAFT.name())
                 || request.getStatus().getName().equals(RequestStatusName.CORRECTION_REQUIRED.name());
 
@@ -73,8 +71,8 @@ public class EditRequestUseCase {
         );
 
         request.fillDetails(
-                command.projectDetails() != null ? command.projectDetails().toDomain() : ProjectDetails.empty(),
-                command.supervisor() != null ? command.supervisor().toDomain() : SupervisorInfo.empty());
+                ProjectDetailsData.toDomainOrEmpty(command.projectDetails()),
+                SupervisorData.toDomainOrEmpty(command.supervisor()));
 
         request.clearTasks();
         command.tasks().forEach(t ->

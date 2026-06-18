@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record GetSingleRequestQuery(
         UUID externalId,
-        String userEmail,
+        UUID userExternalId,
         Collection<String> userAuthorities
 ) {
 }
