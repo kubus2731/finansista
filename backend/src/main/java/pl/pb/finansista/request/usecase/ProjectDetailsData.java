@@ -4,7 +4,6 @@ import pl.pb.finansista.request.ProjectDetails;
 
 import java.time.LocalDate;
 
-/** Use-case input mirror of {@link ProjectDetails} (Załącznik 1, sekcja I). */
 public record ProjectDetailsData(
         String realizerType,
         String projectKind,
@@ -23,5 +22,9 @@ public record ProjectDetailsData(
         return new ProjectDetails(realizerType, projectKind, projectKindOther, projectScope,
                 projectScopeOther, projectNature, projectNatureOther, plannedDateFrom,
                 plannedDateTo, location, participantsInvolved, participantsBenefiting);
+    }
+
+    public static ProjectDetails toDomainOrEmpty(ProjectDetailsData data) {
+        return data == null ? ProjectDetails.empty() : data.toDomain();
     }
 }

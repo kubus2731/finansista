@@ -18,7 +18,6 @@ public record RequestResponse(
         String title,
         String description,
         BigDecimal amount,
-        // sekcja VI RAZEM: sumy wyliczane z wierszy request_funding
         BigDecimal totalRequested,
         BigDecimal totalGranted,
         String status,
@@ -27,11 +26,9 @@ public record RequestResponse(
         Long costCategoryId,
         ZonedDateTime createdAt,
         ZonedDateTime updatedAt,
-        // pola pomocnicze dla klienta frontowego (warstwa Thymeleaf konsumuje REST)
         UUID externalId,
         String departmentName,
         String applicantName,
-        // Załącznik 1, sekcje I-III
         String realizerType,
         String projectKind,
         String projectKindOther,
@@ -49,7 +46,6 @@ public record RequestResponse(
         String supervisorPhone,
         String supervisorDepartment,
         String provostOpinion,
-        // sekcja IV i VI
         List<TaskResponse> tasks,
         List<CostItemResponse> costItems,
         List<FundingResponse> fundings
