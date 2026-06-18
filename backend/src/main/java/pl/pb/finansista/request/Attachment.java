@@ -19,12 +19,20 @@ public class Attachment extends ExposableCreationAuditedEntity {
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    @Column(name = "file_url", nullable = false, length = 500)
-    private String fileUrl;
+    @Column(name = "storage_key", nullable = false, length = 500, updatable = false, unique = true)
+    private String storageKey;
 
-    public Attachment(Request request, String fileName, String fileUrl) {
+    @Column(name = "content_type", nullable = false, length = 150)
+    private String contentType;
+
+    @Column(name = "size_bytes", nullable = false)
+    private long sizeBytes;
+
+    public Attachment(Request request, String fileName, String storageKey, String contentType, long sizeBytes) {
         this.request = request;
         this.fileName = fileName;
-        this.fileUrl = fileUrl;
+        this.storageKey = storageKey;
+        this.contentType = contentType;
+        this.sizeBytes = sizeBytes;
     }
 }

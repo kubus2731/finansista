@@ -17,11 +17,6 @@ import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
-/**
- * A single source's dysponent signs their Section VI row: records the granted
- * amount (possibly partial) plus who/when. Only valid while the request is
- * UNDER_REVIEW. Once every row is signed, the request can be ACCEPTED.
- */
 @Service
 @RequiredArgsConstructor
 public class GrantFundingUseCase {
@@ -33,7 +28,7 @@ public class GrantFundingUseCase {
 
     @Transactional
     public void execute(GrantFundingCommand command) {
-        User actor = userRepository.findByEmail(command.userEmail())
+        User actor = userRepository.findByExternalId(command.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         Specification<Request> spec = Specification.allOf(

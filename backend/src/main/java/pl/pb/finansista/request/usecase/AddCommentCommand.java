@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record AddCommentCommand(
         UUID requestExternalId,
-        String userEmail,
+        UUID userExternalId,
         String content,
         List<String> userAuthorities
 ) {

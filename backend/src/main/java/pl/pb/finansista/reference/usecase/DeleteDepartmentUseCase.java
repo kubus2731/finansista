@@ -18,7 +18,6 @@ public class DeleteDepartmentUseCase {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(DepartmentNotFoundException::new);
 
-        // A department still referenced by users/requests is FK-protected -> surfaces as 409.
         departmentRepository.delete(department);
     }
 }

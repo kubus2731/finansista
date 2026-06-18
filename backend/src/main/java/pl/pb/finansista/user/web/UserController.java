@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.pb.finansista.user.usecase.ChangeUserDepartmentUseCase;
 import pl.pb.finansista.user.usecase.ChangeUserRoleUseCase;
 import pl.pb.finansista.user.usecase.GetMyProfileUseCase;
@@ -42,9 +43,9 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getMyProfile(Authentication authentication) {
+    public ResponseEntity<UserResponse> getMyProfile(@AuthenticationPrincipal UUID userId) {
         return ResponseEntity.ok(
-                UserResponse.of(getMyProfileUseCase.execute(authentication.getName()))
+                UserResponse.of(getMyProfileUseCase.execute(userId))
         );
     }
 

@@ -10,6 +10,26 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 15MB
+
+app:
+  attachments:
+    allowed-content-types:
+      - application/pdf
+      - image/png
+      - image/jpeg
+      - application/msword
+      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      - application/vnd.ms-excel
+      - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+storage:
+  type: local
+  local:
+    base-dir: ./data/attachments
   security:
     user:
       name: admin

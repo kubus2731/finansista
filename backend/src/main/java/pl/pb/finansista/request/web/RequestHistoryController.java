@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.pb.finansista.request.usecase.GetRequestHistoryUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
 
@@ -26,14 +27,15 @@ public class RequestHistoryController {
     @GetMapping("/{id}/history")
     public ResponseEntity<List<ActivityLogResponse>> getHistory(
             @PathVariable UUID id,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Fetching history for request ID: {} by user: {}", id, authentication.getName());
+        log.info("Fetching history for request ID: {} by user: {}", id, userId);
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities);
 
         List<ActivityLogResponse> history = getRequestHistoryUseCase.execute(query).stream()
                 .map(ActivityLogResponse::of)

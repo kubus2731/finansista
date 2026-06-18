@@ -1,5 +1,10 @@
 HELP.md
 target/
+
+### Local attachment storage (LocalFileStorage base-dir) ###
+data/
+
+
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

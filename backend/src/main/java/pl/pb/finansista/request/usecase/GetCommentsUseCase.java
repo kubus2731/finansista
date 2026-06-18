@@ -26,7 +26,7 @@ public class GetCommentsUseCase {
 
     @Transactional(readOnly = true)
     public List<Comment> execute(GetSingleRequestQuery query) {
-        User user = userRepository.findByEmail(query.userEmail())
+        User user = userRepository.findByExternalId(query.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         Specification<Request> spec = Specification.allOf(

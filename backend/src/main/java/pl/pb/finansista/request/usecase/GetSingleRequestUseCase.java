@@ -21,7 +21,7 @@ public class GetSingleRequestUseCase {
 
     @Transactional(readOnly = true)
     public Request execute(GetSingleRequestQuery query) {
-        User user = userRepository.findByEmail(query.userEmail())
+        User user = userRepository.findByExternalId(query.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         Specification<Request> spec = Specification.allOf(

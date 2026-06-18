@@ -14,6 +14,7 @@ import pl.pb.finansista.request.usecase.TaskData;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public record CreateRequestRequest(
         @NotBlank String title,
@@ -42,9 +43,9 @@ public record CreateRequestRequest(
         List<CostItemEntry> costItems,
         List<FundingEntry> fundings
 ) {
-    public CreateRequestCommand toCommand(String userEmail) {
+    public CreateRequestCommand toCommand(UUID userExternalId) {
         return new CreateRequestCommand(
-                title, description, amount, userEmail,
+                title, description, amount, userExternalId,
                 templateId != null ? ExternalIdEncoder.decode(templateId) : null,
                 departmentId, costCategoryId,
                 new ProjectDetailsData(realizerType, projectKind, projectKindOther,

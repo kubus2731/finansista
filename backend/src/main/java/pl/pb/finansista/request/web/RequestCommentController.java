@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.usecase.AddCommentUseCase;
 import pl.pb.finansista.request.usecase.GetCommentsUseCase;
@@ -31,14 +32,15 @@ public class RequestCommentController {
     public ResponseEntity<CommentResponse> addComment(
             @PathVariable UUID id,
             @Valid @RequestBody AddCommentRequest payload,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Adding comment to request ID: {} by user: {}", id, authentication.getName());
+        log.info("Adding comment to request ID: {} by user: {}", id, userId);
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        Comment comment = addCommentUseCase.execute(payload.toCommand(id, authentication.getName(), authorities));
+        Comment comment = addCommentUseCase.execute(payload.toCommand(id, userId, authorities));
         log.info("Successfully added comment with ID: {}", comment.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(CommentResponse.of(comment));
     }
@@ -46,14 +48,15 @@ public class RequestCommentController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<List<CommentResponse>> getComments(
             @PathVariable UUID id,
+            @AuthenticationPrincipal UUID userId,
             Authentication authentication
     ) {
-        log.info("Fetching comments for request ID: {} by user: {}", id, authentication.getName());
+        log.info("Fetching comments for request ID: {} by user: {}", id, userId);
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, authentication.getName(), authorities);
+        GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities);
 
         List<CommentResponse> comments = getCommentsUseCase.execute(query).stream()
                 .map(CommentResponse::of)

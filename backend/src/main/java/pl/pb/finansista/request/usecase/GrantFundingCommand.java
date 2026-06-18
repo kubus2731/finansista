@@ -8,7 +8,7 @@ public record GrantFundingCommand(
         UUID requestExternalId,
         Long fundingSourceId,
         BigDecimal amountGranted,
-        String userEmail,
+        UUID userExternalId,
         Collection<String> userAuthorities
 ) {
 }

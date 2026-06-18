@@ -1,7 +1,10 @@
 package pl.pb.finansista.request.usecase;
 
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.RequestFunding;
 
 import java.util.List;
 import java.util.UUID;
@@ -39,11 +42,14 @@ public class RequestSpecifications {
             if (fundingSourceCode == null) {
                 return null;
             }
-            // A request now has many funding rows; match if ANY row uses this source.
-            if (query != null) {
-                query.distinct(true);
-            }
-            return cb.equal(root.join("fundings").join("source").get("name"), fundingSourceCode);
+
+            Subquery<Long> funding = query.subquery(Long.class);
+            Root<RequestFunding> f = funding.from(RequestFunding.class);
+            funding.select(f.get("id")).where(
+                    cb.equal(f.get("request"), root),
+                    cb.equal(f.join("source").get("name"), fundingSourceCode)
+            );
+            return cb.exists(funding);
         };
     }
 

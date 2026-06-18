@@ -32,7 +32,7 @@ public class JwtService {
 
     public String generateToken(User user) {
         return Jwts.builder()
-                .subject(user.getEmail())
+                .subject(user.getExternalId().toString())
                 .claim("role", user.getRole().getName())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
@@ -63,7 +63,7 @@ public class JwtService {
         return cookie != null ? cookie.getValue() : null;
     }
 
-    public String extractEmail(String token) {
+    public String extractSubject(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()

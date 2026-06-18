@@ -1,9 +1,10 @@
 package pl.pb.finansista.request.usecase;
 
 import java.util.List;
+import java.util.UUID;
 
 public record GetRequestsQuery(
-        String userEmail,
+        UUID userExternalId,
         List<String> userAuthorities,
         String status,
         Long departmentId,

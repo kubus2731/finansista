@@ -31,7 +31,7 @@ public class ChangeRequestStatusUseCase {
 
     @Transactional
     public void execute(ChangeRequestStatusCommand command) {
-        User actor = userRepository.findByEmail(command.userEmail())
+        User actor = userRepository.findByExternalId(command.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         Specification<Request> spec = Specification.allOf(

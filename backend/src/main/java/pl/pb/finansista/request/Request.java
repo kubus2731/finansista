@@ -52,10 +52,10 @@ public class Request extends ExposableModificationAuditedEntity {
     private CostCategory costCategory;
 
     @Embedded
-    private ProjectDetails projectDetails;
+    private ProjectDetails projectDetails = ProjectDetails.empty();
 
     @Embedded
-    private SupervisorInfo supervisor;
+    private SupervisorInfo supervisor = SupervisorInfo.empty();
 
     @Lob
     private String provostOpinion;
@@ -98,6 +98,14 @@ public class Request extends ExposableModificationAuditedEntity {
         this.supervisor = supervisor;
     }
 
+    public void recordProvostOpinion(String provostOpinion) {
+        this.provostOpinion = provostOpinion;
+    }
+
+    public boolean hasProvostOpinion() {
+        return provostOpinion != null && !provostOpinion.isBlank();
+    }
+
     public void addTask(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
                         BigDecimal plannedCost, String actions) {
         this.tasks.add(new RequestTask(this, taskNo, name, dateFrom, dateTo, plannedCost, actions));
@@ -118,7 +126,7 @@ public class Request extends ExposableModificationAuditedEntity {
                 .findFirst();
     }
 
-    public boolean allFundingsGranted() {
+    public boolean allFundingGranted() {
         return !fundings.isEmpty() && fundings.stream().allMatch(RequestFunding::isGranted);
     }
 
@@ -130,7 +138,7 @@ public class Request extends ExposableModificationAuditedEntity {
         this.costItems.clear();
     }
 
-    public void clearFundings() {
+    public void clearFunding() {
         this.fundings.clear();
     }
 }
