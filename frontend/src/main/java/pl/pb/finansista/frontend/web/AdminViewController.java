@@ -13,14 +13,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pl.pb.finansista.common.security.JwtService;
-import pl.pb.finansista.common.web.ExternalIdEncoder;
-import pl.pb.finansista.reference.web.ReferenceResponse;
-import pl.pb.finansista.user.web.ChangeUserActiveRequest;
-import pl.pb.finansista.user.web.ChangeUserDepartmentRequest;
-import pl.pb.finansista.user.web.ChangeUserRoleRequest;
-import pl.pb.finansista.user.web.RoleResponse;
-import pl.pb.finansista.user.web.UserResponse;
+import pl.pb.finansista.frontend.common.ExternalIdEncoder;
+import pl.pb.finansista.frontend.viewmodel.ReferenceResponse;
+import pl.pb.finansista.frontend.viewmodel.ChangeUserActiveRequest;
+import pl.pb.finansista.frontend.viewmodel.ChangeUserDepartmentRequest;
+import pl.pb.finansista.frontend.viewmodel.ChangeUserRoleRequest;
+import pl.pb.finansista.frontend.viewmodel.RoleResponse;
+import pl.pb.finansista.frontend.viewmodel.UserResponse;
+import org.springframework.web.util.WebUtils;
+import jakarta.servlet.http.Cookie;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,7 +39,6 @@ import java.util.UUID;
 public class AdminViewController {
 
     private final RestClient backendRestClient;
-    private final JwtService jwtService;
 
     @GetMapping("/admin/users")
     public String users(HttpServletRequest httpRequest, Model model) {
@@ -132,6 +132,7 @@ public class AdminViewController {
     }
 
     private String bearer(HttpServletRequest request) {
-        return "Bearer " + jwtService.getJwtFromCookies(request);
+        Cookie cookie = WebUtils.getCookie(request, "jwt");
+        return "Bearer " + (cookie != null ? cookie.getValue() : "");
     }
 }

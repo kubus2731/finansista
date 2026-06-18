@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public record RequestResponse(
         String id,
@@ -46,11 +47,25 @@ public record RequestResponse(
         String supervisorPhone,
         String supervisorDepartment,
         String provostOpinion,
+        boolean canEdit,
+        boolean canDelete,
+        boolean canManageAttachments,
+        boolean canRecordProvostOpinion,
         List<TaskResponse> tasks,
         List<CostItemResponse> costItems,
         List<FundingResponse> fundings
 ) {
-    public static RequestResponse of(Request request) {
+    /**
+     * Authorization flags (canEdit/canDelete/... and per-row canGrant) are decided by the
+     * caller — see {@link RequestResponseAssembler}, which mirrors the rules enforced by the
+     * mutating use cases. This factory only shapes the payload; it does not decide permissions.
+     */
+    public static RequestResponse of(Request request,
+                                     boolean canEdit,
+                                     boolean canDelete,
+                                     boolean canManageAttachments,
+                                     boolean canRecordProvostOpinion,
+                                     Predicate<RequestFunding> canGrant) {
         ProjectDetails pd = request.getProjectDetails() != null ? request.getProjectDetails() : ProjectDetails.empty();
         SupervisorInfo sup = request.getSupervisor() != null ? request.getSupervisor() : SupervisorInfo.empty();
 
@@ -96,6 +111,10 @@ public record RequestResponse(
                 sup.getPhone(),
                 sup.getDepartment(),
                 request.getProvostOpinion(),
+                canEdit,
+                canDelete,
+                canManageAttachments,
+                canRecordProvostOpinion,
                 request.getTasks().stream()
                         .map(t -> new TaskResponse(t.getTaskNo(), t.getName(), t.getDateFrom(),
                                 t.getDateTo(), t.getPlannedCost(), t.getActions()))
@@ -106,7 +125,8 @@ public record RequestResponse(
                         .toList(),
                 request.getFundings().stream()
                         .map(f -> new FundingResponse(f.getSource().getId(), f.getSource().getName(),
-                                f.getAmountRequested(), f.getAmountGranted(), f.getGrantedAt()))
+                                f.getAmountRequested(), f.getAmountGranted(), f.getGrantedAt(),
+                                canGrant.test(f)))
                         .toList()
         );
     }
@@ -119,5 +139,5 @@ public record RequestResponse(
 
     public record FundingResponse(Long fundingSourceId, String sourceName,
                                   BigDecimal amountRequested, BigDecimal amountGranted,
-                                  ZonedDateTime grantedAt) {}
+                                  ZonedDateTime grantedAt, boolean canGrant) {}
 }

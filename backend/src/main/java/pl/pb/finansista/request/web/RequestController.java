@@ -35,17 +35,23 @@ public class RequestController {
     private final DeleteRequestUseCase deleteRequestUseCase;
     private final GrantFundingUseCase grantFundingUseCase;
     private final RecordProvostOpinionUseCase recordProvostOpinionUseCase;
+    private final RequestResponseAssembler responseAssembler;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<RequestResponse> createRequest(
             @Valid @RequestBody CreateRequestRequest payload,
-            @AuthenticationPrincipal UUID userId
+            @AuthenticationPrincipal UUID userId,
+            Authentication authentication
     ) {
         log.info("Creating new request for user: {}", userId);
+        List<String> authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
         Request request = createRequestUseCase.execute(payload.toCommand(userId));
         log.info("Successfully created request with ID: {}", request.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(RequestResponse.of(request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(responseAssembler.toResponse(request, userId, authorities));
     }
 
     @GetMapping
@@ -76,9 +82,8 @@ public class RequestController {
                 page.getNumberOfElements(), page.getNumber(), page.getTotalElements(),
                 userId);
 
-        List<RequestResponse> response = page.getContent().stream()
-                .map(RequestResponse::of)
-                .collect(Collectors.toList());
+        List<RequestResponse> response =
+                responseAssembler.toResponses(page.getContent(), userId, authorities);
 
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(page.getTotalElements()))
@@ -101,7 +106,7 @@ public class RequestController {
         Request request = getSingleRequestUseCase.execute(query);
         return ResponseEntity.ok()
                 .eTag(ETags.format(request.getVersion()))
-                .body(RequestResponse.of(request));
+                .body(responseAssembler.toResponse(request, userId, authorities));
     }
 
     @PutMapping("/{id}")
@@ -121,7 +126,7 @@ public class RequestController {
         log.info("Successfully edited request ID: {}", id);
         return ResponseEntity.ok()
                 .eTag(ETags.format(request.getVersion()))
-                .body(RequestResponse.of(request));
+                .body(responseAssembler.toResponse(request, userId, authorities));
     }
 
     @PutMapping("/{id}/fundings/{fundingSourceId}/grant")

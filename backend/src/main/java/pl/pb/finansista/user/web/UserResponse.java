@@ -10,6 +10,7 @@ public record UserResponse(
         String email,
         String phoneNumber,
         String roleName,
+        Long departmentId,
         String departmentName,
         boolean active
 ) {
@@ -21,6 +22,7 @@ public record UserResponse(
                 user.getEmail(),
                 user.getPhoneNumber(),
                 user.getRole().getName(),
+                user.getDepartment().getId(),
                 user.getDepartment().getName(),
                 user.isActive()
         );

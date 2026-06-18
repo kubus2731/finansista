@@ -15,24 +15,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import pl.pb.finansista.frontend.user.view.RegisterForm;
-import pl.pb.finansista.user.web.LoginUserRequest;
-import pl.pb.finansista.user.web.RegisterUserRequest;
+import pl.pb.finansista.frontend.viewmodel.LoginUserRequest;
+import pl.pb.finansista.frontend.viewmodel.RegisterUserRequest;
 
 import java.util.List;
 
-/**
- * Logowanie/rejestracja/wylogowanie ze stron Thymeleaf, ale wykonywane WYŁĄCZNIE
- * przez REST API (/api/v1/auth/*). Ciasteczko JWT ustawione przez backend jest
- * przechwytywane z odpowiedzi REST i przekazywane przeglądarce. Front nie woła
- * use case'ów ani JwtService bezpośrednio - komunikuje się tylko przez REST.
- */
 @Controller
 @RequiredArgsConstructor
 public class AuthViewController {
 
     private final RestClient backendRestClient;
 
-    // rola NIE pochodzi od klienta - wymuszamy bazową (Student) po stronie serwera frontu
     private static final Long STUDENT_ROLE_ID = 2L;
 
     @PostMapping("/login")
@@ -71,7 +64,7 @@ public class AuthViewController {
                     .body(payload)
                     .retrieve()
                     .toBodilessEntity();
-            relayCookies(backendResponse, response);   // automatyczne zalogowanie po rejestracji
+            relayCookies(backendResponse, response);
             return "redirect:/requests";
         } catch (RestClientResponseException e) {
             model.addAttribute("errorMessage", "Konto z tym adresem e-mail lub telefonem już istnieje.");
@@ -89,7 +82,6 @@ public class AuthViewController {
         return "redirect:/login?logout";
     }
 
-    /** Przekazuje nagłówki Set-Cookie z odpowiedzi REST do odpowiedzi dla przeglądarki. */
     private void relayCookies(ResponseEntity<?> backendResponse, HttpServletResponse response) {
         List<String> cookies = backendResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
         if (cookies != null) {

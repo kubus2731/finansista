@@ -5,8 +5,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -15,33 +19,38 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pl.pb.finansista.common.security.JwtService;
+import jakarta.servlet.http.Cookie;
+import org.springframework.web.util.WebUtils;
+import pl.pb.finansista.frontend.viewmodel.UserResponse;
+import pl.pb.finansista.frontend.exception.BusinessException;
+import pl.pb.finansista.frontend.common.ExternalIdEncoder;
+import pl.pb.finansista.frontend.viewmodel.AttachmentResponse;
 import pl.pb.finansista.frontend.request.view.CreateRequestForm;
 import pl.pb.finansista.frontend.request.view.RequestView;
-import pl.pb.finansista.request.web.ActivityLogResponse;
-import pl.pb.finansista.request.web.AddCommentRequest;
-import pl.pb.finansista.request.web.ChangeRequestStatusRequest;
-import pl.pb.finansista.request.web.CommentResponse;
-import pl.pb.finansista.request.web.CreateRequestRequest;
-import pl.pb.finansista.request.web.EditRequestRequest;
-import pl.pb.finansista.request.web.RequestResponse;
-import pl.pb.finansista.user.exception.UserNotFoundException;
-import pl.pb.finansista.user.repository.UserRepository;
+import pl.pb.finansista.frontend.viewmodel.ActivityLogResponse;
+import pl.pb.finansista.frontend.viewmodel.AddCommentRequest;
+import pl.pb.finansista.frontend.viewmodel.ChangeRequestStatusRequest;
+import pl.pb.finansista.frontend.viewmodel.CommentResponse;
+import pl.pb.finansista.frontend.viewmodel.CreateRequestRequest;
+import pl.pb.finansista.frontend.viewmodel.EditRequestRequest;
+import pl.pb.finansista.frontend.viewmodel.GrantFundingRequest;
+import pl.pb.finansista.frontend.viewmodel.RecordProvostOpinionRequest;
+import pl.pb.finansista.frontend.viewmodel.RequestResponse;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
 public class RequestViewController {
 
-    private final UserRepository userRepository;
-    private final RestClient backendRestClient;
-    private final JwtService jwtService;
-
+        private final RestClient backendRestClient;
+    
     private static final List<String> ALL_STATUSES = List.of(
             "DRAFT", "SUBMITTED", "FORMAL_EVALUATION", "UNDER_REVIEW",
             "ACCEPTED", "REJECTED", "CORRECTION_REQUIRED");
@@ -50,7 +59,6 @@ public class RequestViewController {
     public String list(@RequestParam(required = false) String status,
                        @RequestParam(required = false) String search,
                        HttpServletRequest httpRequest, Model model) {
-        // Filtry przekazujemy do backendu tylko gdy mają wartość; resztę robi REST (status/search).
         List<RequestResponse> responses = backendRestClient.get()
                 .uri(b -> b.path("/api/v1/requests")
                         .queryParamIfPresent("status", Optional.ofNullable(StringUtils.hasText(status) ? status : null))
@@ -76,6 +84,8 @@ public class RequestViewController {
         String auth = bearer(httpRequest);
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        boolean isStudentAffairs = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_STUDENT_AFFAIRS"));
 
         RequestResponse response = backendRestClient.get()
                 .uri("/api/v1/requests/{id}", id)
@@ -83,16 +93,12 @@ public class RequestViewController {
                 .retrieve()
                 .body(RequestResponse.class);
 
-        // Komentarze do wniosku (uwagi jednostek oceniających / wnioskodawcy).
         List<CommentResponse> comments = backendRestClient.get()
                 .uri("/api/v1/requests/{id}/comments", id)
                 .header("Authorization", auth)
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<CommentResponse>>() {});
 
-        // Dozwolone przejścia statusu dla ZALOGOWANEGO użytkownika - backend zwraca
-        // tylko te, do których ma uprawnienia (wnioskodawca w DRAFT: [SUBMITTED],
-        // jednostka oceniająca: np. [UNDER_REVIEW, REJECTED, CORRECTION_REQUIRED]).
         List<String> transitions;
         try {
             transitions = backendRestClient.get()
@@ -116,18 +122,143 @@ public class RequestViewController {
             history = List.of();
         }
 
+        List<AttachmentResponse> attachments;
+        try {
+            attachments = backendRestClient.get()
+                    .uri("/api/v1/requests/{id}/attachments", id)
+                    .header("Authorization", auth)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<List<AttachmentResponse>>() {});
+        } catch (RestClientResponseException e) {
+            attachments = List.of();
+        }
+
         model.addAttribute("request", toView(response));
         model.addAttribute("req", response);
         model.addAttribute("comments", comments == null ? List.of() : comments);
         model.addAttribute("transitions", transitions == null ? List.of() : transitions);
         model.addAttribute("history", history == null ? List.of() : history);
-        // Admin usuwa dowolny wniosek; autor - tylko swój w wersji roboczej (backend i tak waliduje).
-        model.addAttribute("canDelete", isAdmin || "DRAFT".equals(response.status()));
+        model.addAttribute("attachments", attachments == null ? List.of() : attachments);
 
         return "requests/details";
     }
 
-    /** Usunięcie wniosku - admin (dowolny) lub autor (własny DRAFT). Autoryzację egzekwuje backend. */
+    @PostMapping("/requests/{id}/provost-opinion")
+    public String recordProvostOpinion(@PathVariable UUID id,
+                                       @RequestParam String opinion,
+                                       HttpServletRequest httpRequest,
+                                       RedirectAttributes redirectAttributes) {
+        if (!StringUtils.hasText(opinion)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Treść opinii nie może być pusta.");
+            return "redirect:/requests/" + id;
+        }
+        try {
+            backendRestClient.put()
+                    .uri("/api/v1/requests/{id}/provost-opinion", id)
+                    .header("Authorization", bearer(httpRequest))
+                    .body(new RecordProvostOpinionRequest(opinion))
+                    .retrieve()
+                    .toBodilessEntity();
+            redirectAttributes.addFlashAttribute("successMessage", "Opinia prorektora została zapisana.");
+        } catch (RestClientResponseException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Nie udało się zapisać opinii (kod " + e.getStatusCode().value() + ").");
+        }
+        return "redirect:/requests/" + id;
+    }
+
+    @PostMapping("/requests/{id}/attachments")
+    public String uploadAttachment(@PathVariable UUID id,
+                                   @RequestParam("file") MultipartFile file,
+                                   HttpServletRequest httpRequest,
+                                   RedirectAttributes redirectAttributes) {
+        if (file == null || file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Nie wybrano pliku.");
+            return "redirect:/requests/" + id;
+        }
+        try {
+            MultipartBodyBuilder builder = new MultipartBodyBuilder();
+            builder.part("file", file.getResource());
+            backendRestClient.post()
+                    .uri("/api/v1/requests/{id}/attachments", id)
+                    .header("Authorization", bearer(httpRequest))
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(builder.build())
+                    .retrieve()
+                    .toBodilessEntity();
+            redirectAttributes.addFlashAttribute("successMessage", "Załącznik został dodany.");
+        } catch (RestClientResponseException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Nie udało się dodać załącznika (kod " + e.getStatusCode().value() + ").");
+        }
+        return "redirect:/requests/" + id;
+    }
+
+    @GetMapping("/requests/{id}/attachments/{aid}/download")
+    public ResponseEntity<byte[]> downloadAttachment(@PathVariable UUID id,
+                                                     @PathVariable String aid,
+                                                     HttpServletRequest httpRequest) {
+        UUID attachmentId = ExternalIdEncoder.decode(aid);
+        ResponseEntity<byte[]> backendResponse = backendRestClient.get()
+                .uri("/api/v1/requests/{id}/attachments/{aid}/content", id, attachmentId)
+                .header("Authorization", bearer(httpRequest))
+                .retrieve()
+                .toEntity(byte[].class);
+
+        HttpHeaders headers = new HttpHeaders();
+        if (backendResponse.getHeaders().getContentType() != null) {
+            headers.setContentType(backendResponse.getHeaders().getContentType());
+        }
+        if (backendResponse.getHeaders().getContentDisposition() != null) {
+            headers.setContentDisposition(backendResponse.getHeaders().getContentDisposition());
+        }
+        return new ResponseEntity<>(backendResponse.getBody(), headers, backendResponse.getStatusCode());
+    }
+
+    @PostMapping("/requests/{id}/attachments/{aid}/delete")
+    public String deleteAttachment(@PathVariable UUID id,
+                                   @PathVariable String aid,
+                                   HttpServletRequest httpRequest,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            UUID attachmentId = ExternalIdEncoder.decode(aid);
+            backendRestClient.delete()
+                    .uri("/api/v1/requests/{id}/attachments/{aid}", id, attachmentId)
+                    .header("Authorization", bearer(httpRequest))
+                    .retrieve()
+                    .toBodilessEntity();
+            redirectAttributes.addFlashAttribute("successMessage", "Załącznik został usunięty.");
+        } catch (RestClientResponseException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Nie udało się usunąć załącznika (kod " + e.getStatusCode().value() + ").");
+        }
+        return "redirect:/requests/" + id;
+    }
+
+
+
+    /** Przyznanie kwoty ze wskazanego źródła (dysponent, gdy wniosek w toku oceny). */
+    @PostMapping("/requests/{id}/fundings/{sourceId}/grant")
+    public String grantFunding(@PathVariable UUID id,
+                               @PathVariable Long sourceId,
+                               @RequestParam BigDecimal amountGranted,
+                               HttpServletRequest httpRequest,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            backendRestClient.put()
+                    .uri("/api/v1/requests/{id}/fundings/{sourceId}/grant", id, sourceId)
+                    .header("Authorization", bearer(httpRequest))
+                    .body(new GrantFundingRequest(amountGranted))
+                    .retrieve()
+                    .toBodilessEntity();
+            redirectAttributes.addFlashAttribute("successMessage", "Kwota z wybranego źródła została przyznana.");
+        } catch (RestClientResponseException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Nie udało się przyznać kwoty (kod " + e.getStatusCode().value() + ").");
+        }
+        return "redirect:/requests/" + id;
+    }
+
     @PostMapping("/requests/{id}/delete")
     public String deleteRequest(@PathVariable UUID id,
                                 HttpServletRequest httpRequest,
@@ -171,12 +302,6 @@ public class RequestViewController {
         return "redirect:/requests/" + id;
     }
 
-    /**
-     * Zmiana statusu wniosku - obsługuje zarówno "wyślij wniosek" (DRAFT -> SUBMITTED)
-     * jak i procesowanie przez jednostki nadrzędne. Backend wymaga nagłówka If-Match
-     * z aktualną wersją encji (optymistyczna blokada), więc najpierw pobieramy świeży
-     * ETag z GET, a potem wysyłamy PATCH.
-     */
     @PostMapping("/requests/{id}/status")
     public String changeStatus(@PathVariable UUID id,
                                @RequestParam String status,
@@ -208,10 +333,9 @@ public class RequestViewController {
     }
 
     @GetMapping("/requests/new")
-    public String createForm(Authentication authentication, Model model) {
-        var user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(UserNotFoundException::new);
-        model.addAttribute("departmentName", user.getDepartment().getName());
+    public String createForm(Authentication authentication, HttpServletRequest httpRequest, Model model) {
+        var user = getCurrentUser(httpRequest);
+        model.addAttribute("departmentName", user.departmentName());
 
         CreateRequestForm form = new CreateRequestForm();
         form.getTasks().add(taskRow(1));
@@ -230,11 +354,7 @@ public class RequestViewController {
         return "requests/form";
     }
 
-    /**
-     * "Złóż ponownie" - otwiera NOWY formularz wypełniony danymi istniejącego wniosku.
-     * Przydatne dla cyklicznych przedsięwzięć (np. coroczne wydarzenie). Zapis tworzy
-     * nowy wniosek (DRAFT) na koncie składającego, z jego wydziałem - oryginał zostaje.
-     */
+
     @GetMapping("/requests/{id}/duplicate")
     public String duplicateForm(@PathVariable UUID id, Authentication authentication,
                                 HttpServletRequest httpRequest, Model model) {
@@ -244,11 +364,10 @@ public class RequestViewController {
                 .retrieve()
                 .body(RequestResponse.class);
 
-        var user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(UserNotFoundException::new);
+        var user = getCurrentUser(httpRequest);
 
         model.addAttribute("form", toForm(response));
-        model.addAttribute("departmentName", user.getDepartment().getName());
+        model.addAttribute("departmentName", user.departmentName());
         model.addAttribute("formAction", "/requests");
         model.addAttribute("editMode", false);
         model.addAttribute("duplicateNotice", true);
@@ -265,11 +384,10 @@ public class RequestViewController {
                 .retrieve()
                 .body(RequestResponse.class);
 
-        var user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(UserNotFoundException::new);
+        var user = getCurrentUser(httpRequest);
 
         model.addAttribute("form", toForm(response));
-        model.addAttribute("departmentName", user.getDepartment().getName());
+        model.addAttribute("departmentName", user.departmentName());
         model.addAttribute("formAction", "/requests/" + id + "/edit");
         model.addAttribute("editMode", true);
         return "requests/form";
@@ -283,11 +401,10 @@ public class RequestViewController {
                          HttpServletRequest httpRequest,
                          Model model,
                          RedirectAttributes redirectAttributes) {
-        var user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(UserNotFoundException::new);
+        var user = getCurrentUser(httpRequest);
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("departmentName", user.getDepartment().getName());
+            model.addAttribute("departmentName", user.departmentName());
             model.addAttribute("formAction", "/requests/" + id + "/edit");
             model.addAttribute("editMode", true);
             return "requests/form";
@@ -295,7 +412,7 @@ public class RequestViewController {
 
         List<String> errors = validateBusinessRules(form);
         if (!errors.isEmpty()) {
-            model.addAttribute("departmentName", user.getDepartment().getName());
+            model.addAttribute("departmentName", user.departmentName());
             model.addAttribute("formAction", "/requests/" + id + "/edit");
             model.addAttribute("editMode", true);
             model.addAttribute("validationErrors", errors);
@@ -324,7 +441,7 @@ public class RequestViewController {
         EditRequestRequest payload = new EditRequestRequest(
                 form.getTitle(), form.getDescription(), form.getAmount(),
                 null,
-                user.getDepartment().getId(),
+                user.departmentId(),
                 form.getCostCategoryId(),
                 form.getRealizerType(), form.getProjectKind(), form.getProjectKindOther(),
                 form.getProjectScope(), form.getProjectScopeOther(),
@@ -337,7 +454,6 @@ public class RequestViewController {
 
         try {
             String auth = bearer(httpRequest);
-            // PUT wymaga If-Match z aktualną wersją - pobieramy świeży ETag z GET.
             ResponseEntity<Void> current = backendRestClient.get()
                     .uri("/api/v1/requests/{id}", id)
                     .header("Authorization", auth)
@@ -361,7 +477,6 @@ public class RequestViewController {
         }
     }
 
-    /** Mapuje wniosek z REST na formularz edycji (odtwarza 4 standardowe wiersze źródeł po ID). */
     private CreateRequestForm toForm(RequestResponse r) {
         CreateRequestForm form = new CreateRequestForm();
         form.setTitle(r.title());
@@ -385,7 +500,6 @@ public class RequestViewController {
         form.setSupervisorPhone(r.supervisorPhone());
         form.setSupervisorDepartment(r.supervisorDepartment());
 
-        // Harmonogram - istniejące pozycje, dopełnione do min. 2 wierszy.
         List<RequestResponse.TaskResponse> srcTasks = r.tasks() == null ? List.of() : r.tasks();
         for (RequestResponse.TaskResponse t : srcTasks) {
             CreateRequestForm.TaskRow row = new CreateRequestForm.TaskRow();
@@ -401,7 +515,6 @@ public class RequestViewController {
             form.getTasks().add(taskRow(i + 1));
         }
 
-        // Kosztorys - istniejące pozycje, dopełnione do min. 4 wierszy.
         List<RequestResponse.CostItemResponse> srcCosts = r.costItems() == null ? List.of() : r.costItems();
         for (RequestResponse.CostItemResponse c : srcCosts) {
             CreateRequestForm.CostItemRow row = new CreateRequestForm.CostItemRow();
@@ -416,7 +529,6 @@ public class RequestViewController {
             form.getCostItems().add(new CreateRequestForm.CostItemRow());
         }
 
-        // Źródła finansowania - 4 stałe wiersze, kwoty z istniejących wpisów po fundingSourceId.
         form.getFundings().add(fundingRowWithAmount("Samorząd Studentów PB", 1L, r));
         form.getFundings().add(fundingRowWithAmount("Samorząd Doktorantów PB", 2L, r));
         form.getFundings().add(fundingRowWithAmount("Inicjatywy kół naukowych / organizacji", 3L, r));
@@ -444,17 +556,16 @@ public class RequestViewController {
                          HttpServletRequest httpRequest,
                          Model model,
                          RedirectAttributes redirectAttributes) {
-        var user = userRepository.findByEmail(authentication.getName())
-                .orElseThrow(UserNotFoundException::new);
+        var user = getCurrentUser(httpRequest);
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("departmentName", user.getDepartment().getName());
+            model.addAttribute("departmentName", user.departmentName());
             return "requests/form";
         }
 
         List<String> errors = validateBusinessRules(form);
         if (!errors.isEmpty()) {
-            model.addAttribute("departmentName", user.getDepartment().getName());
+            model.addAttribute("departmentName", user.departmentName());
             model.addAttribute("validationErrors", errors);
             return "requests/form";
         }
@@ -481,7 +592,7 @@ public class RequestViewController {
         CreateRequestRequest payload = new CreateRequestRequest(
                 form.getTitle(), form.getDescription(), form.getAmount(),
                 null,
-                user.getDepartment().getId(),
+                user.departmentId(),
                 form.getCostCategoryId(),
                 form.getRealizerType(), form.getProjectKind(), form.getProjectKindOther(),
                 form.getProjectScope(), form.getProjectScopeOther(),
@@ -527,10 +638,6 @@ public class RequestViewController {
         );
     }
 
-    /**
-     * Mapuje wyświetlaną nazwę źródła finansowania na ID ze słownika funding_source (V2).
-     * Tymczasowe rozwiązanie - docelowo formularz powinien przechowywać ID wprost.
-     */
     private Long fundingSourceIdFromName(String sourceName) {
         if (sourceName == null) return null;
         return switch (sourceName) {
@@ -543,7 +650,16 @@ public class RequestViewController {
     }
 
     private String bearer(HttpServletRequest request) {
-        return "Bearer " + jwtService.getJwtFromCookies(request);
+        Cookie cookie = WebUtils.getCookie(request, "jwt");
+        return "Bearer " + (cookie != null ? cookie.getValue() : "");
+    }
+
+    private UserResponse getCurrentUser(HttpServletRequest request) {
+        return backendRestClient.get()
+                .uri("/api/v1/users/me")
+                .header("Authorization", bearer(request))
+                .retrieve()
+                .body(UserResponse.class);
     }
 
     private List<String> validateBusinessRules(CreateRequestForm form) {

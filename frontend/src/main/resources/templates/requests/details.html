@@ -24,7 +24,7 @@
             <a th:if="${request.status == 'DRAFT' or request.status == 'CORRECTION_REQUIRED'}"
                th:href="@{/requests/{id}/edit(id=${request.id})}"
                class="btn btn-outline-primary btn-sm">Edytuj wniosek</a>
-            <form th:if="${canDelete}" method="post"
+            <form th:if="${req.canDelete}" method="post"
                   th:action="@{/requests/{id}/delete(id=${request.id})}"
                   onsubmit="return confirm('Czy na pewno usunąć ten wniosek? Operacja jest nieodwracalna.');">
                 <button type="submit" class="btn btn-outline-danger btn-sm">Usuń wniosek</button>
@@ -176,16 +176,84 @@
         <div class="card-body table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
-                    <tr><th>Źródło</th><th class="text-end">Wnioskowana</th><th class="text-end">Przyznana</th></tr>
+                    <tr><th>Źródło</th><th class="text-end">Wnioskowana</th><th class="text-end">Przyznana</th><th>Akcja</th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="f : ${req.fundings}">
                         <td th:text="#{'funding.' + ${f.sourceName}}">—</td>
                         <td class="text-end" th:text="${f.amountRequested != null ? #numbers.formatDecimal(f.amountRequested,1,2) + ' zł' : '—'}">—</td>
                         <td class="text-end" th:text="${f.amountGranted != null ? #numbers.formatDecimal(f.amountGranted,1,2) + ' zł' : '—'}">—</td>
+                        <td>
+                            <!-- Pole przyznania kwoty widoczne tylko dla uprawnionego dysponenta (UNDER_REVIEW, jeszcze nieprzyznane). -->
+                            <form th:if="${f.canGrant}"
+                                  class="d-flex gap-2" method="post"
+                                  th:action="@{/requests/{id}/fundings/{sid}/grant(id=${request.id},sid=${f.fundingSourceId})}">
+                                <input type="number" step="0.01" min="0" name="amountGranted"
+                                       class="form-control form-control-sm" style="max-width:130px"
+                                       th:value="${f.amountRequested}" required>
+                                <button type="submit" class="btn btn-sm btn-outline-success">Przyznaj</button>
+                            </form>
+                        </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Załączniki -->
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Załączniki</div>
+        <div class="card-body">
+            <p class="text-muted" th:if="${#lists.isEmpty(attachments)}">Brak załączników.</p>
+
+            <table class="table table-sm align-middle mb-3" th:unless="${#lists.isEmpty(attachments)}">
+                <thead>
+                    <tr><th>Nazwa</th><th>Typ</th><th class="text-end">Rozmiar</th><th>Dodano</th><th></th></tr>
+                </thead>
+                <tbody>
+                    <tr th:each="a : ${attachments}">
+                        <td>
+                            <a th:href="@{/requests/{id}/attachments/{aid}/download(id=${request.id},aid=${a.id})}"
+                               th:text="${a.fileName}">plik</a>
+                        </td>
+                        <td class="small text-muted" th:text="${a.contentType}">typ</td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(a.sizeBytes / 1024.0, 1, 1)} + ' KB'">0 KB</td>
+                        <td class="small" th:text="${a.createdAt != null ? #temporals.format(a.createdAt, 'dd.MM.yyyy HH:mm') : '—'}">data</td>
+                        <td class="text-end">
+                            <form th:if="${req.canManageAttachments}" method="post"
+                                  th:action="@{/requests/{id}/attachments/{aid}/delete(id=${request.id},aid=${a.id})}"
+                                  onsubmit="return confirm('Usunąć ten załącznik?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Dodawanie tylko gdy wniosek edytowalny (DRAFT / do poprawy). -->
+            <form th:if="${req.canManageAttachments}" method="post" enctype="multipart/form-data"
+                  th:action="@{/requests/{id}/attachments(id=${request.id})}" class="d-flex gap-2 align-items-center">
+                <input type="file" name="file" class="form-control form-control-sm" style="max-width:24rem" required>
+                <button type="submit" class="btn btn-sm btn-outline-success">Dodaj załącznik</button>
+            </form>
+            <p class="text-muted small mb-0 mt-2" th:if="${req.canManageAttachments}">
+                Dozwolone: PDF, PNG, JPEG, DOC(X), XLS(X). Maks. 10&nbsp;MB.
+            </p>
+        </div>
+    </div>
+
+    <!-- Opinia prorektora (sekcja III) - wpisuje CSSDiR/admin na etapie oceny formalnej -->
+    <div class="card mb-4" th:if="${req.canRecordProvostOpinion}">
+        <div class="card-header fw-semibold">Opinia prorektora</div>
+        <div class="card-body">
+            <form th:action="@{/requests/{id}/provost-opinion(id=${request.id})}" method="post">
+                <div class="mb-2">
+                    <label for="provostOpinion" class="form-label">Treść opinii (sekcja III Załącznika)</label>
+                    <textarea class="form-control" id="provostOpinion" name="opinion" rows="3"
+                              th:text="${req.provostOpinion}" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline-success">Zapisz opinię</button>
+            </form>
         </div>
     </div>
 

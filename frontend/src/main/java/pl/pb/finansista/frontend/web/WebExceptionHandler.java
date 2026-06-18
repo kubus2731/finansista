@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
-import pl.pb.finansista.common.exception.BusinessException;
+import pl.pb.finansista.frontend.exception.BusinessException;
 
 @ControllerAdvice(basePackages = "pl.pb.finansista.web")
 @Order(Ordered.HIGHEST_PRECEDENCE)
