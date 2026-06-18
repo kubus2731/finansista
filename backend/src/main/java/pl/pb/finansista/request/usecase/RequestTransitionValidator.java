@@ -18,7 +18,7 @@ import java.util.List;
  *
  * <ul>
  *   <li>SUBMITTED → FORMAL_EVALUATION: CSSDiR (ROLE_STUDENT_AFFAIRS) — ocena formalna</li>
- *   <li>FORMAL_EVALUATION → UNDER_REVIEW: CSSDiR — opinia prorektora (merit)</li>
+ *   <li>FORMAL_EVALUATION → UNDER_REVIEW: CSSDiR, gated on the recorded opinia prorektora (merit)</li>
  *   <li>UNDER_REVIEW → ACCEPTED: Rektor (ROLE_FINANCE_OFFICE), gated on all rows granted</li>
  * </ul>
  */
@@ -50,7 +50,9 @@ public class RequestTransitionValidator {
             }
             case FORMAL_EVALUATION -> {
                 if (isAdmin || isStudentAffairs) {
-                    available.add(RequestStatusName.UNDER_REVIEW);
+                    if (request.hasProvostOpinion()) {
+                        available.add(RequestStatusName.UNDER_REVIEW);
+                    }
                     available.add(RequestStatusName.REJECTED);
                     available.add(RequestStatusName.CORRECTION_REQUIRED);
                 }

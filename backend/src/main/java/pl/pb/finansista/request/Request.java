@@ -52,10 +52,10 @@ public class Request extends ExposableModificationAuditedEntity {
     private CostCategory costCategory;
 
     @Embedded
-    private ProjectDetails projectDetails;
+    private ProjectDetails projectDetails = ProjectDetails.empty();
 
     @Embedded
-    private SupervisorInfo supervisor;
+    private SupervisorInfo supervisor = SupervisorInfo.empty();
 
     @Lob
     private String provostOpinion;
@@ -96,6 +96,14 @@ public class Request extends ExposableModificationAuditedEntity {
     public void fillDetails(ProjectDetails projectDetails, SupervisorInfo supervisor) {
         this.projectDetails = projectDetails;
         this.supervisor = supervisor;
+    }
+
+    public void recordProvostOpinion(String provostOpinion) {
+        this.provostOpinion = provostOpinion;
+    }
+
+    public boolean hasProvostOpinion() {
+        return provostOpinion != null && !provostOpinion.isBlank();
     }
 
     public void addTask(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
