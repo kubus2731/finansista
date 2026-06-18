@@ -62,8 +62,9 @@ public class RegisterUserUseCase {
                 department
         );
 
-        userRepository.save(newUser);
-
-        return newUser;
+        // Zwracamy wynik save(): Spring Data po niepustym @Version traktuje byt jako
+        // istniejący i robi merge(), który wstawia zarządzaną KOPIĘ — to ona (a nie
+        // oryginalny newUser) ma wygenerowany externalId potrzebny do tokenu JWT.
+        return userRepository.save(newUser);
     }
 }

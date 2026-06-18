@@ -33,7 +33,10 @@ class JpaUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        return repository.save(user);
+        // saveAndFlush wymusza INSERT od razu, dzięki czemu Hibernate generuje
+        // externalId (@UuidGenerator) i zwraca go w bycie — potrzebne np. przy
+        // rejestracji, gdzie zaraz po zapisie tworzymy token JWT z externalId.
+        return repository.saveAndFlush(user);
     }
 
     @Override
