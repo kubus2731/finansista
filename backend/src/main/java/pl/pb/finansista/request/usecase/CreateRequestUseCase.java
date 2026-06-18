@@ -10,12 +10,10 @@ import pl.pb.finansista.reference.exception.FundingSourceNotFoundException;
 import pl.pb.finansista.reference.repository.CostCategoryRepository;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
 import pl.pb.finansista.reference.repository.FundingSourceRepository;
-import pl.pb.finansista.request.ProjectDetails;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.request.RequestTemplate;
-import pl.pb.finansista.request.SupervisorInfo;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.request.exception.RequestTemplateNotFoundException;
 import pl.pb.finansista.request.exception.UnauthorizedRequestAccessException;
@@ -40,12 +38,14 @@ public class CreateRequestUseCase {
 
     @Transactional
     public Request execute(CreateRequestCommand command) {
-        var user = userRepository.findByEmail(command.userEmail())
+        var user = userRepository.findByExternalId(command.userExternalId())
                 .orElseThrow(UserNotFoundException::new);
 
         String userRole = user.getRole().getName();
-        if (userRole.equals(RoleName.ROLE_DEAN_OFFICE.name()) || userRole.equals(RoleName.ROLE_FINANCE_OFFICE.name())) {
-            throw UnauthorizedRequestAccessException.forAction("create a request as an administrative employee");
+        boolean isApplicant = userRole.equals(RoleName.ROLE_STUDENT.name());
+        boolean isAdmin = userRole.equals(RoleName.ROLE_ADMIN.name());
+        if (!isApplicant && !isAdmin) {
+            throw UnauthorizedRequestAccessException.forAction("create a request");
         }
 
         var department = departmentRepository.findById(command.departmentId())
@@ -73,8 +73,8 @@ public class CreateRequestUseCase {
         );
 
         request.fillDetails(
-                command.projectDetails() != null ? command.projectDetails().toDomain() : ProjectDetails.empty(),
-                command.supervisor() != null ? command.supervisor().toDomain() : SupervisorInfo.empty());
+                ProjectDetailsData.toDomainOrEmpty(command.projectDetails()),
+                SupervisorData.toDomainOrEmpty(command.supervisor()));
 
         command.tasks().forEach(t ->
                 request.addTask(t.taskNo(), t.name(), t.dateFrom(), t.dateTo(), t.plannedCost(), t.actions()));
