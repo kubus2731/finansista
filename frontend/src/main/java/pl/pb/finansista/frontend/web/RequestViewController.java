@@ -628,7 +628,7 @@ public class RequestViewController {
 
     private RequestView toView(RequestResponse r) {
         return new RequestView(
-                r.externalId(),
+                r.id(),
                 r.title(),
                 r.amount(),
                 r.status(),
