@@ -19,7 +19,7 @@ public class Attachment extends ExposableCreationAuditedEntity {
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
-    @Column(name = "storage_key", nullable = false, length = 500, updatable = false)
+    @Column(name = "storage_key", nullable = false, length = 500, updatable = false, unique = true)
     private String storageKey;
 
     @Column(name = "content_type", nullable = false, length = 150)
