@@ -46,9 +46,11 @@ public class GrantFundingUseCase {
         RequestFunding row = request.fundingFor(command.fundingSourceId())
                 .orElseThrow(RequestFundingNotFoundException::new);
 
-        boolean isSameDepartment = request.getDepartment().getId().equals(actor.getDepartment().getId());
+        boolean deanServesFaculty = actor.getDepartment() != null
+                && actor.getDepartment().getParent() != null
+                && actor.getDepartment().getParent().getId().equals(request.getDepartment().getId());
         if (!fundingAuthorization.canGrantSource(command.userAuthorities(),
-                FundingSourceName.valueOf(row.getSource().getName()), isSameDepartment)) {
+                FundingSourceName.valueOf(row.getSource().getName()), deanServesFaculty)) {
             throw UnauthorizedRequestAccessException.forAction("grant funding from " + row.getSource().getName());
         }
 

@@ -59,14 +59,14 @@ public class RequestResponseAssembler {
                 && status.equals(RequestStatusName.FORMAL_EVALUATION.name());
 
         boolean underReview = status.equals(RequestStatusName.UNDER_REVIEW.name());
-        Long actorDepartmentId = (actor != null && actor.getDepartment() != null)
-                ? actor.getDepartment().getId() : null;
-        boolean sameDepartment = actorDepartmentId != null
-                && actorDepartmentId.equals(request.getDepartment().getId());
+        // Dziekan obsługuje wnioski swojego wydziału: wniosek.dział == wydział nadrzędny działu dziekana.
+        boolean deanServesFaculty = actor != null && actor.getDepartment() != null
+                && actor.getDepartment().getParent() != null
+                && actor.getDepartment().getParent().getId().equals(request.getDepartment().getId());
 
         Predicate<RequestFunding> canGrant = f -> underReview
                 && fundingAuthorization.canGrantSource(roles,
-                        FundingSourceName.valueOf(f.getSource().getName()), sameDepartment);
+                        FundingSourceName.valueOf(f.getSource().getName()), deanServesFaculty);
 
         return RequestResponse.of(request, canEdit, canDelete, canManageAttachments,
                 canRecordProvostOpinion, canGrant);

@@ -2,6 +2,7 @@ package pl.pb.finansista.request.usecase;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import pl.pb.finansista.reference.Department;
 import pl.pb.finansista.reference.FundingSourceName;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
@@ -24,7 +25,6 @@ public class RequestAccessSpecificationFactory {
 
         allowedSpecs.add(RequestSpecifications.hasUserEmail(user.getEmail()));
 
-        // CSSDiR (central student-affairs office): formal check + prorektor opinion → sees everything submitted onward.
         if (userAuthorities.contains(RoleName.ROLE_STUDENT_AFFAIRS.name())) {
             allowedSpecs.add(RequestSpecifications.hasStatusIn(List.of(
                     RequestStatusName.SUBMITTED.name(), RequestStatusName.FORMAL_EVALUATION.name(),
@@ -32,13 +32,17 @@ public class RequestAccessSpecificationFactory {
                     RequestStatusName.REJECTED.name(), RequestStatusName.CORRECTION_REQUIRED.name())));
         }
 
-        // Dziekan: only the dysponent for faculty funds, in their own department.
         if (userAuthorities.contains(RoleName.ROLE_DEAN_OFFICE.name())) {
-            allowedSpecs.add(RequestSpecifications.hasDepartment(user.getDepartment().getId())
-                    .and(RequestSpecifications.hasFundingSource(FundingSourceName.FACULTY_FUNDS.name()))
-                    .and(RequestSpecifications.hasStatusIn(List.of(
-                            RequestStatusName.UNDER_REVIEW.name(), RequestStatusName.ACCEPTED.name(),
-                            RequestStatusName.REJECTED.name(), RequestStatusName.CORRECTION_REQUIRED.name()))));
+            Department deanDepartment = user.getDepartment();
+            Long facultyId = (deanDepartment != null && deanDepartment.getParent() != null)
+                    ? deanDepartment.getParent().getId() : null;
+            if (facultyId != null) {
+                allowedSpecs.add(RequestSpecifications.hasDepartment(facultyId)
+                        .and(RequestSpecifications.hasFundingSource(FundingSourceName.FACULTY_FUNDS.name()))
+                        .and(RequestSpecifications.hasStatusIn(List.of(
+                                RequestStatusName.UNDER_REVIEW.name(), RequestStatusName.ACCEPTED.name(),
+                                RequestStatusName.REJECTED.name(), RequestStatusName.CORRECTION_REQUIRED.name()))));
+            }
         }
 
         if (userAuthorities.contains(RoleName.ROLE_LEGAL_COMMISSION.name())) {
