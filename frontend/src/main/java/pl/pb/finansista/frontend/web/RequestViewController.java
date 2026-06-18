@@ -7,7 +7,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -79,8 +80,9 @@ public class RequestViewController {
     }
 
     @GetMapping("/requests/{id}")
-    public String details(@PathVariable UUID id, Authentication authentication,
+    public String details(@PathVariable("id") String encodedId, Authentication authentication,
                           HttpServletRequest httpRequest, Model model) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         String auth = bearer(httpRequest);
         boolean isAdmin = authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
@@ -144,13 +146,14 @@ public class RequestViewController {
     }
 
     @PostMapping("/requests/{id}/provost-opinion")
-    public String recordProvostOpinion(@PathVariable UUID id,
+    public String recordProvostOpinion(@PathVariable("id") String encodedId,
                                        @RequestParam String opinion,
                                        HttpServletRequest httpRequest,
                                        RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         if (!StringUtils.hasText(opinion)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Treść opinii nie może być pusta.");
-            return "redirect:/requests/" + id;
+            return "redirect:/requests/" + encodedId;
         }
         try {
             backendRestClient.put()
@@ -164,26 +167,27 @@ public class RequestViewController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Nie udało się zapisać opinii (kod " + e.getStatusCode().value() + ").");
         }
-        return "redirect:/requests/" + id;
+        return "redirect:/requests/" + encodedId;
     }
 
     @PostMapping("/requests/{id}/attachments")
-    public String uploadAttachment(@PathVariable UUID id,
+    public String uploadAttachment(@PathVariable("id") String encodedId,
                                    @RequestParam("file") MultipartFile file,
                                    HttpServletRequest httpRequest,
                                    RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         if (file == null || file.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Nie wybrano pliku.");
-            return "redirect:/requests/" + id;
+            return "redirect:/requests/" + encodedId;
         }
         try {
-            MultipartBodyBuilder builder = new MultipartBodyBuilder();
-            builder.part("file", file.getResource());
+            MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+            parts.add("file", file.getResource());
             backendRestClient.post()
                     .uri("/api/v1/requests/{id}/attachments", id)
                     .header("Authorization", bearer(httpRequest))
                     .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .body(builder.build())
+                    .body(parts)
                     .retrieve()
                     .toBodilessEntity();
             redirectAttributes.addFlashAttribute("successMessage", "Załącznik został dodany.");
@@ -191,13 +195,14 @@ public class RequestViewController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Nie udało się dodać załącznika (kod " + e.getStatusCode().value() + ").");
         }
-        return "redirect:/requests/" + id;
+        return "redirect:/requests/" + encodedId;
     }
 
     @GetMapping("/requests/{id}/attachments/{aid}/download")
-    public ResponseEntity<byte[]> downloadAttachment(@PathVariable UUID id,
+    public ResponseEntity<byte[]> downloadAttachment(@PathVariable("id") String encodedId,
                                                      @PathVariable String aid,
                                                      HttpServletRequest httpRequest) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         UUID attachmentId = ExternalIdEncoder.decode(aid);
         ResponseEntity<byte[]> backendResponse = backendRestClient.get()
                 .uri("/api/v1/requests/{id}/attachments/{aid}/content", id, attachmentId)
@@ -216,10 +221,11 @@ public class RequestViewController {
     }
 
     @PostMapping("/requests/{id}/attachments/{aid}/delete")
-    public String deleteAttachment(@PathVariable UUID id,
+    public String deleteAttachment(@PathVariable("id") String encodedId,
                                    @PathVariable String aid,
                                    HttpServletRequest httpRequest,
                                    RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         try {
             UUID attachmentId = ExternalIdEncoder.decode(aid);
             backendRestClient.delete()
@@ -232,18 +238,19 @@ public class RequestViewController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Nie udało się usunąć załącznika (kod " + e.getStatusCode().value() + ").");
         }
-        return "redirect:/requests/" + id;
+        return "redirect:/requests/" + encodedId;
     }
 
 
 
     /** Przyznanie kwoty ze wskazanego źródła (dysponent, gdy wniosek w toku oceny). */
     @PostMapping("/requests/{id}/fundings/{sourceId}/grant")
-    public String grantFunding(@PathVariable UUID id,
+    public String grantFunding(@PathVariable("id") String encodedId,
                                @PathVariable Long sourceId,
                                @RequestParam BigDecimal amountGranted,
                                HttpServletRequest httpRequest,
                                RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         try {
             backendRestClient.put()
                     .uri("/api/v1/requests/{id}/fundings/{sourceId}/grant", id, sourceId)
@@ -256,13 +263,14 @@ public class RequestViewController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Nie udało się przyznać kwoty (kod " + e.getStatusCode().value() + ").");
         }
-        return "redirect:/requests/" + id;
+        return "redirect:/requests/" + encodedId;
     }
 
     @PostMapping("/requests/{id}/delete")
-    public String deleteRequest(@PathVariable UUID id,
+    public String deleteRequest(@PathVariable("id") String encodedId,
                                 HttpServletRequest httpRequest,
                                 RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         try {
             backendRestClient.delete()
                     .uri("/api/v1/requests/{id}", id)
@@ -274,19 +282,20 @@ public class RequestViewController {
         } catch (RestClientResponseException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Nie udało się usunąć wniosku (kod " + e.getStatusCode().value() + ").");
-            return "redirect:/requests/" + id;
+            return "redirect:/requests/" + encodedId;
         }
     }
 
     /** Dodanie komentarza (uwagi) do wniosku przez wnioskodawcę lub jednostkę oceniającą. */
     @PostMapping("/requests/{id}/comments")
-    public String addComment(@PathVariable UUID id,
+    public String addComment(@PathVariable("id") String encodedId,
                              @RequestParam String content,
                              HttpServletRequest httpRequest,
                              RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         if (!StringUtils.hasText(content)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Treść komentarza nie może być pusta.");
-            return "redirect:/requests/" + id;
+            return "redirect:/requests/" + encodedId;
         }
         try {
             backendRestClient.post()
@@ -299,15 +308,16 @@ public class RequestViewController {
         } catch (RestClientResponseException e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Nie udało się dodać komentarza.");
         }
-        return "redirect:/requests/" + id;
+        return "redirect:/requests/" + encodedId;
     }
 
     @PostMapping("/requests/{id}/status")
-    public String changeStatus(@PathVariable UUID id,
+    public String changeStatus(@PathVariable("id") String encodedId,
                                @RequestParam String status,
                                @RequestParam(required = false) String description,
                                HttpServletRequest httpRequest,
                                RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         String auth = bearer(httpRequest);
         try {
             ResponseEntity<Void> current = backendRestClient.get()
@@ -329,7 +339,7 @@ public class RequestViewController {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Nie udało się zmienić statusu wniosku (kod " + e.getStatusCode().value() + ").");
         }
-        return "redirect:/requests/" + id;
+        return "redirect:/requests/" + encodedId;
     }
 
     @GetMapping("/requests/new")
@@ -356,8 +366,9 @@ public class RequestViewController {
 
 
     @GetMapping("/requests/{id}/duplicate")
-    public String duplicateForm(@PathVariable UUID id, Authentication authentication,
+    public String duplicateForm(@PathVariable("id") String encodedId, Authentication authentication,
                                 HttpServletRequest httpRequest, Model model) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         RequestResponse response = backendRestClient.get()
                 .uri("/api/v1/requests/{id}", id)
                 .header("Authorization", bearer(httpRequest))
@@ -376,8 +387,9 @@ public class RequestViewController {
 
     /** Formularz edycji wniosku - dostępny dla autora/admina, gdy status to DRAFT lub CORRECTION_REQUIRED. */
     @GetMapping("/requests/{id}/edit")
-    public String editForm(@PathVariable UUID id, Authentication authentication,
+    public String editForm(@PathVariable("id") String encodedId, Authentication authentication,
                            HttpServletRequest httpRequest, Model model) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         RequestResponse response = backendRestClient.get()
                 .uri("/api/v1/requests/{id}", id)
                 .header("Authorization", bearer(httpRequest))
@@ -388,24 +400,25 @@ public class RequestViewController {
 
         model.addAttribute("form", toForm(response));
         model.addAttribute("departmentName", user.departmentName());
-        model.addAttribute("formAction", "/requests/" + id + "/edit");
+        model.addAttribute("formAction", "/requests/" + encodedId + "/edit");
         model.addAttribute("editMode", true);
         return "requests/form";
     }
 
     @PostMapping("/requests/{id}/edit")
-    public String update(@PathVariable UUID id,
+    public String update(@PathVariable("id") String encodedId,
                          @Valid @ModelAttribute("form") CreateRequestForm form,
                          BindingResult bindingResult,
                          Authentication authentication,
                          HttpServletRequest httpRequest,
                          Model model,
                          RedirectAttributes redirectAttributes) {
+        UUID id = ExternalIdEncoder.decode(encodedId);
         var user = getCurrentUser(httpRequest);
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("departmentName", user.departmentName());
-            model.addAttribute("formAction", "/requests/" + id + "/edit");
+            model.addAttribute("formAction", "/requests/" + encodedId + "/edit");
             model.addAttribute("editMode", true);
             return "requests/form";
         }
@@ -413,7 +426,7 @@ public class RequestViewController {
         List<String> errors = validateBusinessRules(form);
         if (!errors.isEmpty()) {
             model.addAttribute("departmentName", user.departmentName());
-            model.addAttribute("formAction", "/requests/" + id + "/edit");
+            model.addAttribute("formAction", "/requests/" + encodedId + "/edit");
             model.addAttribute("editMode", true);
             model.addAttribute("validationErrors", errors);
             return "requests/form";
@@ -469,11 +482,11 @@ public class RequestViewController {
                     .retrieve()
                     .toBodilessEntity();
             redirectAttributes.addFlashAttribute("successMessage", "Wniosek został zaktualizowany.");
-            return "redirect:/requests/" + id;
+            return "redirect:/requests/" + encodedId;
         } catch (RestClientResponseException e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Nie udało się zapisać zmian (kod " + e.getStatusCode().value() + ").");
-            return "redirect:/requests/" + id + "/edit";
+            return "redirect:/requests/" + encodedId + "/edit";
         }
     }
 

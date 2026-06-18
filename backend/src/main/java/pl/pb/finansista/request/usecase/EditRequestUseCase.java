@@ -75,12 +75,17 @@ public class EditRequestUseCase {
                 SupervisorData.toDomainOrEmpty(command.supervisor()));
 
         request.clearTasks();
+        request.clearCostItems();
+        request.clearFunding();
+        // Wymuś DELETE-y usuniętych wierszy przed wstawieniem nowych. Inaczej w jednym
+        // flushu Hibernate wykona INSERT-y przed DELETE i naruszy unikat
+        // (np. UQ_REQFUNDING_REQUEST_SOURCE przy tym samym źródle finansowania).
+        requestRepository.flush();
+
         command.tasks().forEach(t ->
                 request.addTask(t.taskNo(), t.name(), t.dateFrom(), t.dateTo(), t.plannedCost(), t.actions()));
-        request.clearCostItems();
         command.costItems().forEach(c ->
                 request.addCostItem(c.taskNo(), c.itemName(), c.quantity(), c.unitCost(), c.notes()));
-        request.clearFunding();
         command.fundings().forEach(f -> {
             FundingSource fundingSource = fundingSourceRepository.findById(f.fundingSourceId())
                     .orElseThrow(FundingSourceNotFoundException::new);

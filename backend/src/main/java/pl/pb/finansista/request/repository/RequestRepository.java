@@ -23,6 +23,9 @@ public interface RequestRepository {
 
     Request save(Request request);
 
+    /** Wymusza wykonanie oczekujących operacji SQL (np. DELETE po wyczyszczeniu kolekcji). */
+    void flush();
+
     void delete(Request request);
 
     void setActor(long Id);

@@ -50,6 +50,11 @@ class JpaRequestRepository implements RequestRepository {
     }
 
     @Override
+    public void flush() {
+        repository.flush();
+    }
+
+    @Override
     public void delete(Request request) {
         repository.delete(request);
     }
