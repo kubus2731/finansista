@@ -28,6 +28,8 @@ app:
   security:
     jwt:
       cookie-name: jwt
+  demo-data:
+    enabled: true
 
 springdoc:
   api-docs:
