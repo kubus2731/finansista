@@ -44,7 +44,7 @@ public class JwtService {
     public ResponseCookie generateJwtCookie(String token) {
         return ResponseCookie.from(jwtCookieName, token)
                 .path("/")
-                .maxAge(24 * 60 * 60)
+                .maxAge(30)
                 .httpOnly(true)
                 .secure(jwtCookieSecure)
                 .sameSite("Strict")
@@ -71,15 +71,6 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
-    }
-
-    public String extractRole(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("role", String.class);
     }
 
     public Boolean isTokenValid(String token) {

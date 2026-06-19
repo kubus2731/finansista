@@ -25,6 +25,7 @@ import java.util.UUID;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final IdentityResolver identityResolver;
 
     @Override
     protected void doFilterInternal(
@@ -63,14 +64,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
 
-                String role = jwtService.extractRole(jwt);
+                // Authorization is read live from the DB
+                Identity identity = identityResolver.resolve(userExternalId).orElse(null);
+                if (identity == null || !identity.active()) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
 
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
 
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userExternalId,
                         null,
-                        List.of(new SimpleGrantedAuthority(role))
+                        List.of(new SimpleGrantedAuthority(identity.role()))
                 );
 
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
