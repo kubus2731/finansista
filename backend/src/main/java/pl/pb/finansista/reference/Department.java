@@ -17,19 +17,19 @@ import pl.pb.finansista.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Department extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 200)
-    private String name;
+  @Column(nullable = false, unique = true, length = 200)
+  private String name;
 
-    /** Dział nadrzędny — dla dziekanatu jest to jego wydział. NULL dla działów bez nadrzędnego. */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_department_id")
-    private Department parent;
+  /** Dział nadrzędny — dla dziekanatu jest to jego wydział. NULL dla działów bez nadrzędnego. */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "parent_department_id")
+  private Department parent;
 
-    public Department(String name) {
-        this.name = name;
-    }
+  public Department(String name) {
+    this.name = name;
+  }
 
-    public void rename(String name) {
-        this.name = name;
-    }
+  public void rename(String name) {
+    this.name = name;
+  }
 }

@@ -5,6 +5,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,76 +18,71 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final IdentityResolver identityResolver;
+  private final JwtService jwtService;
+  private final IdentityResolver identityResolver;
 
-    @Override
-    protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+      @NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response,
+      @NonNull FilterChain filterChain)
+      throws ServletException, IOException {
 
-        String jwt = jwtService.getJwtFromCookies(request);
-        final String authHeader = request.getHeader("Authorization");
+    String jwt = jwtService.getJwtFromCookies(request);
+    final String authHeader = request.getHeader("Authorization");
 
-        if ((jwt == null && (authHeader == null || !authHeader.startsWith("Bearer "))) || request.getRequestURI().startsWith("/api/v1/auth")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (jwt == null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7);
-        }
-
-        final String subject;
-        try {
-            subject = jwtService.extractSubject(jwt);
-        } catch (Exception e) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (StringUtils.isNotEmpty(subject) && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtService.isTokenValid(jwt)) {
-                final UUID userExternalId;
-                try {
-                    userExternalId = UUID.fromString(subject);
-                } catch (IllegalArgumentException e) {
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-
-                // Authorization is read live from the DB
-                Identity identity = identityResolver.resolve(userExternalId).orElse(null);
-                if (identity == null || !identity.active()) {
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
-
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userExternalId,
-                        null,
-                        List.of(new SimpleGrantedAuthority(identity.role()))
-                );
-
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                context.setAuthentication(authToken);
-                SecurityContextHolder.setContext(context);
-            }
-        }
-
-        filterChain.doFilter(request, response);
+    if ((jwt == null && (authHeader == null || !authHeader.startsWith("Bearer ")))
+        || request.getRequestURI().startsWith("/api/v1/auth")) {
+      filterChain.doFilter(request, response);
+      return;
     }
+
+    if (jwt == null && authHeader.startsWith("Bearer ")) {
+      jwt = authHeader.substring(7);
+    }
+
+    final String subject;
+    try {
+      subject = jwtService.extractSubject(jwt);
+    } catch (Exception e) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
+    if (StringUtils.isNotEmpty(subject)
+        && SecurityContextHolder.getContext().getAuthentication() == null) {
+      if (jwtService.isTokenValid(jwt)) {
+        final UUID userExternalId;
+        try {
+          userExternalId = UUID.fromString(subject);
+        } catch (IllegalArgumentException e) {
+          filterChain.doFilter(request, response);
+          return;
+        }
+
+        // Authorization is read live from the DB
+        Identity identity = identityResolver.resolve(userExternalId).orElse(null);
+        if (identity == null || !identity.active()) {
+          filterChain.doFilter(request, response);
+          return;
+        }
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+        UsernamePasswordAuthenticationToken authToken =
+            new UsernamePasswordAuthenticationToken(
+                userExternalId, null, List.of(new SimpleGrantedAuthority(identity.role())));
+
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        context.setAuthentication(authToken);
+        SecurityContextHolder.setContext(context);
+      }
+    }
+
+    filterChain.doFilter(request, response);
+  }
 }

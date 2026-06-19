@@ -5,20 +5,20 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class InvalidAttachmentException extends BusinessException {
 
-    private InvalidAttachmentException(String message, HttpStatus status) {
-        super(message, status);
-    }
+  private InvalidAttachmentException(String message, HttpStatus status) {
+    super(message, status);
+  }
 
-    public static InvalidAttachmentException empty() {
-        return new InvalidAttachmentException("Uploaded file is empty.", HttpStatus.BAD_REQUEST);
-    }
+  public static InvalidAttachmentException empty() {
+    return new InvalidAttachmentException("Uploaded file is empty.", HttpStatus.BAD_REQUEST);
+  }
 
-    public static InvalidAttachmentException missingFileName() {
-        return new InvalidAttachmentException("Uploaded file has no name.", HttpStatus.BAD_REQUEST);
-    }
+  public static InvalidAttachmentException missingFileName() {
+    return new InvalidAttachmentException("Uploaded file has no name.", HttpStatus.BAD_REQUEST);
+  }
 
-    public static InvalidAttachmentException unsupportedType(String contentType) {
-        return new InvalidAttachmentException(
-                "Unsupported file type: " + contentType, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-    }
+  public static InvalidAttachmentException unsupportedType(String contentType) {
+    return new InvalidAttachmentException(
+        "Unsupported file type: " + contentType, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+  }
 }

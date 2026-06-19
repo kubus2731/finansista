@@ -12,18 +12,18 @@ import pl.pb.finansista.reference.repository.DepartmentRepository;
 @RequiredArgsConstructor
 public class EditDepartmentUseCase {
 
-    private final DepartmentRepository departmentRepository;
+  private final DepartmentRepository departmentRepository;
 
-    @Transactional
-    public Department execute(Long id, String name) {
-        Department department = departmentRepository.findById(id)
-                .orElseThrow(DepartmentNotFoundException::new);
+  @Transactional
+  public Department execute(Long id, String name) {
+    Department department =
+        departmentRepository.findById(id).orElseThrow(DepartmentNotFoundException::new);
 
-        if (!department.getName().equals(name) && departmentRepository.existsByName(name)) {
-            throw new DepartmentAlreadyExistsException(name);
-        }
-
-        department.rename(name);
-        return departmentRepository.save(department);
+    if (!department.getName().equals(name) && departmentRepository.existsByName(name)) {
+      throw new DepartmentAlreadyExistsException(name);
     }
+
+    department.rename(name);
+    return departmentRepository.save(department);
+  }
 }

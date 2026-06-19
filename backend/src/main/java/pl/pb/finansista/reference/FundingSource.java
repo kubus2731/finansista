@@ -14,10 +14,10 @@ import pl.pb.finansista.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FundingSource extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 100)
-    private String name;
+  @Column(nullable = false, unique = true, length = 100)
+  private String name;
 
-    public FundingSource(String name) {
-        this.name = name;
-    }
+  public FundingSource(String name) {
+    this.name = name;
+  }
 }

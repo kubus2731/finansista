@@ -5,7 +5,7 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class DepartmentNotFoundException extends BusinessException {
 
-    public DepartmentNotFoundException() {
-        super("Department not found.", HttpStatus.NOT_FOUND);
-    }
+  public DepartmentNotFoundException() {
+    super("Department not found.", HttpStatus.NOT_FOUND);
+  }
 }

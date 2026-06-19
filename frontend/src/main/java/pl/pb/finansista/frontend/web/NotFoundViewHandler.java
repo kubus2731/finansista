@@ -13,10 +13,10 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class NotFoundViewHandler {
 
-    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
-    public ModelAndView handleNotFound() {
-        ModelAndView modelAndView = new ModelAndView("error/404");
-        modelAndView.setStatus(HttpStatus.NOT_FOUND);
-        return modelAndView;
-    }
+  @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+  public ModelAndView handleNotFound() {
+    ModelAndView modelAndView = new ModelAndView("error/404");
+    modelAndView.setStatus(HttpStatus.NOT_FOUND);
+    return modelAndView;
+  }
 }

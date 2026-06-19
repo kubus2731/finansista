@@ -5,7 +5,7 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class RequestTemplateNotFoundException extends BusinessException {
 
-    public RequestTemplateNotFoundException() {
-        super("Request Template not found.", HttpStatus.NOT_FOUND);
-    }
+  public RequestTemplateNotFoundException() {
+    super("Request Template not found.", HttpStatus.NOT_FOUND);
+  }
 }

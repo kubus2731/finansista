@@ -1,5 +1,6 @@
 package pl.pb.finansista.frontend.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,6 +28,34 @@ public class SecurityConfig {
             .logout(logout -> logout.disable())
             .addFilterBefore(new JwtCookieFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.csrf(csrf -> csrf.disable())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            auth ->
+                auth.requestMatchers(
+                        "/",
+                        "/login",
+                        "/register",
+                        "/accessibility",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/webjars/**")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .exceptionHandling(
+            ex ->
+                ex.authenticationEntryPoint(
+                    new org.springframework.security.web.authentication
+                        .LoginUrlAuthenticationEntryPoint("/login")))
+        .logout(logout -> logout.disable())
+        .addFilterBefore(
+            new JwtCookieFilter(jwtCookieName), UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+  }
 }

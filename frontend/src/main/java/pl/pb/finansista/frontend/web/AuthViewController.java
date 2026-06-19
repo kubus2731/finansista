@@ -2,6 +2,7 @@ package pl.pb.finansista.frontend.web;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -18,32 +19,30 @@ import pl.pb.finansista.frontend.user.view.RegisterForm;
 import pl.pb.finansista.frontend.viewmodel.LoginUserRequest;
 import pl.pb.finansista.frontend.viewmodel.RegisterUserRequest;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 public class AuthViewController {
 
-    private final RestClient backendRestClient;
+  private static final Long STUDENT_ROLE_ID = 2L;
+  private final RestClient backendRestClient;
 
-    private static final Long STUDENT_ROLE_ID = 2L;
-
-    @PostMapping("/login")
-    public String login(@RequestParam String email,
-                        @RequestParam String password,
-                        HttpServletResponse response) {
-        try {
-            ResponseEntity<Void> backendResponse = backendRestClient.post()
-                    .uri("/api/v1/auth/login")
-                    .body(new LoginUserRequest(email, password))
-                    .retrieve()
-                    .toBodilessEntity();
-            relayCookies(backendResponse, response);
-            return "redirect:/requests";
-        } catch (RestClientResponseException e) {
-            return "redirect:/login?error";
-        }
+  @PostMapping("/login")
+  public String login(
+      @RequestParam String email, @RequestParam String password, HttpServletResponse response) {
+    try {
+      ResponseEntity<Void> backendResponse =
+          backendRestClient
+              .post()
+              .uri("/api/v1/auth/login")
+              .body(new LoginUserRequest(email, password))
+              .retrieve()
+              .toBodilessEntity();
+      relayCookies(backendResponse, response);
+      return "redirect:/requests";
+    } catch (RestClientResponseException e) {
+      return "redirect:/login?error";
     }
+  }
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute RegisterForm form,
@@ -75,21 +74,44 @@ public class AuthViewController {
             return "auth/register";
         }
     }
+    try {
+      RegisterUserRequest payload =
+          new RegisterUserRequest(
+              form.name(),
+              form.surname(),
+              form.email(),
+              form.phoneNumber(),
+              form.rawPassword(),
+              STUDENT_ROLE_ID,
+              form.departmentId());
 
-    @GetMapping("/logout")
-    public String logout(HttpServletResponse response) {
-        ResponseEntity<Void> backendResponse = backendRestClient.post()
-                .uri("/api/v1/auth/logout")
-                .retrieve()
-                .toBodilessEntity();
-        relayCookies(backendResponse, response);
-        return "redirect:/login?logout";
+      ResponseEntity<Void> backendResponse =
+          backendRestClient
+              .post()
+              .uri("/api/v1/auth/register")
+              .body(payload)
+              .retrieve()
+              .toBodilessEntity();
+      relayCookies(backendResponse, response);
+      return "redirect:/requests";
+    } catch (RestClientResponseException e) {
+      model.addAttribute("errorMessage", "Konto z tym adresem e-mail lub telefonem już istnieje.");
+      return "auth/register";
     }
+  }
 
-    private void relayCookies(ResponseEntity<?> backendResponse, HttpServletResponse response) {
-        List<String> cookies = backendResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
-        if (cookies != null) {
-            cookies.forEach(cookie -> response.addHeader(HttpHeaders.SET_COOKIE, cookie));
-        }
+  @GetMapping("/logout")
+  public String logout(HttpServletResponse response) {
+    ResponseEntity<Void> backendResponse =
+        backendRestClient.post().uri("/api/v1/auth/logout").retrieve().toBodilessEntity();
+    relayCookies(backendResponse, response);
+    return "redirect:/login?logout";
+  }
+
+  private void relayCookies(ResponseEntity<?> backendResponse, HttpServletResponse response) {
+    List<String> cookies = backendResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
+    if (cookies != null) {
+      cookies.forEach(cookie -> response.addHeader(HttpHeaders.SET_COOKIE, cookie));
     }
+  }
 }

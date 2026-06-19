@@ -1,17 +1,16 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.RequestStatus;
-
 import java.util.List;
 import java.util.Optional;
+import pl.pb.finansista.request.RequestStatus;
 
 public interface RequestStatusRepository {
 
-    Optional<RequestStatus> findById(Long id);
+  Optional<RequestStatus> findById(Long id);
 
-    Optional<RequestStatus> findByName(String name);
+  Optional<RequestStatus> findByName(String name);
 
-    List<RequestStatus> findAll();
+  List<RequestStatus> findAll();
 
-    RequestStatus save(RequestStatus requestStatus);
+  RequestStatus save(RequestStatus requestStatus);
 }

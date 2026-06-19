@@ -1,23 +1,20 @@
 package pl.pb.finansista.user.repository;
 
-import pl.pb.finansista.user.Role;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import pl.pb.finansista.user.Role;
 
 public interface RoleRepository {
 
-    Optional<Role> findById(Long id);
+  Optional<Role> findById(Long id);
 
-    Optional<Role> findByName(String name);
+  Optional<Role> findByName(String name);
 
-    List<Role> findAll();
+  List<Role> findAll();
 
-    boolean existsByName(String name);
+  boolean existsByName(String name);
 
-    Role save(Role role);
+  Role save(Role role);
 
-    void delete(Role role);
+  void delete(Role role);
 }
-

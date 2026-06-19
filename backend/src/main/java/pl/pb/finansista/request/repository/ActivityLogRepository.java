@@ -1,15 +1,14 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.ActivityLog;
-
 import java.util.List;
 import java.util.Optional;
+import pl.pb.finansista.request.ActivityLog;
 
 public interface ActivityLogRepository {
 
-    Optional<ActivityLog> findById(Long id);
+  Optional<ActivityLog> findById(Long id);
 
-    List<ActivityLog> findByRequestIdOrderByCreatedAtDesc(Long requestId);
+  List<ActivityLog> findByRequestIdOrderByCreatedAtDesc(Long requestId);
 
-    ActivityLog save(ActivityLog activityLog);
+  ActivityLog save(ActivityLog activityLog);
 }

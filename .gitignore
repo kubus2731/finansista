@@ -4,6 +4,10 @@ target/
 ### Local attachment storage (LocalFileStorage base-dir) ###
 data/
 
+### Local env + scratch ###
+.env
+cookies.txt
+
 
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

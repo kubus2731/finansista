@@ -14,18 +14,22 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class ChangeUserDepartmentUseCase {
 
-    private final UserRepository userRepository;
-    private final DepartmentRepository departmentRepository;
+  private final UserRepository userRepository;
+  private final DepartmentRepository departmentRepository;
 
-    @Transactional
-    public void execute(ChangeUserDepartmentCommand command) {
-        User user = userRepository.findByExternalId(command.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional
+  public void execute(ChangeUserDepartmentCommand command) {
+    User user =
+        userRepository
+            .findByExternalId(command.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Department newDepartment = departmentRepository.findById(command.newDepartmentId())
-                .orElseThrow(DepartmentNotFoundException::new);
+    Department newDepartment =
+        departmentRepository
+            .findById(command.newDepartmentId())
+            .orElseThrow(DepartmentNotFoundException::new);
 
-        user.changeDepartment(newDepartment);
-        userRepository.save(user);
-    }
+    user.changeDepartment(newDepartment);
+    userRepository.save(user);
+  }
 }

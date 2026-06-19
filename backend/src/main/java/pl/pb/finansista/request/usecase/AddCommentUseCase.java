@@ -17,25 +17,26 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class AddCommentUseCase {
 
-    private final RequestRepository requestRepository;
-    private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecFactory;
+  private final RequestRepository requestRepository;
+  private final CommentRepository commentRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecFactory;
 
-    @Transactional
-    public Comment execute(AddCommentCommand command) {
-        User actor = userRepository.findByExternalId(command.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional
+  public Comment execute(AddCommentCommand command) {
+    User actor =
+        userRepository
+            .findByExternalId(command.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = Specification.allOf(
-                RequestSpecifications.hasExternalId(command.requestExternalId()),
-                accessSpecFactory.createForUser(actor, command.userAuthorities())
-        );
+    Specification<Request> spec =
+        Specification.allOf(
+            RequestSpecifications.hasExternalId(command.requestExternalId()),
+            accessSpecFactory.createForUser(actor, command.userAuthorities()));
 
-        Request request = requestRepository.findOne(spec)
-                .orElseThrow(RequestNotFoundException::new);
+    Request request = requestRepository.findOne(spec).orElseThrow(RequestNotFoundException::new);
 
-        Comment comment = new Comment(request, actor, command.content());
-        return commentRepository.save(comment);
-    }
+    Comment comment = new Comment(request, actor, command.content());
+    return commentRepository.save(comment);
+  }
 }

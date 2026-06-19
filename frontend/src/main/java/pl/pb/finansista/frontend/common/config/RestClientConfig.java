@@ -8,10 +8,9 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class RestClientConfig {
 
-    @Bean
-    public RestClient backendRestClient(@Value("${app.backend.url:http://localhost:8080}") String backendUrl) {
-        return RestClient.builder()
-                .baseUrl(backendUrl)
-                .build();
-    }
+  @Bean
+  public RestClient backendRestClient(
+      @Value("${app.backend.url:http://localhost:8080}") String backendUrl) {
+    return RestClient.builder().baseUrl(backendUrl).build();
+  }
 }

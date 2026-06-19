@@ -14,14 +14,15 @@ import pl.pb.finansista.request.config.AttachmentProperties;
 @RequiredArgsConstructor
 public class AttachmentConstraintsController {
 
-    private final AttachmentProperties attachmentProperties;
-    private final Environment environment;
+  private final AttachmentProperties attachmentProperties;
+  private final Environment environment;
 
-    @GetMapping("/constraints")
-    public ResponseEntity<AttachmentConstraintsResponse> getConstraints() {
-        DataSize maxFileSize = DataSize.parse(
-                environment.getProperty("spring.servlet.multipart.max-file-size", "1MB"));
-        return ResponseEntity.ok(new AttachmentConstraintsResponse(
-                attachmentProperties.allowedContentTypes(), maxFileSize.toBytes()));
-    }
+  @GetMapping("/constraints")
+  public ResponseEntity<AttachmentConstraintsResponse> getConstraints() {
+    DataSize maxFileSize =
+        DataSize.parse(environment.getProperty("spring.servlet.multipart.max-file-size", "1MB"));
+    return ResponseEntity.ok(
+        new AttachmentConstraintsResponse(
+            attachmentProperties.allowedContentTypes(), maxFileSize.toBytes()));
+  }
 }

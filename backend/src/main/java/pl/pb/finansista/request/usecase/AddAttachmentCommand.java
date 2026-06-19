@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.UUID;
 
 public record AddAttachmentCommand(
-        UUID requestExternalId,
-        UUID userExternalId,
-        String fileName,
-        String contentType,
-        InputStream content,
-        long sizeBytes,
-        List<String> userAuthorities
-) {
-}
+    UUID requestExternalId,
+    UUID userExternalId,
+    String fileName,
+    String contentType,
+    InputStream content,
+    long sizeBytes,
+    List<String> userAuthorities) {}

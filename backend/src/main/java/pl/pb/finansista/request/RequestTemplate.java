@@ -15,31 +15,29 @@ import pl.pb.finansista.common.ExposableModificationAuditedEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RequestTemplate extends ExposableModificationAuditedEntity {
 
-    @Column(nullable = false, length = 100)
-    private String title;
+  @Column(nullable = false, length = 100)
+  private String title;
 
-    @Lob
-    private String description;
+  @Lob private String description;
 
-    @Column(nullable = false)
-    private boolean active = true;
+  @Column(nullable = false)
+  private boolean active = true;
 
+  public RequestTemplate(String title, String description) {
+    this.title = title;
+    this.description = description;
+  }
 
-    public RequestTemplate(String title, String description) {
-        this.title = title;
-        this.description = description;
-    }
+  public void updateDetails(String newTitle, String newDescription) {
+    this.title = newTitle;
+    this.description = newDescription;
+  }
 
-    public void updateDetails(String newTitle, String newDescription) {
-        this.title = newTitle;
-        this.description = newDescription;
-    }
+  public void deactivate() {
+    this.active = false;
+  }
 
-    public void deactivate() {
-        this.active = false;
-    }
-
-    public void activate() {
-        this.active = true;
-    }
+  public void activate() {
+    this.active = true;
+  }
 }
