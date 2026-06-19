@@ -16,14 +16,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-/**
- * Builds {@link RequestResponse} together with the per-actor authorization flags.
- * <p>
- * The flags mirror exactly the rules enforced by the mutating use cases
- * (Edit/Delete/AddAttachment/RecordProvostOpinion/GrantFunding) so the UI only ever
- * offers an action the backend would actually allow. Authorization stays on the backend —
- * the frontend just renders what it receives.
- */
 @Component
 @RequiredArgsConstructor
 public class RequestResponseAssembler {

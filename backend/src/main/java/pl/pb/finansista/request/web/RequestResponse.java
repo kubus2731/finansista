@@ -54,11 +54,6 @@ public record RequestResponse(
         List<CostItemResponse> costItems,
         List<FundingResponse> fundings
 ) {
-    /**
-     * Authorization flags (canEdit/canDelete/... and per-row canGrant) are decided by the
-     * caller — see {@link RequestResponseAssembler}, which mirrors the rules enforced by the
-     * mutating use cases. This factory only shapes the payload; it does not decide permissions.
-     */
     public static RequestResponse of(Request request,
                                      boolean canEdit,
                                      boolean canDelete,

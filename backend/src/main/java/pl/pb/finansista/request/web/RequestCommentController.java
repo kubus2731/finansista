@@ -1,22 +1,21 @@
 package pl.pb.finansista.request.web;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.usecase.AddCommentUseCase;
 import pl.pb.finansista.request.usecase.GetCommentsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/requests")
@@ -24,44 +23,43 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RequestCommentController {
 
-    private final AddCommentUseCase addCommentUseCase;
-    private final GetCommentsUseCase getCommentsUseCase;
+  private final AddCommentUseCase addCommentUseCase;
+  private final GetCommentsUseCase getCommentsUseCase;
 
-    @PostMapping("/{id}/comments")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<CommentResponse> addComment(
-            @PathVariable UUID id,
-            @Valid @RequestBody AddCommentRequest payload,
-            @AuthenticationPrincipal UUID userId,
-            Authentication authentication
-    ) {
-        log.info("Adding comment to request ID: {} by user: {}", id, userId);
-        List<String> authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+  @PostMapping("/{id}/comments")
+  @ResponseStatus(HttpStatus.CREATED)
+  public ResponseEntity<CommentResponse> addComment(
+      @PathVariable UUID id,
+      @Valid @RequestBody AddCommentRequest payload,
+      @AuthenticationPrincipal UUID userId,
+      Authentication authentication) {
+    log.info("Adding comment to request ID: {} by user: {}", id, userId);
+    List<String> authorities =
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
 
-        Comment comment = addCommentUseCase.execute(payload.toCommand(id, userId, authorities));
-        log.info("Successfully added comment with ID: {}", comment.getId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(CommentResponse.of(comment));
-    }
+    Comment comment = addCommentUseCase.execute(payload.toCommand(id, userId, authorities));
+    log.info("Successfully added comment with ID: {}", comment.getId());
+    return ResponseEntity.status(HttpStatus.CREATED).body(CommentResponse.of(comment));
+  }
 
-    @GetMapping("/{id}/comments")
-    public ResponseEntity<List<CommentResponse>> getComments(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal UUID userId,
-            Authentication authentication
-    ) {
-        log.info("Fetching comments for request ID: {} by user: {}", id, userId);
-        List<String> authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+  @GetMapping("/{id}/comments")
+  public ResponseEntity<List<CommentResponse>> getComments(
+      @PathVariable UUID id, @AuthenticationPrincipal UUID userId, Authentication authentication) {
+    log.info("Fetching comments for request ID: {} by user: {}", id, userId);
+    List<String> authorities =
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities);
+    GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities);
 
-        List<CommentResponse> comments = getCommentsUseCase.execute(query).stream()
-                .map(CommentResponse::of)
-                .collect(Collectors.toList());
+    List<CommentResponse> comments =
+        getCommentsUseCase.execute(query).stream()
+            .map(CommentResponse::of)
+            .collect(Collectors.toList());
 
-        return ResponseEntity.ok(comments);
-    }
+    return ResponseEntity.ok(comments);
+  }
 }
