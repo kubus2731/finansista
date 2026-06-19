@@ -155,6 +155,7 @@ Razem z kontami demo migracja V8 wstawia 3 przykładowe wnioski
   testy wydajnościowe, uruchomienie).
 - `docs/diagram-encji.md` + `docs/dokument sbd/diagram_encji.png` — ERD.
 - `docs/dokument sbd/maszyna_stanow.png` — diagram statusów wniosku.
+- `docs/java` — instrukcja dla poszczególnych użytkowników.
 
 ## Sprzątanie
 
