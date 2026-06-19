@@ -18,16 +18,16 @@ import pl.pb.finansista.user.User;
 @Service
 public class JwtService {
 
-    @Value("${app.security.jwt.secret-key:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
+    @Value("${app.security.jwt.secret-key}")
     private String secretKey;
 
-    @Value("${app.security.jwt.expiration:86400000}")
+    @Value("${app.security.jwt.expiration}")
     private long jwtExpiration;
 
-    @Value("${app.security.jwt.cookie-name:jwt}")
+    @Value("${app.security.jwt.cookie-name}")
     private String jwtCookieName;
 
-    @Value("${app.security.jwt.cookie-secure:false}")
+    @Value("${app.security.jwt.cookie-secure}")
     private boolean jwtCookieSecure;
 
     public String generateToken(User user) {
@@ -44,7 +44,7 @@ public class JwtService {
     public ResponseCookie generateJwtCookie(String token) {
         return ResponseCookie.from(jwtCookieName, token)
                 .path("/")
-                .maxAge(30)
+                .maxAge(jwtExpiration / 1000)
                 .httpOnly(true)
                 .secure(jwtCookieSecure)
                 .sameSite("Strict")
