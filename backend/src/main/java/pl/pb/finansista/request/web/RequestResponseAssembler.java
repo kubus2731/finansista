@@ -34,22 +34,21 @@ public class RequestResponseAssembler {
     return requests.stream().map(r -> build(r, actor, actorExternalId, roles)).toList();
   }
 
-  private RequestResponse build(
-      Request request, User actor, UUID actorExternalId, Collection<String> roles) {
-    String status = request.getStatus().getName();
-    boolean isAdmin = roles.contains(RoleName.ROLE_ADMIN.name());
-    boolean isAuthor = request.getUser().getExternalId().equals(actorExternalId);
-    boolean isStudentAffairs = roles.contains(RoleName.ROLE_STUDENT_AFFAIRS.name());
+    private RequestResponse build(Request request, User actor, UUID actorExternalId, Collection<String> roles) {
+        String status = request.getStatus().getName();
+        boolean isAdmin = roles.contains(RoleName.ROLE_ADMIN.name());
+        boolean isAuthor = request.getUser().getExternalId().equals(actorExternalId);
+        boolean isProvost = roles.contains(RoleName.ROLE_PROVOST.name());
 
     boolean editable =
         status.equals(RequestStatusName.DRAFT.name())
             || status.equals(RequestStatusName.CORRECTION_REQUIRED.name());
 
-    boolean canEdit = (isAdmin || isAuthor) && editable;
-    boolean canDelete = isAdmin || (isAuthor && status.equals(RequestStatusName.DRAFT.name()));
-    boolean canManageAttachments = (isAdmin || isAuthor) && editable;
-    boolean canRecordProvostOpinion =
-        (isAdmin || isStudentAffairs) && status.equals(RequestStatusName.FORMAL_EVALUATION.name());
+        boolean canEdit = (isAdmin || isAuthor) && editable;
+        boolean canDelete = isAdmin || (isAuthor && status.equals(RequestStatusName.DRAFT.name()));
+        boolean canManageAttachments = (isAdmin || isAuthor) && editable;
+        boolean canRecordProvostOpinion = (isAdmin || isProvost)
+                && status.equals(RequestStatusName.FORMAL_EVALUATION.name());
 
     boolean underReview = status.equals(RequestStatusName.UNDER_REVIEW.name());
     // Dziekan obsługuje wnioski swojego wydziału: wniosek.dział == wydział nadrzędny działu
@@ -60,11 +59,10 @@ public class RequestResponseAssembler {
             && actor.getDepartment().getParent() != null
             && actor.getDepartment().getParent().getId().equals(request.getDepartment().getId());
 
-    Predicate<RequestFunding> canGrant =
-        f ->
-            underReview
-                && fundingAuthorization.canGrantSource(
-                    roles, FundingSourceName.valueOf(f.getSource().getName()), deanServesFaculty);
+        Predicate<RequestFunding> canGrant = f -> underReview
+                && !f.isGranted()
+                && fundingAuthorization.canGrantSource(roles,
+                        FundingSourceName.valueOf(f.getSource().getName()), deanServesFaculty);
 
     RequestResponse.RequestPermissions permissions =
         new RequestResponse.RequestPermissions(

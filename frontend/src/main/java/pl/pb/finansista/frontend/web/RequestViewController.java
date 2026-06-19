@@ -460,13 +460,77 @@ public class RequestViewController {
       return "requests/form";
     }
 
-    List<String> errors = validateBusinessRules(form);
-    if (!errors.isEmpty()) {
-      model.addAttribute("departmentName", user.departmentName());
-      model.addAttribute("formAction", "/requests/" + id + "/edit");
-      model.addAttribute("editMode", true);
-      model.addAttribute("validationErrors", errors);
-      return "requests/form";
+    @PostMapping("/requests")
+    public String create(@Valid @ModelAttribute("form") CreateRequestForm form,
+                         BindingResult bindingResult,
+                         Authentication authentication,
+                         HttpServletRequest httpRequest,
+                         Model model,
+                         RedirectAttributes redirectAttributes) {
+        var user = getCurrentUser(httpRequest);
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("departmentName", user.departmentName());
+            return "requests/form";
+        }
+
+        List<String> errors = validateBusinessRules(form);
+        if (!errors.isEmpty()) {
+            model.addAttribute("departmentName", user.departmentName());
+            model.addAttribute("validationErrors", errors);
+            return "requests/form";
+        }
+
+        List<CreateRequestRequest.TaskItem> tasks = form.getTasks().stream()
+                .filter(t -> StringUtils.hasText(t.getName()) || t.getPlannedCost() != null)
+                .map(t -> new CreateRequestRequest.TaskItem(t.getTaskNo(), t.getName(),
+                        t.getDateFrom(), t.getDateTo(), t.getPlannedCost(), t.getActions()))
+                .toList();
+
+        List<CreateRequestRequest.CostItemEntry> costItems = form.getCostItems().stream()
+                .filter(c -> StringUtils.hasText(c.getItemName()))
+                .map(c -> new CreateRequestRequest.CostItemEntry(c.getTaskNo(), c.getItemName(),
+                        c.getQuantity(), c.getUnitCost(), c.getNotes()))
+                .toList();
+
+        List<CreateRequestRequest.FundingEntry> fundings = form.getFundings().stream()
+                .filter(f -> f.getAmountRequested() != null)
+                .map(f -> new CreateRequestRequest.FundingEntry(
+                        fundingSourceIdFromName(f.getSourceName()),
+                        f.getAmountRequested()))
+                .toList();
+
+        CreateRequestRequest payload = new CreateRequestRequest(
+                form.getTitle(), form.getDescription(), form.getAmount(),
+                null,
+                user.departmentId(),
+                form.getCostCategoryId(),
+                form.getRealizerType(), form.getProjectKind(), form.getProjectKindOther(),
+                form.getProjectScope(), form.getProjectScopeOther(),
+                form.getProjectNature(), form.getProjectNatureOther(),
+                form.getPlannedDateFrom(), form.getPlannedDateTo(), form.getLocation(),
+                form.getParticipantsInvolved(), form.getParticipantsBenefiting(),
+                form.getSupervisorName(), form.getSupervisorEmail(),
+                form.getSupervisorPhone(), form.getSupervisorDepartment(),
+                tasks, costItems, fundings);
+
+        try {
+            backendRestClient.post()
+                    .uri("/api/v1/requests")
+                    .header("Authorization", bearer(httpRequest))
+                    .body(payload)
+                    .retrieve()
+                    .toBodilessEntity();
+
+            redirectAttributes.addFlashAttribute("successMessage", "Wniosek został zapisany jako wersja robocza.");
+            return "redirect:/requests";
+        } catch (RestClientResponseException e) {
+            model.addAttribute("departmentName", user.departmentName());
+            List<String> combinedErrors = new ArrayList<>(errors);
+            combinedErrors.add("Wystąpił błąd po stronie serwera (" + e.getStatusCode() + "): upewnij się, że wszystkie pola formularza są poprawne.");
+            model.addAttribute("validationErrors", combinedErrors);
+            return "requests/form";
+        }
     }
 
     List<EditRequestRequest.TaskItem> tasks =

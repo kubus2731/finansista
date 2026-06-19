@@ -23,7 +23,7 @@
             <a sec:authorize="hasAnyRole('STUDENT','ADMIN')"
                th:href="@{/requests/{id}/duplicate(id=${request.id})}"
                class="btn btn-outline-secondary btn-sm">Złóż ponownie</a>
-            <a th:if="${request.status == 'DRAFT' or request.status == 'CORRECTION_REQUIRED'}"
+            <a th:if="${req.permissions.canEdit}"
                th:href="@{/requests/{id}/edit(id=${request.id})}"
                class="btn btn-outline-primary btn-sm">Edytuj wniosek</a>
             <form th:if="${req.permissions.canDelete}" method="post"
@@ -135,7 +135,7 @@
         <div class="card-body table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
-                    <tr><th>Nr</th><th>Nazwa</th><th>Od</th><th>Do</th><th class="text-end">Koszt</th><th>Działania</th></tr>
+                    <tr><th scope="col">Nr</th><th scope="col">Nazwa</th><th scope="col">Od</th><th scope="col">Do</th><th scope="col" class="text-end">Koszt</th><th scope="col">Działania</th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="t : ${req.tasks}">
@@ -157,7 +157,7 @@
         <div class="card-body table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
-                    <tr><th>Zad.</th><th>Przedmiot/usługa</th><th class="text-end">Ilość</th><th class="text-end">Koszt</th><th>Uwagi</th></tr>
+                    <tr><th scope="col">Zad.</th><th scope="col">Przedmiot/usługa</th><th scope="col" class="text-end">Ilość</th><th scope="col" class="text-end">Koszt</th><th scope="col">Uwagi</th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="c : ${req.costItems}">
@@ -178,7 +178,7 @@
         <div class="card-body table-responsive">
             <table class="table table-sm align-middle mb-0">
                 <thead>
-                    <tr><th>Źródło</th><th class="text-end">Wnioskowana</th><th class="text-end">Przyznana</th><th>Akcja</th></tr>
+                    <tr><th scope="col">Źródło</th><th scope="col" class="text-end">Wnioskowana</th><th scope="col" class="text-end">Przyznana</th><th scope="col">Akcja</th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="f : ${req.fundings}">
@@ -190,7 +190,7 @@
                             <form th:if="${f.canGrant}"
                                   class="d-flex gap-2" method="post"
                                   th:action="@{/requests/{id}/fundings/{sid}/grant(id=${request.id},sid=${f.fundingSourceId})}">
-                                <input type="number" step="0.01" min="0" name="amountGranted"
+                                <input type="number" step="0.01" min="0" th:max="${f.amountRequested}" name="amountGranted"
                                        class="form-control form-control-sm" style="max-width:130px"
                                        th:value="${f.amountRequested}" required>
                                 <button type="submit" class="btn btn-sm btn-outline-success">Przyznaj</button>
@@ -210,7 +210,7 @@
 
             <table class="table table-sm align-middle mb-3" th:unless="${#lists.isEmpty(attachments)}">
                 <thead>
-                    <tr><th>Nazwa</th><th>Typ</th><th class="text-end">Rozmiar</th><th>Dodano</th><th></th></tr>
+                    <tr><th scope="col">Nazwa</th><th scope="col">Typ</th><th scope="col" class="text-end">Rozmiar</th><th scope="col">Dodano</th><th scope="col"><span class="visually-hidden">Akcje</span></th></tr>
                 </thead>
                 <tbody>
                     <tr th:each="a : ${attachments}">
@@ -245,7 +245,7 @@
     </div>
 
     <!-- Opinia prorektora (sekcja III) - wpisuje CSSDiR/admin na etapie oceny formalnej -->
-    <div class="card mb-4" th:if="${req.permissions.canRecordProvostOpinion}">
+    <div class="card mb-4" th:if="${req.permissions.canRecordProvostOpinion and #strings.isEmpty(req.provostOpinion)}">
         <div class="card-header fw-semibold">Opinia prorektora</div>
         <div class="card-body">
             <form th:action="@{/requests/{id}/provost-opinion(id=${request.id})}" method="post">
@@ -293,7 +293,7 @@
             <div class="table-responsive" th:unless="${#lists.isEmpty(history)}">
                 <table class="table table-sm align-middle mb-0">
                     <thead>
-                        <tr><th>Data</th><th>Zmiana</th><th>Autor</th><th>Uwagi</th></tr>
+                        <tr><th scope="col">Data</th><th scope="col">Zmiana</th><th scope="col">Autor</th><th scope="col">Uwagi</th></tr>
                     </thead>
                     <tbody>
                         <tr th:each="h : ${history}">

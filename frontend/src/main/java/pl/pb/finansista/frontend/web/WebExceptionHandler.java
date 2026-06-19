@@ -17,19 +17,58 @@ import pl.pb.finansista.frontend.exception.BusinessException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class WebExceptionHandler {
 
-  /**
-   * Załącznik przekroczył limit rozmiaru — zamiast 500/zawieszenia wracamy na stronę wniosku z
-   * czytelnym komunikatem.
-   */
-  @ExceptionHandler(MaxUploadSizeExceededException.class)
-  public String handleMaxUploadSize(
-      HttpServletRequest request, RedirectAttributes redirectAttributes) {
-    redirectAttributes.addFlashAttribute(
-        "errorMessage", "Załącznik jest za duży — maksymalny rozmiar pliku to 10 MB.");
-    String uri = request.getRequestURI();
-    int idx = uri.indexOf("/attachments");
-    if (uri.startsWith("/requests/") && idx > 0) {
-      return "redirect:" + uri.substring(0, idx);
+    /**
+     * Załącznik przekroczył limit rozmiaru — zamiast 500/zawieszenia wracamy na stronę
+     * wniosku z czytelnym komunikatem.
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public String handleMaxUploadSize(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("errorMessage",
+                "Załącznik jest za duży — maksymalny rozmiar pliku to 10 MB.");
+        String uri = request.getRequestURI();
+        int idx = uri.indexOf("/attachments");
+        if (uri.startsWith("/requests/") && idx > 0) {
+            return "redirect:" + uri.substring(0, idx);
+        }
+        return "redirect:/requests";
+    }
+
+    @ExceptionHandler(BusinessException.class)
+    public ModelAndView handleBusiness(BusinessException ex) {
+        return errorView(ex.getHttpStatus());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ModelAndView handleAccessDenied(AccessDeniedException ex) {
+        return errorView(HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ModelAndView handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        return errorView(HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(org.springframework.web.client.HttpClientErrorException.class)
+    public Object handleHttpClientError(org.springframework.web.client.HttpClientErrorException ex, jakarta.servlet.http.HttpServletResponse response) {
+        if (ex.getStatusCode().value() == 401) {
+            jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("jwt", null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            return "redirect:/login?error=expired";
+        }
+        return errorView(org.springframework.http.HttpStatus.valueOf(ex.getStatusCode().value()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleUnexpected(Exception ex) {
+        return errorView(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ModelAndView errorView(HttpStatus status) {
+        ModelAndView modelAndView = new ModelAndView("error/" + status.value());
+        modelAndView.setStatus(status);
+        return modelAndView;
     }
     return "redirect:/requests";
   }

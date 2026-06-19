@@ -28,7 +28,7 @@
             <div class="card-header fw-semibold">I. Dane dotyczące przedsięwzięcia</div>
             <div class="card-body">
                 <div class="mb-3">
-                    <label class="form-label">Nazwa przedsięwzięcia</label>
+                    <label class="form-label" for="title">Nazwa przedsięwzięcia</label>
                     <input type="text" class="form-control" th:field="*{title}"
                            th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
@@ -36,7 +36,7 @@
 
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label">Realizator przedsięwzięcia</label>
+                        <label class="form-label" for="realizerType">Realizator przedsięwzięcia</label>
                         <select class="form-select" th:field="*{realizerType}">
                             <option value="">Wybierz…</option>
                             <option value="Samorząd Studentów PB">Samorząd Studentów PB</option>
@@ -47,7 +47,7 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Kategoria wydatku</label>
+                        <label class="form-label" for="costCategoryId">Kategoria wydatku</label>
                         <select class="form-select" th:field="*{costCategoryId}"
                                 th:classappend="${#fields.hasErrors('costCategoryId')} ? 'is-invalid'">
                             <option value="">Wybierz…</option>
@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Rodzaj przedsięwzięcia</label>
+                        <label class="form-label" for="projectKind">Rodzaj przedsięwzięcia</label>
                         <select class="form-select" th:field="*{projectKind}">
                             <option value="">Wybierz…</option>
                             <option value="Kulturalny">Kulturalny</option>
@@ -71,12 +71,12 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Rodzaj – inny (jaki?)</label>
+                        <label class="form-label" for="projectKindOther">Rodzaj – inny (jaki?)</label>
                         <input type="text" class="form-control" th:field="*{projectKindOther}">
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Zasięg przedsięwzięcia</label>
+                        <label class="form-label" for="projectScope">Zasięg przedsięwzięcia</label>
                         <select class="form-select" th:field="*{projectScope}">
                             <option value="">Wybierz…</option>
                             <option value="Wydziałowy">Wydziałowy</option>
@@ -88,12 +88,12 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Zasięg – inny (jaki?)</label>
+                        <label class="form-label" for="projectScopeOther">Zasięg – inny (jaki?)</label>
                         <input type="text" class="form-control" th:field="*{projectScopeOther}">
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Charakter przedsięwzięcia</label>
+                        <label class="form-label" for="projectNature">Charakter przedsięwzięcia</label>
                         <select class="form-select" th:field="*{projectNature}">
                             <option value="">Wybierz…</option>
                             <option value="Jednorazowe">Jednorazowe</option>
@@ -102,29 +102,29 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Charakter – inny (jaki?)</label>
+                        <label class="form-label" for="projectNatureOther">Charakter – inny (jaki?)</label>
                         <input type="text" class="form-control" th:field="*{projectNatureOther}">
                     </div>
 
                     <div class="col-md-3">
-                        <label class="form-label">Termin od</label>
+                        <label class="form-label" for="plannedDateFrom">Termin od</label>
                         <input type="date" class="form-control" th:field="*{plannedDateFrom}">
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Termin do</label>
+                        <label class="form-label" for="plannedDateTo">Termin do</label>
                         <input type="date" class="form-control" th:field="*{plannedDateTo}">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Miejsce realizacji</label>
+                        <label class="form-label" for="location">Miejsce realizacji</label>
                         <input type="text" class="form-control" th:field="*{location}">
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label">Liczba zaangażowanych studentów/doktorantów</label>
+                        <label class="form-label" for="participantsInvolved">Liczba zaangażowanych studentów/doktorantów</label>
                         <input type="number" min="0" class="form-control" th:field="*{participantsInvolved}">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Liczba korzystających</label>
+                        <label class="form-label" for="participantsBenefiting">Liczba korzystających</label>
                         <input type="number" min="0" class="form-control" th:field="*{participantsBenefiting}">
                     </div>
                 </div>
@@ -136,19 +136,19 @@
             <div class="card-header fw-semibold">II. Opiekun naukowy <span class="text-secondary fw-normal">(dla kół naukowych)</span></div>
             <div class="card-body row g-3">
                 <div class="col-md-6">
-                    <label class="form-label">Imię i nazwisko</label>
+                    <label class="form-label" for="supervisorName">Imię i nazwisko</label>
                     <input type="text" class="form-control" th:field="*{supervisorName}">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Wydział</label>
+                    <label class="form-label" for="supervisorDepartment">Wydział</label>
                     <input type="text" class="form-control" th:field="*{supervisorDepartment}">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">E-mail służbowy</label>
+                    <label class="form-label" for="supervisorEmail">E-mail służbowy</label>
                     <input type="email" class="form-control" th:field="*{supervisorEmail}">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Telefon służbowy</label>
+                    <label class="form-label" for="supervisorPhone">Telefon służbowy</label>
                     <input type="tel" class="form-control" th:field="*{supervisorPhone}">
                 </div>
             </div>
@@ -158,7 +158,7 @@
         <div class="card mb-4">
             <div class="card-header fw-semibold">III. Opis przedsięwzięcia</div>
             <div class="card-body">
-                <label class="form-label">Uzasadnienie merytoryczne celowości</label>
+                <label class="form-label" for="description">Uzasadnienie merytoryczne celowości</label>
                 <textarea class="form-control" rows="4" th:field="*{description}"
                           th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"></textarea>
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
@@ -173,8 +173,8 @@
                     <table class="table table-sm align-middle">
                         <thead>
                             <tr>
-                                <th>Nr</th><th>Nazwa zadania</th><th>Od</th><th>Do</th>
-                                <th>Planowany koszt</th><th>Zaplanowane działania</th>
+                                <th scope="col">Nr</th><th scope="col">Nazwa zadania</th><th scope="col">Od</th><th scope="col">Do</th>
+                                <th scope="col">Planowany koszt</th><th scope="col">Zaplanowane działania</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -203,8 +203,8 @@
                     <table class="table table-sm align-middle">
                         <thead>
                             <tr>
-                                <th>Zadanie nr</th><th>Nazwa przedmiotu/usługi</th>
-                                <th>Ilość</th><th>Koszt</th><th>Uwagi</th>
+                                <th scope="col">Zadanie nr</th><th scope="col">Nazwa przedmiotu/usługi</th>
+                                <th scope="col">Ilość</th><th scope="col">Koszt</th><th scope="col">Uwagi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -230,7 +230,7 @@
                 <div class="table-responsive">
                     <table class="table table-sm align-middle">
                         <thead>
-                            <tr><th>Źródło finansowania</th><th>Kwota wnioskowana (zł)</th></tr>
+                            <tr><th scope="col">Źródło finansowania</th><th scope="col">Kwota wnioskowana (zł)</th></tr>
                         </thead>
                         <tbody>
                             <tr th:each="fund, stat : *{fundings}">
@@ -250,7 +250,7 @@
                     </table>
                 </div>
                 <div class="mt-2">
-                    <label class="form-label fw-semibold">Łączna wnioskowana kwota (zł)</label>
+                    <label class="form-label fw-semibold" for="amount">Łączna wnioskowana kwota (zł)</label>
                     <input type="number" step="0.01" min="0.01" class="form-control" style="max-width:240px" th:field="*{amount}"
                            th:classappend="${#fields.hasErrors('amount')} ? 'is-invalid'">
                     <div class="invalid-feedback" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></div>

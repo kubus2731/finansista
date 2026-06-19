@@ -20,14 +20,16 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
 
-  private static final Set<String> PRIVILEGED_ROLES =
-      Set.of(
-          RoleName.ROLE_ADMIN.name(),
-          RoleName.ROLE_DEAN_OFFICE.name(),
-          RoleName.ROLE_FINANCE_OFFICE.name(),
-          RoleName.ROLE_LEGAL_COMMISSION.name(),
-          RoleName.ROLE_STUDENT_COUNCIL.name(),
-          RoleName.ROLE_DOCTORAL_COUNCIL.name());
+    private static final Set<String> PRIVILEGED_ROLES = Set.of(
+            RoleName.ROLE_ADMIN.name(),
+            RoleName.ROLE_DEAN_OFFICE.name(),
+            RoleName.ROLE_FINANCE_OFFICE.name(),
+            RoleName.ROLE_LEGAL_COMMISSION.name(),
+            RoleName.ROLE_STUDENT_COUNCIL.name(),
+            RoleName.ROLE_DOCTORAL_COUNCIL.name(),
+            RoleName.ROLE_PROVOST.name(),
+            RoleName.ROLE_STUDENT_AFFAIRS.name()
+    );
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
