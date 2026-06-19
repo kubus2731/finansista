@@ -62,6 +62,11 @@ public record CreateRequestRequest(
         );
     }
 
+    @AssertTrue(message = "Planned end date must not be before planned start date")
+    private boolean isPlannedDateRangeValid() {
+        return plannedDateFrom == null || plannedDateTo == null || !plannedDateTo.isBefore(plannedDateFrom);
+    }
+
     private List<TaskData> mapTasks() {
         return tasks == null ? List.of() : tasks.stream()
                 .map(t -> new TaskData(t.taskNo(), t.name(), t.dateFrom(),
