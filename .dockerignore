@@ -1,0 +1,11 @@
+**/target/
+.git/
+.idea/
+*.iml
+docs/
+data/
+cookies.txt
+*.md
+.gitignore
+.env
+.env.example
