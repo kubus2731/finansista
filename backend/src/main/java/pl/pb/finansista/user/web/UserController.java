@@ -88,7 +88,8 @@ public class UserController {
         authentication.getName(),
         request.active(),
         id);
-    setUserActiveUseCase.execute(request.toCommand(id, authentication.getName()));
+    setUserActiveUseCase.execute(
+        request.toCommand(id, UUID.fromString(authentication.getName())));
     log.info("Successfully updated active flag for user ID: {}", id);
 
     return ResponseEntity.noContent().build();

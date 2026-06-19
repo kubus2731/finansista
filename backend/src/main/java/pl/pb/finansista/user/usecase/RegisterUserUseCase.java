@@ -39,7 +39,7 @@ public class RegisterUserUseCase {
   @Transactional
   public User execute(RegisterUserCommand command) {
     if (userRepository.existsByEmail(command.email())) {
-      throw new UserAlreadyExistsException(command.email());
+      throw UserAlreadyExistsException.withEmail(command.email());
     }
 
     Role role = roleRepository.findById(command.roleId()).orElseThrow(RoleNotFoundException::new);
@@ -65,9 +65,6 @@ public class RegisterUserUseCase {
             role,
             department);
 
-    // Zwracamy wynik save(): Spring Data po niepustym @Version traktuje byt jako
-    // istniejący i robi merge(), który wstawia zarządzaną KOPIĘ — to ona (a nie
-    // oryginalny newUser) ma wygenerowany externalId potrzebny do tokenu JWT.
     return userRepository.save(newUser);
   }
 }
