@@ -14,11 +14,7 @@ public class ExternalIdConverter implements Converter<String, UUID> {
         if (source.isBlank()) {
             return null;
         }
-        
-        try {
-            return ExternalIdEncoder.decode(source);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid ID format", e);
-        }
+
+        return ExternalIdEncoder.decode(source);
     }
 }
