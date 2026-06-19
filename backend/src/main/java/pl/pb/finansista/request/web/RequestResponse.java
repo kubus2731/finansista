@@ -46,19 +46,13 @@ public record RequestResponse(
         String supervisorPhone,
         String supervisorDepartment,
         String provostOpinion,
-        boolean canEdit,
-        boolean canDelete,
-        boolean canManageAttachments,
-        boolean canRecordProvostOpinion,
+        RequestPermissions permissions,
         List<TaskResponse> tasks,
         List<CostItemResponse> costItems,
         List<FundingResponse> fundings
 ) {
     public static RequestResponse of(Request request,
-                                     boolean canEdit,
-                                     boolean canDelete,
-                                     boolean canManageAttachments,
-                                     boolean canRecordProvostOpinion,
+                                     RequestPermissions permissions,
                                      Predicate<RequestFunding> canGrant) {
         ProjectDetails pd = request.getProjectDetails() != null ? request.getProjectDetails() : ProjectDetails.empty();
         SupervisorInfo sup = request.getSupervisor() != null ? request.getSupervisor() : SupervisorInfo.empty();
@@ -104,10 +98,7 @@ public record RequestResponse(
                 sup.getPhone(),
                 sup.getDepartment(),
                 request.getProvostOpinion(),
-                canEdit,
-                canDelete,
-                canManageAttachments,
-                canRecordProvostOpinion,
+                permissions,
                 request.getTasks().stream()
                         .map(t -> new TaskResponse(t.getTaskNo(), t.getName(), t.getDateFrom(),
                                 t.getDateTo(), t.getPlannedCost(), t.getActions()))
@@ -123,6 +114,9 @@ public record RequestResponse(
                         .toList()
         );
     }
+
+    public record RequestPermissions(boolean canEdit, boolean canDelete,
+                                     boolean canManageAttachments, boolean canRecordProvostOpinion) {}
 
     public record TaskResponse(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
                                BigDecimal plannedCost, String actions) {}

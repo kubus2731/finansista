@@ -60,7 +60,8 @@ public class RequestResponseAssembler {
                 && fundingAuthorization.canGrantSource(roles,
                         FundingSourceName.valueOf(f.getSource().getName()), deanServesFaculty);
 
-        return RequestResponse.of(request, canEdit, canDelete, canManageAttachments,
-                canRecordProvostOpinion, canGrant);
+        RequestResponse.RequestPermissions permissions = new RequestResponse.RequestPermissions(
+                canEdit, canDelete, canManageAttachments, canRecordProvostOpinion);
+        return RequestResponse.of(request, permissions, canGrant);
     }
 }

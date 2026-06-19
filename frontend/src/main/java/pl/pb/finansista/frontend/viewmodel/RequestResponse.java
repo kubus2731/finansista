@@ -40,15 +40,14 @@ public record RequestResponse(
         String supervisorPhone,
         String supervisorDepartment,
         String provostOpinion,
-        boolean canEdit,
-        boolean canDelete,
-        boolean canManageAttachments,
-        boolean canRecordProvostOpinion,
+        RequestPermissions permissions,
         List<TaskResponse> tasks,
         List<CostItemResponse> costItems,
         List<FundingResponse> fundings
 ) {
-    
+
+    public record RequestPermissions(boolean canEdit, boolean canDelete,
+                                     boolean canManageAttachments, boolean canRecordProvostOpinion) {}
 
     public record TaskResponse(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
                                BigDecimal plannedCost, String actions) {}

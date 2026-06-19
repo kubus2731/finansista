@@ -24,7 +24,7 @@
             <a th:if="${request.status == 'DRAFT' or request.status == 'CORRECTION_REQUIRED'}"
                th:href="@{/requests/{id}/edit(id=${request.id})}"
                class="btn btn-outline-primary btn-sm">Edytuj wniosek</a>
-            <form th:if="${req.canDelete}" method="post"
+            <form th:if="${req.permissions.canDelete}" method="post"
                   th:action="@{/requests/{id}/delete(id=${request.id})}"
                   onsubmit="return confirm('Czy na pewno usunąć ten wniosek? Operacja jest nieodwracalna.');">
                 <button type="submit" class="btn btn-outline-danger btn-sm">Usuń wniosek</button>
@@ -220,7 +220,7 @@
                         <td class="text-end" th:text="${#numbers.formatDecimal(a.sizeBytes / 1024.0, 1, 1)} + ' KB'">0 KB</td>
                         <td class="small" th:text="${a.createdAt != null ? #temporals.format(a.createdAt, 'dd.MM.yyyy HH:mm') : '—'}">data</td>
                         <td class="text-end">
-                            <form th:if="${req.canManageAttachments}" method="post"
+                            <form th:if="${req.permissions.canManageAttachments}" method="post"
                                   th:action="@{/requests/{id}/attachments/{aid}/delete(id=${request.id},aid=${a.id})}"
                                   onsubmit="return confirm('Usunąć ten załącznik?');">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">Usuń</button>
@@ -231,19 +231,19 @@
             </table>
 
             <!-- Dodawanie tylko gdy wniosek edytowalny (DRAFT / do poprawy). -->
-            <form th:if="${req.canManageAttachments}" method="post" enctype="multipart/form-data"
+            <form th:if="${req.permissions.canManageAttachments}" method="post" enctype="multipart/form-data"
                   th:action="@{/requests/{id}/attachments(id=${request.id})}" class="d-flex gap-2 align-items-center">
                 <input type="file" name="file" class="form-control form-control-sm" style="max-width:24rem" required>
                 <button type="submit" class="btn btn-sm btn-outline-success">Dodaj załącznik</button>
             </form>
-            <p class="text-muted small mb-0 mt-2" th:if="${req.canManageAttachments}">
+            <p class="text-muted small mb-0 mt-2" th:if="${req.permissions.canManageAttachments}">
                 Dozwolone: PDF, PNG, JPEG, DOC(X), XLS(X). Maks. 10&nbsp;MB.
             </p>
         </div>
     </div>
 
     <!-- Opinia prorektora (sekcja III) - wpisuje CSSDiR/admin na etapie oceny formalnej -->
-    <div class="card mb-4" th:if="${req.canRecordProvostOpinion}">
+    <div class="card mb-4" th:if="${req.permissions.canRecordProvostOpinion}">
         <div class="card-header fw-semibold">Opinia prorektora</div>
         <div class="card-body">
             <form th:action="@{/requests/{id}/provost-opinion(id=${request.id})}" method="post">
