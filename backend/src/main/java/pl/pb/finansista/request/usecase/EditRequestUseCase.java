@@ -47,7 +47,7 @@ public class EditRequestUseCase {
             || request.getStatus().getName().equals(RequestStatusName.CORRECTION_REQUIRED.name());
 
     if (!isAdmin && !isAuthor) {
-      throw UnauthorizedRequestAccessException.forAction("edit");
+      throw UnauthorizedRequestAccessException.forEditingRequest();
     }
 
     if (!statusAllowsEdit) {

@@ -81,8 +81,7 @@ public class RequestTransitionValidator {
       Request request, User actor, Collection<String> roles, RequestStatusName targetStatus) {
     List<RequestStatusName> available = getAvailableTransitions(request, actor, roles);
     if (!available.contains(targetStatus)) {
-      throw UnauthorizedRequestAccessException.forAction(
-          "perform transition to " + targetStatus.name());
+      throw UnauthorizedRequestAccessException.forTransitionTo(targetStatus.name());
     }
   }
 }

@@ -39,7 +39,7 @@ public class RecordProvostOpinionUseCase {
         boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
         boolean isProvost = command.userAuthorities().contains(RoleName.ROLE_PROVOST.name());
         if (!isAdmin && !isProvost) {
-            throw UnauthorizedRequestAccessException.forAction("record the provost opinion");
+            throw UnauthorizedRequestAccessException.forRecordingProvostOpinion();
         }
 
         if (!request.getStatus().getName().equals(RequestStatusName.FORMAL_EVALUATION.name())) {

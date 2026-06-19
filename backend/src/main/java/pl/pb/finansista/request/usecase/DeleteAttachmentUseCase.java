@@ -42,7 +42,7 @@ public class DeleteAttachmentUseCase {
     boolean isAdmin = userAuthorities.contains(RoleName.ROLE_ADMIN.name());
     boolean isAuthor = request.getUser().getExternalId().equals(userExternalId);
     if (!isAdmin && !isAuthor) {
-      throw UnauthorizedRequestAccessException.forAction("delete attachment");
+      throw UnauthorizedRequestAccessException.forDeletingAttachment();
     }
 
     String status = request.getStatus().getName();

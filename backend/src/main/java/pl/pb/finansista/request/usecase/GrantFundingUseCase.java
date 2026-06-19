@@ -57,8 +57,7 @@ public class GrantFundingUseCase {
         command.userAuthorities(),
         FundingSourceName.valueOf(row.getSource().getName()),
         deanServesFaculty)) {
-      throw UnauthorizedRequestAccessException.forAction(
-          "grant funding from " + row.getSource().getName());
+      throw UnauthorizedRequestAccessException.forGrantingFundingFrom(row.getSource().getName());
     }
 
     row.grant(command.amountGranted(), actor);

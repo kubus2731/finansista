@@ -8,6 +8,7 @@ import pl.pb.finansista.request.Comment;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatus;
 import pl.pb.finansista.request.RequestStatusName;
+import pl.pb.finansista.request.exception.FundingAmountMismatchException;
 import pl.pb.finansista.request.exception.InvalidRequestStateException;
 import pl.pb.finansista.request.exception.MissingFundingSourceException;
 import pl.pb.finansista.request.exception.RequestNotFoundException;
@@ -51,9 +52,14 @@ public class ChangeRequestStatusUseCase {
             .orElseThrow(
                 () -> InvalidRequestStateException.withStatusName(command.newStatusName()));
 
-    if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name())
-        && request.getFundings().isEmpty()) {
-      throw new MissingFundingSourceException();
+    if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name())) {
+      if (request.getFundings().isEmpty()) {
+        throw new MissingFundingSourceException();
+      }
+      if (!request.fundingMatchesAmount()) {
+        throw new FundingAmountMismatchException(
+            request.totalRequestedFunding(), request.getAmount());
+      }
     }
 
     transitionValidator.validateTransition(

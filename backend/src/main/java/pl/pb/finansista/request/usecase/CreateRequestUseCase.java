@@ -47,7 +47,7 @@ public class CreateRequestUseCase {
     boolean isApplicant = userRole.equals(RoleName.ROLE_STUDENT.name());
     boolean isAdmin = userRole.equals(RoleName.ROLE_ADMIN.name());
     if (!isApplicant && !isAdmin) {
-      throw UnauthorizedRequestAccessException.forAction("create a request");
+      throw UnauthorizedRequestAccessException.forCreatingRequest();
     }
 
     var department =

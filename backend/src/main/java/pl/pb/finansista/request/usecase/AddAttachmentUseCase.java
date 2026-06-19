@@ -36,7 +36,7 @@ public class AddAttachmentUseCase {
     boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
     boolean isAuthor = request.getUser().getExternalId().equals(command.userExternalId());
     if (!isAdmin && !isAuthor) {
-      throw UnauthorizedRequestAccessException.forAction("add an attachment");
+      throw UnauthorizedRequestAccessException.forAddingAttachment();
     }
 
     if (!isEditableState(request)) {

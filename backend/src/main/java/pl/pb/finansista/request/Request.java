@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -127,6 +128,17 @@ public class Request extends ExposableModificationAuditedEntity {
 
     public boolean allFundingGranted() {
         return !fundings.isEmpty() && fundings.stream().allMatch(RequestFunding::isGranted);
+    }
+
+    public BigDecimal totalRequestedFunding() {
+        return fundings.stream()
+                .map(RequestFunding::getAmountRequested)
+                .filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public boolean fundingMatchesAmount() {
+        return amount != null && totalRequestedFunding().compareTo(amount) == 0;
     }
 
     public void clearTasks() {
