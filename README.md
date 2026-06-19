@@ -27,69 +27,85 @@ przekazując token JWT z ciasteczka jako `Authorization: Bearer`.
 
 ## Uruchomienie — krok po kroku
 
-### 1) Baza danych
+### Wariant A: całość w Dockerze (zalecane)
 
-```powershell
+Jedna komenda buduje obrazy i podnosi wszystkie trzy serwisy
+(baza + backend + frontend):
+
+```bash
 # z katalogu głównego projektu
-docker compose up -d
+docker compose up -d --build
 ```
 
-To podnosi kontener `pb_finansista_db` (Oracle 23ai Free) z:
-- portem `1521` zmapowanym na host,
-- userem `admin_pb` / hasłem `paw1ewjav1e`,
-- service name `FREEPDB1`.
+Podnosi to:
+- `pb_finansista_db` — Oracle Free (port `1521`, user `admin_pb`,
+  service name `FREEPDB1`),
+- `pb_finansista_backend` — REST API na **`http://localhost:8080`**,
+- `pb_finansista_frontend` — UI na **`http://localhost:8081`**.
 
-Pierwsze uruchomienie pobiera obraz (~2 GB) i inicjalizuje bazę
-— może trwać kilka minut. Sprawdź czy gotowe:
+Kolejność startu jest pilnowana healthcheckami: backend rusza dopiero gdy
+baza jest zdrowa, a frontend gdy zdrowy jest backend. Pierwsze uruchomienie
+pobiera obraz Oracle (~2 GB) i buduje obrazy aplikacji — może potrwać kilka
+minut. Status:
 
-```powershell
-docker logs pb_finansista_db --tail 20
-# szukaj linijki "DATABASE IS READY TO USE!"
+```bash
+docker compose ps
+# czekaj aż "oracle-db" i "backend" będą (healthy)
 ```
 
-### 2) Build obu modułów (jednorazowo)
+Przy starcie backendu Flyway wykonuje migracje V1–V10 (schemat, słowniki,
+widoki, triggery, pakiet, indeksy, maszyna stanów, dane demo), a `DataSeeder`
+idempotentnie dosiewa konta demo.
 
-```powershell
+#### Konfiguracja (`.env`)
+
+Domyślne wartości są wbudowane w `docker-compose.yml`, więc `docker compose up`
+działa bez żadnej konfiguracji. Aby je nadpisać, skopiuj szablon i zmień co
+trzeba:
+
+```bash
+cp .env.example .env
+```
+
+Najważniejsze zmienne: porty (`BACKEND_PORT`, `FRONTEND_PORT`, `DB_PORT`),
+sekrety bazy, oraz konfiguracja JWT i dokumentacji API:
+
+| Zmienna | Znaczenie |
+|---|---|
+| `JWT_SECRET` | klucz HMAC podpisujący token (zmień w prod) |
+| `JWT_EXPIRATION` | czas życia tokenu i ciasteczka w ms |
+| `JWT_COOKIE_SECURE` | `true` za HTTPS |
+| `SPRINGDOC_API_DOCS_ENABLED` / `SPRINGDOC_SWAGGER_UI_ENABLED` | włącz/wyłącz Swagger / OpenAPI |
+| `MANAGEMENT_PORT` | wewnętrzny port actuatora (nie publikowany na host) |
+
+### Wariant B: dev lokalny (moduły z Maven)
+
+Aby uruchamiać aplikacje spoza kontenerów (np. szybsza iteracja), podnieś
+samą bazę, a moduły odpal przez wrapper:
+
+```bash
+docker compose up -d oracle-db
 ./mvnw clean install -DskipTests
+cd backend  && ../mvnw spring-boot:run   # terminal #1 → :8080
+cd frontend && ../mvnw spring-boot:run   # terminal #2 → :8081
 ```
 
-To buduje `backend` i `frontend` jako uruchamialne JAR-y oraz instaluje
-`finansista-backend` do lokalnego repozytorium Maven (frontend ma go jako
-tymczasową zależność do współdzielenia DTO).
+> **Uwaga:** backend nie ma już wbudowanych wartości domyślnych JWT, więc do
+> lokalnego startu musi dostać zmienne z `.env` (sekret, czas życia, nazwa i
+> tryb ciasteczka). Najprościej załadować je do powłoki przed startem:
+>
+> ```bash
+> set -a; source .env; set +a
+> ```
 
-### 3) Backend (terminal #1)
-
-```powershell
-cd backend
-../mvnw spring-boot:run
-```
-
-Przy starcie:
-- Flyway wykonuje migracje V1–V8 (schemat, słowniki, widoki, triggery,
-  pakiet, indeksy, maszyna stanów, dane demo),
-- `DataSeeder` dosiewa 6 kont demo z hasłami BCrypt
-  (idempotentnie — sprawdza `existsByEmail`),
-- aplikacja nasłuchuje na **`http://localhost:8080`**.
-
-### 4) Frontend (terminal #2)
-
-```powershell
-cd frontend
-../mvnw spring-boot:run
-```
-
-UI nasłuchuje na **`http://localhost:8081`**.
-
-### 5) Sprawdzenie że żyje
-
-Otwórz w przeglądarce:
+### Sprawdzenie że żyje
 
 | URL | Co tam jest |
 |---|---|
 | http://localhost:8081 | strona główna (frontend) |
 | http://localhost:8081/login | logowanie |
-| http://localhost:8080/swagger-ui.html | dokumentacja REST API (Swagger) |
-| http://localhost:8080/v3/api-docs | OpenAPI spec w JSON |
+| http://localhost:8080/swagger-ui.html | dokumentacja REST API (Swagger, jeśli włączony) |
+| http://localhost:8080/v3/api-docs | OpenAPI spec w JSON (jeśli włączony) |
 
 ## Konta testowe
 
@@ -141,12 +157,13 @@ Razem z kontami demo migracja V8 wstawia 3 przykładowe wnioski
 
 ## Sprzątanie
 
-```powershell
-# zatrzymanie aplikacji: Ctrl+C w każdym terminalu
-
-# zatrzymanie bazy (zachowuje dane):
+```bash
+# zatrzymanie wszystkich serwisów (zachowuje dane):
 docker compose stop
 
-# pełny reset bazy (USUWA dane i wolumen):
+# zatrzymanie + usunięcie kontenerów (zachowuje wolumeny):
+docker compose down
+
+# pełny reset (USUWA dane bazy i załączniki):
 docker compose down -v
 ```
