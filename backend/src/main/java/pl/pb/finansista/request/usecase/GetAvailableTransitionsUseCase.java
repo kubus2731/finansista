@@ -17,26 +17,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetAvailableTransitionsUseCase {
 
-    private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecFactory;
-    private final RequestTransitionValidator transitionValidator;
+  private final RequestRepository requestRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecFactory;
+  private final RequestTransitionValidator transitionValidator;
 
-    @Transactional(readOnly = true)
-    public List<String> execute(GetSingleRequestQuery query) {
-        User actor = userRepository.findByExternalId(query.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional(readOnly = true)
+  public List<String> execute(GetSingleRequestQuery query) {
+    User actor =
+        userRepository
+            .findByExternalId(query.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = Specification.allOf(
-                RequestSpecifications.hasExternalId(query.externalId()),
-                accessSpecFactory.createForUser(actor, query.userAuthorities())
-        );
+    Specification<Request> spec =
+        Specification.allOf(
+            RequestSpecifications.hasExternalId(query.externalId()),
+            accessSpecFactory.createForUser(actor, query.userAuthorities()));
 
-        Request request = requestRepository.findOne(spec)
-                .orElseThrow(RequestNotFoundException::new);
+    Request request = requestRepository.findOne(spec).orElseThrow(RequestNotFoundException::new);
 
-        return transitionValidator.getAvailableTransitions(request, actor, query.userAuthorities()).stream()
-                .map(Enum::name)
-                .toList();
-    }
+    return transitionValidator
+        .getAvailableTransitions(request, actor, query.userAuthorities())
+        .stream()
+        .map(Enum::name)
+        .toList();
+  }
 }

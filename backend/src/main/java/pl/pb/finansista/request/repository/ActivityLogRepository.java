@@ -1,9 +1,8 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.ActivityLog;
-
 import java.util.List;
 import java.util.Optional;
+import pl.pb.finansista.request.ActivityLog;
 
 public interface ActivityLogRepository {
 

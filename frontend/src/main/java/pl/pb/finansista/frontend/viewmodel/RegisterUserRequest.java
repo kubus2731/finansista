@@ -6,27 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 
 public record RegisterUserRequest(
-        @NotBlank
-        String name,
-
-        @NotBlank
-        String surname,
-
-        @NotBlank
-        @Email
-        String email,
-
-        @NotBlank
-        String phoneNumber,
-
-        @NotBlank
-        String rawPassword,
-
-        @NotNull
-        Long roleId,
-
-        @NotNull
-        Long departmentId
-) {
-    
-}
+    @NotBlank String name,
+    @NotBlank String surname,
+    @NotBlank @Email String email,
+    @NotBlank String phoneNumber,
+    @NotBlank String rawPassword,
+    @NotNull Long roleId,
+    @NotNull Long departmentId) {}

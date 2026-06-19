@@ -1,10 +1,9 @@
 package pl.pb.finansista.user.repository;
 
-import pl.pb.finansista.user.User;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import pl.pb.finansista.user.User;
 
 public interface UserRepository {
 

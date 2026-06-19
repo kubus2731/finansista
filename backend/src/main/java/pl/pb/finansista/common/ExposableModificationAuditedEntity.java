@@ -12,9 +12,8 @@ import java.util.UUID;
 @Getter
 public abstract class ExposableModificationAuditedEntity extends ModificationAuditedEntity {
 
-    @NaturalId
-    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
-    @Column(name = "external_id", updatable = false, nullable = false, unique = true)
-    private UUID externalId;
-
+  @NaturalId
+  @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+  @Column(name = "external_id", updatable = false, nullable = false, unique = true)
+  private UUID externalId;
 }

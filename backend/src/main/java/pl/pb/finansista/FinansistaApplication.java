@@ -9,8 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @ConfigurationPropertiesScan
 public class FinansistaApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(FinansistaApplication.class, args);
-	}
-
+  static void main(String[] args) {
+    SpringApplication.run(FinansistaApplication.class, args);
+  }
 }

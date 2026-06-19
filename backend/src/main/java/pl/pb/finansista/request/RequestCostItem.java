@@ -1,13 +1,12 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 import pl.pb.finansista.common.BaseEntity;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "request_cost_item")

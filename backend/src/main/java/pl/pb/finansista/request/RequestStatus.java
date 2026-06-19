@@ -14,10 +14,10 @@ import pl.pb.finansista.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RequestStatus extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String name;
+  @Column(nullable = false, unique = true, length = 50)
+  private String name;
 
-    public RequestStatus(String name) {
-        this.name = name;
-    }
+  public RequestStatus(String name) {
+    this.name = name;
+  }
 }

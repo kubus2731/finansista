@@ -15,16 +15,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RequestStatisticsController {
 
-    private final GetDepartmentSummariesUseCase getDepartmentSummariesUseCase;
+  private final GetDepartmentSummariesUseCase getDepartmentSummariesUseCase;
 
-    @GetMapping("/departments")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<List<DepartmentRequestsSummaryResponse>> getDepartmentSummaries() {
-        List<DepartmentRequestsSummaryResponse> responses = getDepartmentSummariesUseCase.execute()
-                .stream()
-                .map(DepartmentRequestsSummaryResponse::of)
-                .toList();
+  @GetMapping("/departments")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  public ResponseEntity<List<DepartmentRequestsSummaryResponse>> getDepartmentSummaries() {
+    List<DepartmentRequestsSummaryResponse> responses =
+        getDepartmentSummariesUseCase.execute().stream()
+            .map(DepartmentRequestsSummaryResponse::of)
+            .toList();
 
-        return ResponseEntity.ok(responses);
-    }
+    return ResponseEntity.ok(responses);
+  }
 }

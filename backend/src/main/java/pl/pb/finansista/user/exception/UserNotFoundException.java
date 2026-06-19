@@ -5,7 +5,7 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class UserNotFoundException extends BusinessException {
 
-    public UserNotFoundException() {
-        super("User not found.", HttpStatus.NOT_FOUND);
-    }
+  public UserNotFoundException() {
+    super("User not found.", HttpStatus.NOT_FOUND);
+  }
 }

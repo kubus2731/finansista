@@ -11,13 +11,13 @@ import pl.pb.finansista.user.repository.RoleRepository;
 @RequiredArgsConstructor
 public class CreateRoleUseCase {
 
-    private final RoleRepository roleRepository;
+  private final RoleRepository roleRepository;
 
-    @Transactional
-    public Role execute(String name) {
-        if (roleRepository.existsByName(name)) {
-            throw new RoleAlreadyExistsException(name);
-        }
-        return roleRepository.save(new Role(name));
+  @Transactional
+  public Role execute(String name) {
+    if (roleRepository.existsByName(name)) {
+      throw new RoleAlreadyExistsException(name);
     }
+    return roleRepository.save(new Role(name));
+  }
 }

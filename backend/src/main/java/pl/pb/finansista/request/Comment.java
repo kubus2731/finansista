@@ -14,22 +14,22 @@ import pl.pb.finansista.user.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends ExposableCreationAuditedEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id", nullable = false)
-    private Request request;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "request_id", nullable = false)
+  private Request request;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @Lob
-    @Column(nullable = false, length = 1000)
-    private String content;
+  @Lob
+  @Column(nullable = false, length = 1000)
+  private String content;
 
-    public Comment(Request request, User user, String content) {
-        Assert.hasText(content, "Comment content cannot be blank");
-        this.request = request;
-        this.user = user;
-        this.content = content;
-    }
+  public Comment(Request request, User user, String content) {
+    Assert.hasText(content, "Comment content cannot be blank");
+    this.request = request;
+    this.user = user;
+    this.content = content;
+  }
 }

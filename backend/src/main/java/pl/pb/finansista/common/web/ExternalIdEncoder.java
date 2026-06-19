@@ -1,10 +1,9 @@
 package pl.pb.finansista.common.web;
 
-import pl.pb.finansista.common.exception.InvalidExternalIdException;
-
 import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.util.UUID;
+import pl.pb.finansista.common.exception.InvalidExternalIdException;
 
 public class ExternalIdEncoder {
 

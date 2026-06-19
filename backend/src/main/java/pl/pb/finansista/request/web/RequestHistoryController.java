@@ -22,25 +22,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class RequestHistoryController {
-    private final GetRequestHistoryUseCase getRequestHistoryUseCase;
+  private final GetRequestHistoryUseCase getRequestHistoryUseCase;
 
-    @GetMapping("/{id}/history")
-    public ResponseEntity<List<ActivityLogResponse>> getHistory(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal UUID userId,
-            Authentication authentication
-    ) {
-        log.info("Fetching history for request ID: {} by user: {}", id, userId);
-        List<String> authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+  @GetMapping("/{id}/history")
+  public ResponseEntity<List<ActivityLogResponse>> getHistory(
+      @PathVariable UUID id, @AuthenticationPrincipal UUID userId, Authentication authentication) {
+    log.info("Fetching history for request ID: {} by user: {}", id, userId);
+    List<String> authorities =
+        authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.toList());
 
-        GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities);
+    GetSingleRequestQuery query = new GetSingleRequestQuery(id, userId, authorities);
 
-        List<ActivityLogResponse> history = getRequestHistoryUseCase.execute(query).stream()
-                .map(ActivityLogResponse::of)
-                .collect(Collectors.toList());
+    List<ActivityLogResponse> history =
+        getRequestHistoryUseCase.execute(query).stream()
+            .map(ActivityLogResponse::of)
+            .collect(Collectors.toList());
 
-        return ResponseEntity.ok(history);
-    }
+    return ResponseEntity.ok(history);
+  }
 }

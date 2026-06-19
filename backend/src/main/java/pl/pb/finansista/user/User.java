@@ -1,15 +1,11 @@
 package pl.pb.finansista.user;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import pl.pb.finansista.common.ExposableModificationAuditedEntity;
 import pl.pb.finansista.reference.Department;
-
-import java.util.Collection;
 
 @Entity
 @Table(name = "users")

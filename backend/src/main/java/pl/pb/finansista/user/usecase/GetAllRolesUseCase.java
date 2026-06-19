@@ -12,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetAllRolesUseCase {
 
-    private final RoleRepository roleRepository;
+  private final RoleRepository roleRepository;
 
-    @Transactional(readOnly = true)
-    public List<Role> execute() {
-        return roleRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<Role> execute() {
+    return roleRepository.findAll();
+  }
 }

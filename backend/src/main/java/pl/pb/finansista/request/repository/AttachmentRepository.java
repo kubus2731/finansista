@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface AttachmentRepository {
 
-    Optional<Attachment> findById(Long id);
+  Optional<Attachment> findById(Long id);
 
-    Optional<Attachment> findByExternalId(UUID externalId);
+  Optional<Attachment> findByExternalId(UUID externalId);
 
-    List<Attachment> findByRequestId(Long requestId);
+  List<Attachment> findByRequestId(Long requestId);
 
-    Attachment save(Attachment attachment);
+  Attachment save(Attachment attachment);
 
-    void delete(Attachment attachment);
+  void delete(Attachment attachment);
 }

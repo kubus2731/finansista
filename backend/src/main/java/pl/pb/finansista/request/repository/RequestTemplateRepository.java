@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface RequestTemplateRepository {
 
-    Optional<RequestTemplate> findByExternalId(UUID externalId);
+  Optional<RequestTemplate> findByExternalId(UUID externalId);
 
-    List<RequestTemplate> findActiveTemplates();
+  List<RequestTemplate> findActiveTemplates();
 
-    List<RequestTemplate> findAll();
+  List<RequestTemplate> findAll();
 
-    RequestTemplate save(RequestTemplate requestTemplate);
+  RequestTemplate save(RequestTemplate requestTemplate);
 
-    void delete(RequestTemplate requestTemplate);
+  void delete(RequestTemplate requestTemplate);
 }

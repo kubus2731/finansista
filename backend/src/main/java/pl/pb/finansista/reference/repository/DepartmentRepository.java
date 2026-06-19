@@ -7,13 +7,13 @@ import java.util.UUID;
 
 public interface DepartmentRepository {
 
-    Optional<Department> findById(Long id);
+  Optional<Department> findById(Long id);
 
-    Department save(Department department);
+  Department save(Department department);
 
-    List<Department> findAll();
+  List<Department> findAll();
 
-    void delete(Department department);
+  void delete(Department department);
 
-    boolean existsByName(String name);
+  boolean existsByName(String name);
 }

@@ -5,7 +5,9 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class MissingFundingSourceException extends BusinessException {
 
-    public MissingFundingSourceException() {
-        super("At least one funding source must be added before submitting the request.", HttpStatus.UNPROCESSABLE_ENTITY);
-    }
+  public MissingFundingSourceException() {
+    super(
+        "At least one funding source must be added before submitting the request.",
+        HttpStatus.UNPROCESSABLE_ENTITY);
+  }
 }

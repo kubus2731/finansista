@@ -19,17 +19,17 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ModificationAuditedEntity extends CreationAuditedEntity {
 
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private ZonedDateTime updatedAt;
+  @LastModifiedDate
+  @Column(name = "updated_at", nullable = false)
+  private ZonedDateTime updatedAt;
 
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version = 0L;
+  @Version
+  @Column(name = "version", nullable = false)
+  private Long version = 0L;
 
-    public void assertVersion(Long expectedVersion) {
-        if (!version.equals(expectedVersion)) {
-            throw new ObjectOptimisticLockingFailureException(getClass(), getId());
-        }
+  public void assertVersion(Long expectedVersion) {
+    if (!version.equals(expectedVersion)) {
+      throw new ObjectOptimisticLockingFailureException(getClass(), getId());
     }
+  }
 }

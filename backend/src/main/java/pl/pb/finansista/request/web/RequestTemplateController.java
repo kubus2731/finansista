@@ -1,6 +1,8 @@
 package pl.pb.finansista.request.web;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -10,9 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.common.web.ETags;
 import pl.pb.finansista.request.RequestTemplate;
 import pl.pb.finansista.request.usecase.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/request-templates")

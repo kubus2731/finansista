@@ -4,15 +4,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import pl.pb.finansista.user.usecase.LoginUserCommand;
 
-public record LoginUserRequest(
-        @NotBlank
-        @Email
-        String email,
+public record LoginUserRequest(@NotBlank @Email String email, @NotBlank String password) {
 
-        @NotBlank
-        String password
-) {
-    public LoginUserCommand toCommand() {
-        return new LoginUserCommand(email, password);
-    }
+  public LoginUserCommand toCommand() {
+    return new LoginUserCommand(email, password);
+  }
 }

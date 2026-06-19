@@ -12,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetDepartmentSummariesUseCase {
 
-    private final DepartmentSummaryRepository repository;
+  private final DepartmentSummaryRepository repository;
 
-    @Transactional(readOnly = true)
-    public List<DepartmentRequestsSummary> execute() {
-        return repository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<DepartmentRequestsSummary> execute() {
+    return repository.findAll();
+  }
 }

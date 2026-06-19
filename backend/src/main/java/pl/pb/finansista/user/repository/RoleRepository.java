@@ -1,10 +1,8 @@
 package pl.pb.finansista.user.repository;
 
-import pl.pb.finansista.user.Role;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import pl.pb.finansista.user.Role;
 
 public interface RoleRepository {
 

@@ -5,5 +5,5 @@ import java.util.UUID;
 
 public interface IdentityResolver {
 
-    Optional<Identity> resolve(UUID subject);
+  Optional<Identity> resolve(UUID subject);
 }

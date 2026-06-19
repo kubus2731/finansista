@@ -1,7 +1,10 @@
 package pl.pb.finansista.frontend.web;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -13,17 +16,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pl.pb.finansista.frontend.viewmodel.ReferenceResponse;
+import org.springframework.web.util.WebUtils;
 import pl.pb.finansista.frontend.viewmodel.ChangeUserActiveRequest;
 import pl.pb.finansista.frontend.viewmodel.ChangeUserDepartmentRequest;
 import pl.pb.finansista.frontend.viewmodel.ChangeUserRoleRequest;
+import pl.pb.finansista.frontend.viewmodel.ReferenceResponse;
 import pl.pb.finansista.frontend.viewmodel.RoleResponse;
 import pl.pb.finansista.frontend.viewmodel.UserResponse;
-import org.springframework.web.util.WebUtils;
-import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Value;
-
-import java.util.List;
 
 /**
  * Panel administratora - zarządzanie użytkownikami (zmiana roli i działu).

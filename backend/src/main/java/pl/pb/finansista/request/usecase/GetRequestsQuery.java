@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 public record GetRequestsQuery(
-        UUID userExternalId,
-        List<String> userAuthorities,
-        String status,
-        Long departmentId,
-        String search
-) {
-}
+    UUID userExternalId,
+    List<String> userAuthorities,
+    String status,
+    Long departmentId,
+    String search) {}

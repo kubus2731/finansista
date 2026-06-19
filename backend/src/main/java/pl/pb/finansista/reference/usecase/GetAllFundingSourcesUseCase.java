@@ -12,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetAllFundingSourcesUseCase {
 
-    private final FundingSourceRepository fundingSourceRepository;
+  private final FundingSourceRepository fundingSourceRepository;
 
-    @Transactional(readOnly = true)
-    public List<FundingSource> execute() {
-        return fundingSourceRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<FundingSource> execute() {
+    return fundingSourceRepository.findAll();
+  }
 }

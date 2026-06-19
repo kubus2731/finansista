@@ -2,6 +2,7 @@ package pl.pb.finansista.frontend.web;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +19,12 @@ import pl.pb.finansista.frontend.user.view.RegisterForm;
 import pl.pb.finansista.frontend.viewmodel.LoginUserRequest;
 import pl.pb.finansista.frontend.viewmodel.RegisterUserRequest;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 public class AuthViewController {
 
-    private final RestClient backendRestClient;
-
     private static final Long STUDENT_ROLE_ID = 2L;
+    private final RestClient backendRestClient;
 
     @PostMapping("/login")
     public String login(@RequestParam String email,

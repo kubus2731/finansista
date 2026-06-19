@@ -1,9 +1,8 @@
 package pl.pb.finansista.user.web;
 
 import jakarta.validation.constraints.NotNull;
-import pl.pb.finansista.user.usecase.ChangeUserRoleCommand;
-
 import java.util.UUID;
+import pl.pb.finansista.user.usecase.ChangeUserRoleCommand;
 
 public record ChangeUserRoleRequest(
         @NotNull Long roleId

@@ -19,30 +19,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetRequestsUseCase {
 
-    private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecificationFactory;
+  private final RequestRepository requestRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecificationFactory;
 
-    @Transactional(readOnly = true)
-    public Page<Request> execute(GetRequestsQuery query, Pageable pageable) {
-        User currentUser = userRepository.findByExternalId(query.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional(readOnly = true)
+  public Page<Request> execute(GetRequestsQuery query, Pageable pageable) {
+    User currentUser =
+        userRepository
+            .findByExternalId(query.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        List<Specification<Request>> specs = new ArrayList<>();
-        specs.add(accessSpecificationFactory.createForUser(currentUser, query.userAuthorities()));
+    List<Specification<Request>> specs = new ArrayList<>();
+    specs.add(accessSpecificationFactory.createForUser(currentUser, query.userAuthorities()));
 
-        if (query.status() != null && !query.status().isBlank()) {
-            specs.add(RequestSpecifications.hasStatus(query.status()));
-        }
-
-        if (query.departmentId() != null) {
-            specs.add(RequestSpecifications.hasDepartment(query.departmentId()));
-        }
-
-        if (query.search() != null && !query.search().isBlank()) {
-            specs.add(RequestSpecifications.containsText(query.search()));
-        }
-
-        return requestRepository.findAll(Specification.allOf(specs), pageable);
+    if (query.status() != null && !query.status().isBlank()) {
+      specs.add(RequestSpecifications.hasStatus(query.status()));
     }
+
+    if (query.departmentId() != null) {
+      specs.add(RequestSpecifications.hasDepartment(query.departmentId()));
+    }
+
+    if (query.search() != null && !query.search().isBlank()) {
+      specs.add(RequestSpecifications.containsText(query.search()));
+    }
+
+    return requestRepository.findAll(Specification.allOf(specs), pageable);
+  }
 }

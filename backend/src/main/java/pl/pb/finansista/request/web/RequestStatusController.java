@@ -1,23 +1,22 @@
 package pl.pb.finansista.request.web;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.common.web.ETags;
 import pl.pb.finansista.request.usecase.ChangeRequestStatusUseCase;
 import pl.pb.finansista.request.usecase.GetAllRequestStatusesUseCase;
 import pl.pb.finansista.request.usecase.GetAvailableTransitionsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/requests")

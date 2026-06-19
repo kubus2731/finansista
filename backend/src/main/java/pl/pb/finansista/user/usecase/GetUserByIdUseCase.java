@@ -13,11 +13,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GetUserByIdUseCase {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Transactional(readOnly = true)
-    public User execute(UUID id) {
-        return userRepository.findByExternalId(id)
-                .orElseThrow(UserNotFoundException::new);
-    }
+  @Transactional(readOnly = true)
+  public User execute(UUID id) {
+    return userRepository.findByExternalId(id).orElseThrow(UserNotFoundException::new);
+  }
 }

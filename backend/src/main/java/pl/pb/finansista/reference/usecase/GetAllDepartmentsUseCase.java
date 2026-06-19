@@ -12,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetAllDepartmentsUseCase {
 
-    private final DepartmentRepository departmentRepository;
+  private final DepartmentRepository departmentRepository;
 
-    @Transactional(readOnly = true)
-    public List<Department> execute() {
-        return departmentRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<Department> execute() {
+    return departmentRepository.findAll();
+  }
 }

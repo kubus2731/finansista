@@ -1,9 +1,8 @@
 package pl.pb.finansista.user.web;
 
 import jakarta.validation.constraints.NotNull;
-import pl.pb.finansista.user.usecase.ChangeUserDepartmentCommand;
-
 import java.util.UUID;
+import pl.pb.finansista.user.usecase.ChangeUserDepartmentCommand;
 
 public record ChangeUserDepartmentRequest(
         @NotNull Long departmentId

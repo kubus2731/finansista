@@ -19,24 +19,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetCommentsUseCase {
 
-    private final CommentRepository commentRepository;
-    private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecFactory;
+  private final CommentRepository commentRepository;
+  private final RequestRepository requestRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecFactory;
 
-    @Transactional(readOnly = true)
-    public List<Comment> execute(GetSingleRequestQuery query) {
-        User user = userRepository.findByExternalId(query.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional(readOnly = true)
+  public List<Comment> execute(GetSingleRequestQuery query) {
+    User user =
+        userRepository
+            .findByExternalId(query.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = Specification.allOf(
-                RequestSpecifications.hasExternalId(query.externalId()),
-                accessSpecFactory.createForUser(user, query.userAuthorities())
-        );
+    Specification<Request> spec =
+        Specification.allOf(
+            RequestSpecifications.hasExternalId(query.externalId()),
+            accessSpecFactory.createForUser(user, query.userAuthorities()));
 
-        Request request = requestRepository.findOne(spec)
-                .orElseThrow(RequestNotFoundException::new);
+    Request request = requestRepository.findOne(spec).orElseThrow(RequestNotFoundException::new);
 
-        return commentRepository.findByRequestId(request.getId());
-    }
+    return commentRepository.findByRequestId(request.getId());
+  }
 }

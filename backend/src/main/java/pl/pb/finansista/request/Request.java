@@ -1,6 +1,11 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,12 +14,6 @@ import pl.pb.finansista.reference.CostCategory;
 import pl.pb.finansista.reference.Department;
 import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.user.User;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Table(name = "requests")
@@ -61,13 +60,13 @@ public class Request extends ExposableModificationAuditedEntity {
     private String provostOpinion;
 
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RequestTask> tasks = new ArrayList<>();
+    private final List<RequestTask> tasks = new ArrayList<>();
 
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RequestCostItem> costItems = new ArrayList<>();
+    private final List<RequestCostItem> costItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RequestFunding> fundings = new ArrayList<>();
+    private final List<RequestFunding> fundings = new ArrayList<>();
 
     public Request(String title, String description, BigDecimal amount, User user, RequestStatus status, RequestTemplate template, Department department, CostCategory costCategory) {
         this.title = title;

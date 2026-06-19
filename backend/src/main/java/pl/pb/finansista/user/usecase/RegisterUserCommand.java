@@ -2,7 +2,6 @@ package pl.pb.finansista.user.usecase;
 
 import org.springframework.util.Assert;
 
-
 public record RegisterUserCommand(
         String name,
         String surname,

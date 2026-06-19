@@ -21,35 +21,42 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DeleteAttachmentUseCase {
 
-    private final AttachmentRepository attachmentRepository;
-    private final FileStorage fileStorage;
+  private final AttachmentRepository attachmentRepository;
+  private final FileStorage fileStorage;
 
-    @Transactional
-    public void execute(UUID requestExternalId, UUID attachmentExternalId, UUID userExternalId, Collection<String> userAuthorities) {
-        Attachment attachment = attachmentRepository.findByExternalId(attachmentExternalId)
-                .orElseThrow(AttachmentNotFoundException::new);
-        Request request = attachment.getRequest();
+  @Transactional
+  public void execute(
+      UUID requestExternalId,
+      UUID attachmentExternalId,
+      UUID userExternalId,
+      Collection<String> userAuthorities) {
+    Attachment attachment =
+        attachmentRepository
+            .findByExternalId(attachmentExternalId)
+            .orElseThrow(AttachmentNotFoundException::new);
+    Request request = attachment.getRequest();
 
-        if (!request.getExternalId().equals(requestExternalId)) {
-            throw new AttachmentNotFoundException();
-        }
-
-        boolean isAdmin = userAuthorities.contains(RoleName.ROLE_ADMIN.name());
-        boolean isAuthor = request.getUser().getExternalId().equals(userExternalId);
-        if (!isAdmin && !isAuthor) {
-            throw UnauthorizedRequestAccessException.forAction("delete attachment");
-        }
-
-        String status = request.getStatus().getName();
-        boolean editableState = status.equals(RequestStatusName.DRAFT.name())
-                || status.equals(RequestStatusName.CORRECTION_REQUIRED.name());
-        if (!editableState) {
-            throw InvalidRequestStateException.withStatusName(status);
-        }
-
-        String storageKey = attachment.getStorageKey();
-        attachmentRepository.delete(attachment);
-
-        AfterTransaction.onCommit(() -> fileStorage.delete(storageKey));
+    if (!request.getExternalId().equals(requestExternalId)) {
+      throw new AttachmentNotFoundException();
     }
+
+    boolean isAdmin = userAuthorities.contains(RoleName.ROLE_ADMIN.name());
+    boolean isAuthor = request.getUser().getExternalId().equals(userExternalId);
+    if (!isAdmin && !isAuthor) {
+      throw UnauthorizedRequestAccessException.forAction("delete attachment");
+    }
+
+    String status = request.getStatus().getName();
+    boolean editableState =
+        status.equals(RequestStatusName.DRAFT.name())
+            || status.equals(RequestStatusName.CORRECTION_REQUIRED.name());
+    if (!editableState) {
+      throw InvalidRequestStateException.withStatusName(status);
+    }
+
+    String storageKey = attachment.getStorageKey();
+    attachmentRepository.delete(attachment);
+
+    AfterTransaction.onCommit(() -> fileStorage.delete(storageKey));
+  }
 }

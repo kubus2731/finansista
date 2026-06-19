@@ -1,14 +1,13 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 import pl.pb.finansista.common.BaseEntity;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "request_task")

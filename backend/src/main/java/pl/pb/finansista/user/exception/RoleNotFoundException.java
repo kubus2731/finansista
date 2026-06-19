@@ -5,7 +5,7 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class RoleNotFoundException extends BusinessException {
 
-    public RoleNotFoundException() {
-        super("Role not found.", HttpStatus.NOT_FOUND);
-    }
+  public RoleNotFoundException() {
+    super("Role not found.", HttpStatus.NOT_FOUND);
+  }
 }

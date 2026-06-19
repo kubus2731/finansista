@@ -1,5 +1,12 @@
 package pl.pb.finansista.request.web;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -10,9 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.pb.finansista.request.Attachment;
 import pl.pb.finansista.request.usecase.AddAttachmentCommand;
 import pl.pb.finansista.request.usecase.AddAttachmentUseCase;
@@ -21,14 +28,6 @@ import pl.pb.finansista.request.usecase.DeleteAttachmentUseCase;
 import pl.pb.finansista.request.usecase.GetAttachmentContentUseCase;
 import pl.pb.finansista.request.usecase.GetAttachmentsUseCase;
 import pl.pb.finansista.request.usecase.GetSingleRequestQuery;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/requests")

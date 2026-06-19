@@ -1,5 +1,9 @@
 package pl.pb.finansista.request.web;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.pb.finansista.reference.FundingSourceName;
@@ -10,11 +14,6 @@ import pl.pb.finansista.request.usecase.RequestFundingAuthorization;
 import pl.pb.finansista.user.RoleName;
 import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.repository.UserRepository;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Predicate;
 
 @Component
 @RequiredArgsConstructor

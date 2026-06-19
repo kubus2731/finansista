@@ -1,10 +1,9 @@
 package pl.pb.finansista.request.repository;
 
-import org.springframework.stereotype.Repository;
-import pl.pb.finansista.request.ActivityLog;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
+import pl.pb.finansista.request.ActivityLog;
 
 @Repository
 class JpaActivityLogRepository implements ActivityLogRepository {

@@ -7,6 +7,5 @@ import java.util.List;
 
 interface SpringDataJpaCommentRepository extends JpaRepository<Comment, Long> {
 
-    List<Comment> findByRequestId(Long requestId);
+  List<Comment> findByRequestId(Long requestId);
 }
-

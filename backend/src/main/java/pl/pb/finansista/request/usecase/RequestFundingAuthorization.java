@@ -1,10 +1,9 @@
 package pl.pb.finansista.request.usecase;
 
+import java.util.Collection;
 import org.springframework.stereotype.Component;
 import pl.pb.finansista.reference.FundingSourceName;
 import pl.pb.finansista.user.RoleName;
-
-import java.util.Collection;
 
 /**
  * Maps each Section VI funding source to the dysponent allowed to sign its grant,

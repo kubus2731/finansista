@@ -11,13 +11,13 @@ import pl.pb.finansista.reference.repository.DepartmentRepository;
 @RequiredArgsConstructor
 public class DeleteDepartmentUseCase {
 
-    private final DepartmentRepository departmentRepository;
+  private final DepartmentRepository departmentRepository;
 
-    @Transactional
-    public void execute(Long id) {
-        Department department = departmentRepository.findById(id)
-                .orElseThrow(DepartmentNotFoundException::new);
+  @Transactional
+  public void execute(Long id) {
+    Department department =
+        departmentRepository.findById(id).orElseThrow(DepartmentNotFoundException::new);
 
-        departmentRepository.delete(department);
-    }
+    departmentRepository.delete(department);
+  }
 }

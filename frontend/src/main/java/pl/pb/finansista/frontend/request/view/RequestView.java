@@ -2,7 +2,6 @@ package pl.pb.finansista.frontend.request.view;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.UUID;
 
 public record RequestView(
         String id,

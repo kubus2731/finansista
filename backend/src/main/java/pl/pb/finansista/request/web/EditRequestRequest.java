@@ -8,6 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import pl.pb.finansista.common.web.ExternalIdEncoder;
 import pl.pb.finansista.request.usecase.CostItemData;
 import pl.pb.finansista.request.usecase.EditRequestCommand;
@@ -15,11 +19,6 @@ import pl.pb.finansista.request.usecase.FundingData;
 import pl.pb.finansista.request.usecase.ProjectDetailsData;
 import pl.pb.finansista.request.usecase.SupervisorData;
 import pl.pb.finansista.request.usecase.TaskData;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 public record EditRequestRequest(
         @NotBlank @Size(max = 100) String title,

@@ -1,18 +1,16 @@
 package pl.pb.finansista.request.web;
 
-import pl.pb.finansista.common.web.ExternalIdEncoder;
-import pl.pb.finansista.request.ProjectDetails;
-import pl.pb.finansista.request.Request;
-import pl.pb.finansista.request.RequestFunding;
-import pl.pb.finansista.request.SupervisorInfo;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.function.Predicate;
+import pl.pb.finansista.common.web.ExternalIdEncoder;
+import pl.pb.finansista.request.ProjectDetails;
+import pl.pb.finansista.request.Request;
+import pl.pb.finansista.request.RequestFunding;
+import pl.pb.finansista.request.SupervisorInfo;
 
 public record RequestResponse(
         String id,

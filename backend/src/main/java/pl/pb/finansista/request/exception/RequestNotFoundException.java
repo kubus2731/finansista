@@ -5,7 +5,7 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class RequestNotFoundException extends BusinessException {
 
-    public RequestNotFoundException() {
-        super("Request not found.", HttpStatus.NOT_FOUND);
-    }
+  public RequestNotFoundException() {
+    super("Request not found.", HttpStatus.NOT_FOUND);
+  }
 }

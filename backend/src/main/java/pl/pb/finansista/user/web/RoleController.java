@@ -1,6 +1,7 @@
 package pl.pb.finansista.user.web;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +11,6 @@ import pl.pb.finansista.user.usecase.CreateRoleUseCase;
 import pl.pb.finansista.user.usecase.DeleteRoleUseCase;
 import pl.pb.finansista.user.usecase.EditRoleUseCase;
 import pl.pb.finansista.user.usecase.GetAllRolesUseCase;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/roles")

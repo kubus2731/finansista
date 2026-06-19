@@ -3,7 +3,12 @@ package pl.pb.finansista.frontend.web;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -21,28 +26,20 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.WebUtils;
-import org.springframework.beans.factory.annotation.Value;
 import pl.pb.finansista.frontend.request.view.CreateRequestForm;
 import pl.pb.finansista.frontend.request.view.RequestView;
 import pl.pb.finansista.frontend.viewmodel.*;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class RequestViewController {
 
-        private final RestClient backendRestClient;
-
-        @Value("${app.security.jwt.cookie-name:jwt}")
-        private String jwtCookieName;
-    
     private static final List<String> ALL_STATUSES = List.of(
             "DRAFT", "SUBMITTED", "FORMAL_EVALUATION", "UNDER_REVIEW",
             "ACCEPTED", "REJECTED", "CORRECTION_REQUIRED");
+        private final RestClient backendRestClient;
+        @Value("${app.security.jwt.cookie-name:jwt}")
+        private String jwtCookieName;
 
     @GetMapping("/requests")
     public String list(@RequestParam(required = false) String status,

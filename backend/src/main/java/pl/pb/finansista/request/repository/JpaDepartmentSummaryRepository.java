@@ -10,10 +10,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JpaDepartmentSummaryRepository implements DepartmentSummaryRepository {
 
-    private final SpringDataJpaDepartmentSummaryRepository repository;
+  private final SpringDataJpaDepartmentSummaryRepository repository;
 
-    @Override
-    public List<DepartmentRequestsSummary> findAll() {
-        return repository.findAll();
-    }
+  @Override
+  public List<DepartmentRequestsSummary> findAll() {
+    return repository.findAll();
+  }
 }

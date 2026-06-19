@@ -4,8 +4,4 @@ import java.util.Collection;
 import java.util.UUID;
 
 public record GetSingleRequestQuery(
-        UUID externalId,
-        UUID userExternalId,
-        Collection<String> userAuthorities
-) {
-}
+    UUID externalId, UUID userExternalId, Collection<String> userAuthorities) {}

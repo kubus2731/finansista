@@ -12,10 +12,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GetAllCostCategoriesUseCase {
 
-    private final CostCategoryRepository costCategoryRepository;
+  private final CostCategoryRepository costCategoryRepository;
 
-    @Transactional(readOnly = true)
-    public List<CostCategory> execute() {
-        return costCategoryRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<CostCategory> execute() {
+    return costCategoryRepository.findAll();
+  }
 }

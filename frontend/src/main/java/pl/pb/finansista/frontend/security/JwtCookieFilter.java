@@ -21,47 +21,50 @@ import java.util.List;
 
 public class JwtCookieFilter extends OncePerRequestFilter {
 
-    private final String jwtCookieName;
+  private final String jwtCookieName;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public JwtCookieFilter(String jwtCookieName) {
-        this.jwtCookieName = jwtCookieName;
-    }
+  public JwtCookieFilter(String jwtCookieName) {
+    this.jwtCookieName = jwtCookieName;
+  }
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+  @Override
+  protected void doFilterInternal(
+      HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
-        Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
-        if (cookie != null && cookie.getValue() != null && !cookie.getValue().isEmpty()) {
-            String token = cookie.getValue();
-            try {
-                String[] parts = token.split("\\.");
-                if (parts.length == 3) {
-                    String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]));
-                    JsonNode payload = objectMapper.readTree(payloadJson);
-                    
-                    String principalName = payload.has("name") ? payload.get("name").asText() : 
-                                          (payload.has("sub") ? payload.get("sub").asText() : null);
-                    
-                    String role = payload.has("role") ? payload.get("role").asText() : null;
-                    
-                    List<GrantedAuthority> authorities = new ArrayList<>();
-                    if (role != null) {
-                        authorities.add(new SimpleGrantedAuthority(role));
-                    }
+    Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
+    if (cookie != null && cookie.getValue() != null && !cookie.getValue().isEmpty()) {
+      String token = cookie.getValue();
+      try {
+        String[] parts = token.split("\\.");
+        if (parts.length == 3) {
+          String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]));
+          JsonNode payload = objectMapper.readTree(payloadJson);
 
-                    if (principalName != null) {
-                        UsernamePasswordAuthenticationToken auth = 
-                                new UsernamePasswordAuthenticationToken(principalName, null, authorities);
-                        SecurityContextHolder.getContext().setAuthentication(auth);
-                    }
-                }
-            } catch (Exception e) {
-            }
+          String principalName =
+              payload.has("name")
+                  ? payload.get("name").asText()
+                  : (payload.has("sub") ? payload.get("sub").asText() : null);
+
+          String role = payload.has("role") ? payload.get("role").asText() : null;
+
+          List<GrantedAuthority> authorities = new ArrayList<>();
+          if (role != null) {
+            authorities.add(new SimpleGrantedAuthority(role));
+          }
+
+          if (principalName != null) {
+            UsernamePasswordAuthenticationToken auth =
+                new UsernamePasswordAuthenticationToken(principalName, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+          }
         }
-
-        filterChain.doFilter(request, response);
+      } catch (Exception e) {
+      }
     }
+
+    filterChain.doFilter(request, response);
+  }
 }

@@ -14,22 +14,22 @@ import pl.pb.finansista.user.User;
 @NoArgsConstructor
 public class ActivityLog extends CreationAuditedEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id", nullable = false)
-    private Request request;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "request_id", nullable = false)
+  private Request request;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "old_status_id")
-    private RequestStatus oldStatus;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "old_status_id")
+  private RequestStatus oldStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "new_status_id", nullable = false)
-    private RequestStatus newStatus;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "new_status_id", nullable = false)
+  private RequestStatus newStatus;
 
-    @Column(length = 500)
-    private String description;
+  @Column(length = 500)
+  private String description;
 }

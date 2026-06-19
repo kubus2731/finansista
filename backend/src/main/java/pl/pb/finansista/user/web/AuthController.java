@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.common.security.JwtService;
 import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.usecase.LoginUserUseCase;
-import pl.pb.finansista.user.usecase.RegisterUserCommand;
 import pl.pb.finansista.user.usecase.RegisterUserUseCase;
 
 @RestController

@@ -1,10 +1,9 @@
 package pl.pb.finansista.request.web;
 
 import jakarta.validation.constraints.NotBlank;
-import pl.pb.finansista.request.usecase.ChangeRequestStatusCommand;
-
 import java.util.List;
 import java.util.UUID;
+import pl.pb.finansista.request.usecase.ChangeRequestStatusCommand;
 
 public record ChangeRequestStatusRequest(
         @NotBlank String status,

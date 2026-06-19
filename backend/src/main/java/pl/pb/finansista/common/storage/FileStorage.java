@@ -1,8 +1,7 @@
 package pl.pb.finansista.common.storage;
 
-import org.springframework.core.io.Resource;
-
 import java.io.InputStream;
+import org.springframework.core.io.Resource;
 
 public interface FileStorage {
 

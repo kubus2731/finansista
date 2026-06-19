@@ -1,5 +1,8 @@
 package pl.pb.finansista.request.usecase;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import pl.pb.finansista.reference.Department;
@@ -8,10 +11,6 @@ import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestStatusName;
 import pl.pb.finansista.user.RoleName;
 import pl.pb.finansista.user.User;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 @Component
 public class RequestAccessSpecificationFactory {

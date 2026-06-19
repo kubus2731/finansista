@@ -13,21 +13,20 @@ import pl.pb.finansista.user.repository.RoleRepository;
 @RequiredArgsConstructor
 public class EditRoleUseCase {
 
-    private final RoleRepository roleRepository;
+  private final RoleRepository roleRepository;
 
-    @Transactional
-    public Role execute(Long id, String name) {
-        Role role = roleRepository.findById(id)
-                .orElseThrow(RoleNotFoundException::new);
+  @Transactional
+  public Role execute(Long id, String name) {
+    Role role = roleRepository.findById(id).orElseThrow(RoleNotFoundException::new);
 
-        if (role.isBuiltIn()) {
-            throw new SystemRoleModificationException();
-        }
-        if (!role.getName().equals(name) && roleRepository.existsByName(name)) {
-            throw new RoleAlreadyExistsException(name);
-        }
-
-        role.rename(name);
-        return roleRepository.save(role);
+    if (role.isBuiltIn()) {
+      throw new SystemRoleModificationException();
     }
+    if (!role.getName().equals(name) && roleRepository.existsByName(name)) {
+      throw new RoleAlreadyExistsException(name);
+    }
+
+    role.rename(name);
+    return roleRepository.save(role);
+  }
 }

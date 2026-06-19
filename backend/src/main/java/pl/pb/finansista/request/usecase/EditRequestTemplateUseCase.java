@@ -13,23 +13,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EditRequestTemplateUseCase {
 
-    private final RequestTemplateRepository requestTemplateRepository;
+  private final RequestTemplateRepository requestTemplateRepository;
 
-    @Transactional
-    public RequestTemplate execute(UUID id, String title, String description, boolean active, Long version) {
-        RequestTemplate template = requestTemplateRepository.findByExternalId(id)
-                .orElseThrow(RequestTemplateNotFoundException::new);
+  @Transactional
+  public RequestTemplate execute(
+      UUID id, String title, String description, boolean active, Long version) {
+    RequestTemplate template =
+        requestTemplateRepository
+            .findByExternalId(id)
+            .orElseThrow(RequestTemplateNotFoundException::new);
 
-        template.assertVersion(version);
+    template.assertVersion(version);
 
-        template.updateDetails(title, description);
+    template.updateDetails(title, description);
 
-        if (active && !template.isActive()) {
-            template.activate();
-        } else if (!active && template.isActive()) {
-            template.deactivate();
-        }
-
-        return requestTemplateRepository.save(template);
+    if (active && !template.isActive()) {
+      template.activate();
+    } else if (!active && template.isActive()) {
+      template.deactivate();
     }
+
+    return requestTemplateRepository.save(template);
+  }
 }

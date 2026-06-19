@@ -9,26 +9,28 @@ import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
 
 /**
- * Soft delete: aktywacja / dezaktywacja konta użytkownika. Nie usuwa rekordu
- * (zachowuje integralność FK i audyt), tylko przełącza flagę {@code active}.
+ * Soft delete: aktywacja / dezaktywacja konta użytkownika. Nie usuwa rekordu (zachowuje
+ * integralność FK i audyt), tylko przełącza flagę {@code active}.
  */
 @Service
 @RequiredArgsConstructor
 public class SetUserActiveUseCase {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
-    @Transactional
-    public void execute(SetUserActiveCommand command) {
-        User user = userRepository.findByExternalId(command.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional
+  public void execute(SetUserActiveCommand command) {
+    User user =
+        userRepository
+            .findByExternalId(command.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        // Admin nie może odciąć sam sobie dostępu, dezaktywując własne konto.
-        if (!command.active() && user.getEmail().equals(command.actingUserEmail())) {
-            throw new CannotDeactivateSelfException();
-        }
-
-        user.setActive(command.active());
-        userRepository.save(user);
+    // Admin nie może odciąć sam sobie dostępu, dezaktywując własne konto.
+    if (!command.active() && user.getEmail().equals(command.actingUserEmail())) {
+      throw new CannotDeactivateSelfException();
     }
+
+    user.setActive(command.active());
+    userRepository.save(user);
+  }
 }

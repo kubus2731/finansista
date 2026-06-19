@@ -1,5 +1,6 @@
 package pl.pb.finansista.request.usecase;
 
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,8 +16,6 @@ import pl.pb.finansista.request.repository.RequestRepository;
 import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

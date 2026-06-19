@@ -13,11 +13,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GetSingleRequestTemplateUseCase {
 
-    private final RequestTemplateRepository requestTemplateRepository;
+  private final RequestTemplateRepository requestTemplateRepository;
 
-    @Transactional(readOnly = true)
-    public RequestTemplate execute(UUID id) {
-        return requestTemplateRepository.findByExternalId(id)
-                .orElseThrow(RequestTemplateNotFoundException::new);
-    }
+  @Transactional(readOnly = true)
+  public RequestTemplate execute(UUID id) {
+    return requestTemplateRepository
+        .findByExternalId(id)
+        .orElseThrow(RequestTemplateNotFoundException::new);
+  }
 }

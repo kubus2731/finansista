@@ -1,10 +1,9 @@
 package pl.pb.finansista.request.web;
 
 import jakarta.validation.constraints.NotBlank;
-import pl.pb.finansista.request.usecase.AddCommentCommand;
-
 import java.util.List;
 import java.util.UUID;
+import pl.pb.finansista.request.usecase.AddCommentCommand;
 
 public record AddCommentRequest(
         @NotBlank String content

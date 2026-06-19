@@ -1,21 +1,20 @@
 package pl.pb.finansista.user.usecase;
 
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.reference.exception.DepartmentNotFoundException;
 import pl.pb.finansista.reference.repository.DepartmentRepository;
-import pl.pb.finansista.user.exception.RegistrationForbiddenException;
 import pl.pb.finansista.user.Role;
 import pl.pb.finansista.user.RoleName;
-import pl.pb.finansista.user.exception.RoleNotFoundException;
 import pl.pb.finansista.user.User;
+import pl.pb.finansista.user.exception.RegistrationForbiddenException;
+import pl.pb.finansista.user.exception.RoleNotFoundException;
 import pl.pb.finansista.user.exception.UserAlreadyExistsException;
 import pl.pb.finansista.user.repository.RoleRepository;
 import pl.pb.finansista.user.repository.UserRepository;
-
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
