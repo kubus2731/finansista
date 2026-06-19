@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pl.pb.finansista.frontend.common.ExternalIdEncoder;
 import pl.pb.finansista.frontend.viewmodel.ReferenceResponse;
 import pl.pb.finansista.frontend.viewmodel.ChangeUserActiveRequest;
 import pl.pb.finansista.frontend.viewmodel.ChangeUserDepartmentRequest;
@@ -24,7 +23,6 @@ import org.springframework.web.util.WebUtils;
 import jakarta.servlet.http.Cookie;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Panel administratora - zarządzanie użytkownikami (zmiana roli i działu).
@@ -70,12 +68,11 @@ public class AdminViewController {
     }
 
     @PostMapping("/admin/users/{id}/role")
-    public String changeRole(@PathVariable("id") String encodedUserId,
+    public String changeRole(@PathVariable("id") String userId,
                              @RequestParam Long roleId,
                              HttpServletRequest httpRequest,
                              RedirectAttributes redirectAttributes) {
         try {
-            UUID userId = ExternalIdEncoder.decode(encodedUserId);
             backendRestClient.patch()
                     .uri("/api/v1/users/{id}/role", userId)
                     .header("Authorization", bearer(httpRequest))
@@ -90,12 +87,11 @@ public class AdminViewController {
     }
 
     @PostMapping("/admin/users/{id}/department")
-    public String changeDepartment(@PathVariable("id") String encodedUserId,
+    public String changeDepartment(@PathVariable("id") String userId,
                                    @RequestParam Long departmentId,
                                    HttpServletRequest httpRequest,
                                    RedirectAttributes redirectAttributes) {
         try {
-            UUID userId = ExternalIdEncoder.decode(encodedUserId);
             backendRestClient.patch()
                     .uri("/api/v1/users/{id}/department", userId)
                     .header("Authorization", bearer(httpRequest))
@@ -111,12 +107,11 @@ public class AdminViewController {
 
     /** Soft delete: dezaktywacja / ponowna aktywacja konta użytkownika. */
     @PostMapping("/admin/users/{id}/active")
-    public String setActive(@PathVariable("id") String encodedUserId,
+    public String setActive(@PathVariable("id") String userId,
                             @RequestParam boolean active,
                             HttpServletRequest httpRequest,
                             RedirectAttributes redirectAttributes) {
         try {
-            UUID userId = ExternalIdEncoder.decode(encodedUserId);
             backendRestClient.patch()
                     .uri("/api/v1/users/{id}/active", userId)
                     .header("Authorization", bearer(httpRequest))

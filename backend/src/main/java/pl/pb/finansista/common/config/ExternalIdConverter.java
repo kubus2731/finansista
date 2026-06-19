@@ -15,10 +15,6 @@ public class ExternalIdConverter implements Converter<String, UUID> {
             return null;
         }
         
-        if (source.length() == 36 && source.contains("-")) {
-            return UUID.fromString(source);
-        }
-        
         try {
             return ExternalIdEncoder.decode(source);
         } catch (Exception e) {
