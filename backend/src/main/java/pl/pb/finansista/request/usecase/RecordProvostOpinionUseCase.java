@@ -37,8 +37,8 @@ public class RecordProvostOpinionUseCase {
                 .orElseThrow(RequestNotFoundException::new);
 
         boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
-        boolean isStudentAffairs = command.userAuthorities().contains(RoleName.ROLE_STUDENT_AFFAIRS.name());
-        if (!isAdmin && !isStudentAffairs) {
+        boolean isProvost = command.userAuthorities().contains(RoleName.ROLE_PROVOST.name());
+        if (!isAdmin && !isProvost) {
             throw UnauthorizedRequestAccessException.forAction("record the provost opinion");
         }
 

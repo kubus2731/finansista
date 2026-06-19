@@ -614,15 +614,23 @@ public class RequestViewController {
                 form.getSupervisorPhone(), form.getSupervisorDepartment(),
                 tasks, costItems, fundings);
 
-        backendRestClient.post()
-                .uri("/api/v1/requests")
-                .header("Authorization", bearer(httpRequest))
-                .body(payload)
-                .retrieve()
-                .toBodilessEntity();
+        try {
+            backendRestClient.post()
+                    .uri("/api/v1/requests")
+                    .header("Authorization", bearer(httpRequest))
+                    .body(payload)
+                    .retrieve()
+                    .toBodilessEntity();
 
-        redirectAttributes.addFlashAttribute("successMessage", "Wniosek został zapisany jako wersja robocza.");
-        return "redirect:/requests";
+            redirectAttributes.addFlashAttribute("successMessage", "Wniosek został zapisany jako wersja robocza.");
+            return "redirect:/requests";
+        } catch (RestClientResponseException e) {
+            model.addAttribute("departmentName", user.departmentName());
+            List<String> combinedErrors = new ArrayList<>(errors);
+            combinedErrors.add("Wystąpił błąd po stronie serwera (" + e.getStatusCode() + "): upewnij się, że wszystkie pola formularza są poprawne.");
+            model.addAttribute("validationErrors", combinedErrors);
+            return "requests/form";
+        }
     }
 
     private CreateRequestForm.TaskRow taskRow(int no) {

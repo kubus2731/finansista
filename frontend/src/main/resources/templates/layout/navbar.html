@@ -6,8 +6,10 @@
 
 <nav th:fragment="navbar" class="navbar navbar-expand-lg navbar-dark pb-navbar" aria-label="Nawigacja główna">
     <div class="container">
-        <a class="navbar-brand fw-semibold" th:href="@{/}">
-            Finansista <span class="badge text-bg-light text-success align-middle">PB</span>
+        <a class="navbar-brand fw-semibold d-flex align-items-center gap-2" th:href="@{/}">
+            <img th:src="@{/logo.svg}"
+                 alt="Logo Politechniki Białostockiej" class="pb-logo" width="36" height="36">
+            <span>Finansista</span>
         </a>
 
         <button class="navbar-toggler" type="button"

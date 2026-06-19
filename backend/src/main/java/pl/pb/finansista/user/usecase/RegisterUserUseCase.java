@@ -27,7 +27,9 @@ public class RegisterUserUseCase {
             RoleName.ROLE_FINANCE_OFFICE.name(),
             RoleName.ROLE_LEGAL_COMMISSION.name(),
             RoleName.ROLE_STUDENT_COUNCIL.name(),
-            RoleName.ROLE_DOCTORAL_COUNCIL.name()
+            RoleName.ROLE_DOCTORAL_COUNCIL.name(),
+            RoleName.ROLE_PROVOST.name(),
+            RoleName.ROLE_STUDENT_AFFAIRS.name()
     );
 
     private final UserRepository userRepository;

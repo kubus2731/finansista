@@ -32,6 +32,13 @@ public class RequestAccessSpecificationFactory {
                     RequestStatusName.REJECTED.name(), RequestStatusName.CORRECTION_REQUIRED.name())));
         }
 
+        if (userAuthorities.contains(RoleName.ROLE_PROVOST.name())) {
+            allowedSpecs.add(RequestSpecifications.hasStatusIn(List.of(
+                    RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
+                    RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
+                    RequestStatusName.CORRECTION_REQUIRED.name())));
+        }
+
         if (userAuthorities.contains(RoleName.ROLE_DEAN_OFFICE.name())) {
             Department deanDepartment = user.getDepartment();
             Long facultyId = (deanDepartment != null && deanDepartment.getParent() != null)

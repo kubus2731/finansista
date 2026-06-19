@@ -24,13 +24,6 @@ import jakarta.servlet.http.Cookie;
 
 import java.util.List;
 
-/**
- * Panel administratora - zarządzanie użytkownikami (zmiana roli i działu).
- * Cała komunikacja idzie przez REST backendu. Dostęp ograniczony do ROLE_ADMIN
- * na poziomie metody (EnableMethodSecurity), niezależnie od backendowego
- * @PreAuthorize - dzięki temu nie-admin dostaje stronę 403 zamiast błędu 500
- * z odrzuconego wywołania REST.
- */
 @Controller
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")

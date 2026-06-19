@@ -1,10 +1,11 @@
 # Finansista PB
 
-Aplikacja do obsługi wniosków finansowych w Politechnice Białostockiej
-(Java 25 + Spring Boot 4 + Oracle 23ai + Thymeleaf).
+![Java](https://img.shields.io/badge/Java-25-orange?logo=java&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.6-brightgreen?logo=springboot&logoColor=white)
+![Oracle DB](https://img.shields.io/badge/Oracle-23ai-red?logo=oracle&logoColor=white)
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-UI-blue)
 
-Projekt zaliczeniowy z przedmiotów *Aplikacje webowe w Javie* oraz
-*Systemy baz danych*.
+**Finansista PB** to nowoczesna aplikacja webowa stworzona na potrzeby Politechniki Białostockiej, służąca do kompleksowej obsługi, procedowania i zarządzania wnioskami finansowymi. System cyfryzuje i upraszcza obieg dokumentów pomiędzy studentami, samorządem (WRSS), komisjami, dziekanatami a kwesturą.
 
 ## Architektura
 

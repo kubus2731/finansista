@@ -78,9 +78,9 @@
 		{\large Jakub Borkowski \par}
 		{\large \textbf{Prowadzący:} \par}
 		\vspace{0.2cm}
-		{\large Kamil Duda \par}
+		{\large inż. Adrian Twardowski \par}
 		\vspace{0.8cm}
-		{\small Przedmiot: Systemy Baz Danych \par}
+		{\small Przedmiot: Programowanie Aplikacji WWW w języku Java \par}
 		
 		\vfill
 		
@@ -135,15 +135,15 @@ System obejmuje:
   \item Rejestracja i logowanie użytkownika.
   \item Wypełnianie wniosku poprzez formularz odwzorowujący Załącznik nr 1.
   \item Walidacja formularza.
-  \item Wysyłanie wniosku do wyższych jednostek (zmiana statusu DRAFT $\to$ SUBMITTED) - dostępne tylko od strony back-end.
+  \item Wysyłanie wniosku do wyższych jednostek (zmiana statusu DRAFT $\to$ SUBMITTED).
   \item Kontrola wniosku finansowego poprzez sprawdzanie jego statusu.
-  \item Edycja/poprawa wniosku w razie odrzucenia lub uwag - dostępne tylko od strony back-end.
+  \item Edycja/poprawa wniosku w razie odrzucenia lub uwag.
   \item Procedowanie wniosku przez wyższe jednostki (Dziekanat, CSSDiR, Kwestor) - pola
-        dostępne dla odpowiednich ról oraz odpowiednie ścieżki dla konkretnych wniosków - dostępne tylko od strony back-end.
+        dostępne dla odpowiednich ról oraz odpowiednie ścieżki dla konkretnych wniosków.
   \item Dostępność aplikacji dla osób ze specjalnymi potrzebami.
-  \item Filtrowanie i wyszukiwanie wniosków - dostępne tylko od strony back-end.
-  \item Zarządzanie uprawnieniami i rolami użytkowników (administrator) - dostępne tylko od strony back-end.
-  \item Wyświetlanie pełnej historii zmian statusu wniosku - dostępne tylko od strony back-end.
+  \item Filtrowanie i wyszukiwanie wniosków.
+  \item Zarządzanie uprawnieniami i rolami użytkowników (administrator).
+  \item Wyświetlanie pełnej historii zmian statusu wniosku.
   \item Źródło finansowania jako zmienna w encji wniosku.
 \end{enumerate}
 
@@ -613,7 +613,7 @@ i zwraca go w bezpiecznym ciasteczku z atrybutami \texttt{HttpOnly}, \texttt{Sam
 Token zawiera identyfikator użytkownika (e-mail) oraz jego rolę.
 
 \subsection{Autoryzacja oparta na rolach}
-Słownik ról zdefiniowany w migracji \texttt{V2} (osiem ról):
+Słownik ról (dziewięć ról):
 \begin{itemize}[leftmargin=*]
   \item \texttt{ROLE\_ADMIN} -- decyzja Rektora, zarządzanie systemem (CRUD słowników, ról, departamentów);
   \item \texttt{ROLE\_STUDENT} -- składa wnioski, widzi i edytuje własne (w fazie DRAFT / CORRECTION\_REQUIRED);
@@ -622,7 +622,8 @@ Słownik ról zdefiniowany w migracji \texttt{V2} (osiem ról):
   \item \texttt{ROLE\_LEGAL\_COMMISSION} -- komisja prawno-organizacyjna Rektora, ocena formalno-prawna;
   \item \texttt{ROLE\_DEAN\_OFFICE} -- Dziekanat / CSSDiR, ocena formalna na poziomie wydziału;
   \item \texttt{ROLE\_FINANCE\_OFFICE} -- Kwestura, kontrola finansowa i rozliczenie środków;
-  \item \texttt{ROLE\_STUDENT\_AFFAIRS} -- Centrum Spraw Studenckich i Doktoranckich, koordynacja obiegu między jednostkami.
+  \item \texttt{ROLE\_STUDENT\_AFFAIRS} -- Centrum Spraw Studenckich i Doktoranckich, koordynacja obiegu między jednostkami;
+  \item \texttt{ROLE\_PROVOST} -- Prorektor, wydawanie opinii merytorycznej na etapie oceny formalnej wniosku.
 \end{itemize}
 
 \subsection{Zabezpieczenia formularzy}

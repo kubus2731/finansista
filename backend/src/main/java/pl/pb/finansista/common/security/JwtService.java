@@ -44,7 +44,7 @@ public class JwtService {
     public ResponseCookie generateJwtCookie(String token) {
         return ResponseCookie.from(jwtCookieName, token)
                 .path("/")
-                .maxAge(30)
+                .maxAge(jwtExpiration / 1000)
                 .httpOnly(true)
                 .secure(jwtCookieSecure)
                 .sameSite("Strict")

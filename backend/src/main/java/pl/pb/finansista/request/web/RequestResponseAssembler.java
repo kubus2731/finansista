@@ -39,7 +39,7 @@ public class RequestResponseAssembler {
         String status = request.getStatus().getName();
         boolean isAdmin = roles.contains(RoleName.ROLE_ADMIN.name());
         boolean isAuthor = request.getUser().getExternalId().equals(actorExternalId);
-        boolean isStudentAffairs = roles.contains(RoleName.ROLE_STUDENT_AFFAIRS.name());
+        boolean isProvost = roles.contains(RoleName.ROLE_PROVOST.name());
 
         boolean editable = status.equals(RequestStatusName.DRAFT.name())
                 || status.equals(RequestStatusName.CORRECTION_REQUIRED.name());
@@ -47,7 +47,7 @@ public class RequestResponseAssembler {
         boolean canEdit = (isAdmin || isAuthor) && editable;
         boolean canDelete = isAdmin || (isAuthor && status.equals(RequestStatusName.DRAFT.name()));
         boolean canManageAttachments = (isAdmin || isAuthor) && editable;
-        boolean canRecordProvostOpinion = (isAdmin || isStudentAffairs)
+        boolean canRecordProvostOpinion = (isAdmin || isProvost)
                 && status.equals(RequestStatusName.FORMAL_EVALUATION.name());
 
         boolean underReview = status.equals(RequestStatusName.UNDER_REVIEW.name());
@@ -57,6 +57,7 @@ public class RequestResponseAssembler {
                 && actor.getDepartment().getParent().getId().equals(request.getDepartment().getId());
 
         Predicate<RequestFunding> canGrant = f -> underReview
+                && !f.isGranted()
                 && fundingAuthorization.canGrantSource(roles,
                         FundingSourceName.valueOf(f.getSource().getName()), deanServesFaculty);
 

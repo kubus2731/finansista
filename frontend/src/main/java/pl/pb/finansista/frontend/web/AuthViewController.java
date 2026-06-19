@@ -51,7 +51,11 @@ public class AuthViewController {
                            HttpServletResponse response,
                            Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("errorMessage", "Sprawdź poprawność wprowadzonych danych.");
+            model.addAttribute("errorMessage", "Sprawdź poprawność wprowadzonych danych (np. telefon musi mieć 9 cyfr, hasło minimum 8 znaków).");
+            return "auth/register";
+        }
+        if (!form.rawPassword().equals(form.passwordConfirm())) {
+            model.addAttribute("errorMessage", "Podane hasła nie są identyczne.");
             return "auth/register";
         }
         try {

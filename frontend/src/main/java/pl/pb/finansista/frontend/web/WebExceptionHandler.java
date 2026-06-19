@@ -48,6 +48,18 @@ public class WebExceptionHandler {
         return errorView(HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(org.springframework.web.client.HttpClientErrorException.class)
+    public Object handleHttpClientError(org.springframework.web.client.HttpClientErrorException ex, jakarta.servlet.http.HttpServletResponse response) {
+        if (ex.getStatusCode().value() == 401) {
+            jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("jwt", null);
+            cookie.setMaxAge(0);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            return "redirect:/login?error=expired";
+        }
+        return errorView(org.springframework.http.HttpStatus.valueOf(ex.getStatusCode().value()));
+    }
+
     @ExceptionHandler(Exception.class)
     public ModelAndView handleUnexpected(Exception ex) {
         return errorView(HttpStatus.INTERNAL_SERVER_ERROR);
