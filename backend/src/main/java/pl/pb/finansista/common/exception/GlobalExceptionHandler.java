@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.*;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -15,6 +17,10 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -29,6 +35,24 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if (result != null && result.getBody() instanceof ProblemDetail pd) {
             pd.setProperty("code", codeFor(ex));
             pd.setProperty("traceId", MDC.get("traceId"));
+        }
+
+        return result;
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            @NonNull MethodArgumentNotValidException ex, @NonNull HttpHeaders headers,
+            @NonNull HttpStatusCode status, @NonNull WebRequest request) {
+
+        var result = super.handleMethodArgumentNotValid(ex, headers, status, request);
+        if (result != null && result.getBody() instanceof ProblemDetail pd) {
+            List<Map<String, String>> errors = ex.getBindingResult().getAllErrors().stream()
+                    .map(err -> Map.of(
+                            "field", err instanceof FieldError fe ? fe.getField() : err.getObjectName(),
+                            "message", Objects.requireNonNullElse(err.getDefaultMessage(), "invalid")))
+                    .toList();
+            pd.setProperty("errors", errors);
         }
 
         return result;
