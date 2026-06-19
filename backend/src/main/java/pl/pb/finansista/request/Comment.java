@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 import pl.pb.finansista.common.ExposableCreationAuditedEntity;
 import pl.pb.finansista.user.User;
 
@@ -26,6 +27,7 @@ public class Comment extends ExposableCreationAuditedEntity {
     private String content;
 
     public Comment(Request request, User user, String content) {
+        Assert.hasText(content, "Comment content cannot be blank");
         this.request = request;
         this.user = user;
         this.content = content;

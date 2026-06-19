@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 import pl.pb.finansista.common.BaseEntity;
 import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.user.User;
@@ -45,6 +46,8 @@ public class RequestFunding extends BaseEntity {
     private ZonedDateTime grantedAt;
 
     public RequestFunding(Request request, FundingSource source, BigDecimal amountRequested) {
+        Assert.isTrue(amountRequested == null || amountRequested.signum() >= 0,
+                "Requested funding amount cannot be negative");
         this.request = request;
         this.source = source;
         this.amountRequested = amountRequested;

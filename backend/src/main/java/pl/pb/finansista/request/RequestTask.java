@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 import pl.pb.finansista.common.BaseEntity;
 
 import java.math.BigDecimal;
@@ -32,6 +33,8 @@ public class RequestTask extends BaseEntity {
 
     public RequestTask(Request request, Integer taskNo, String name, LocalDate dateFrom,
                        LocalDate dateTo, BigDecimal plannedCost, String actions) {
+        Assert.isTrue(dateFrom == null || dateTo == null || !dateTo.isBefore(dateFrom),
+                "Task end date cannot be before its start date");
         this.request = request;
         this.taskNo = taskNo;
         this.name = name;

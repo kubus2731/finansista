@@ -1,8 +1,12 @@
 package pl.pb.finansista.request.web;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import pl.pb.finansista.common.web.ExternalIdEncoder;
 import pl.pb.finansista.request.usecase.CostItemData;
 import pl.pb.finansista.request.usecase.CreateRequestCommand;
@@ -17,7 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record CreateRequestRequest(
-        @NotBlank String title,
+        @NotBlank @Size(max = 100) String title,
         @NotBlank String description,
         @NotNull @Positive BigDecimal amount,
         String templateId,
@@ -33,15 +37,15 @@ public record CreateRequestRequest(
         LocalDate plannedDateFrom,
         LocalDate plannedDateTo,
         String location,
-        Integer participantsInvolved,
-        Integer participantsBenefiting,
+        @PositiveOrZero Integer participantsInvolved,
+        @PositiveOrZero Integer participantsBenefiting,
         String supervisorName,
-        String supervisorEmail,
+        @Email String supervisorEmail,
         String supervisorPhone,
         String supervisorDepartment,
-        List<TaskItem> tasks,
-        List<CostItemEntry> costItems,
-        List<FundingEntry> fundings
+        @Valid List<TaskItem> tasks,
+        @Valid List<CostItemEntry> costItems,
+        @Valid List<FundingEntry> fundings
 ) {
     public CreateRequestCommand toCommand(UUID userExternalId) {
         return new CreateRequestCommand(
@@ -77,11 +81,14 @@ public record CreateRequestRequest(
                 .toList();
     }
 
-    public record TaskItem(Integer taskNo, String name, LocalDate dateFrom, LocalDate dateTo,
-                           BigDecimal plannedCost, String actions) {}
+    public record TaskItem(@NotNull Integer taskNo, @NotBlank String name,
+                           @NotNull LocalDate dateFrom, @NotNull LocalDate dateTo,
+                           @NotNull @PositiveOrZero BigDecimal plannedCost, String actions) {}
 
-    public record CostItemEntry(Integer taskNo, String itemName, Integer quantity,
-                                BigDecimal unitCost, String notes) {}
+    public record CostItemEntry(@NotNull Integer taskNo, @NotBlank String itemName,
+                                @NotNull @Positive Integer quantity,
+                                @NotNull @PositiveOrZero BigDecimal unitCost, String notes) {}
 
-    public record FundingEntry(Long fundingSourceId, BigDecimal amountRequested) {}
+    public record FundingEntry(@NotNull Long fundingSourceId,
+                               @NotNull @Positive BigDecimal amountRequested) {}
 }

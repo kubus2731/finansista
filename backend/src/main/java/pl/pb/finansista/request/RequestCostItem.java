@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 import pl.pb.finansista.common.BaseEntity;
 
 import java.math.BigDecimal;
@@ -26,6 +27,8 @@ public class RequestCostItem extends BaseEntity {
 
     public RequestCostItem(Request request, Integer taskNo, String itemName,
                            Integer quantity, BigDecimal unitCost, String notes) {
+        Assert.isTrue(quantity == null || quantity > 0, "Cost item quantity must be positive");
+        Assert.isTrue(unitCost == null || unitCost.signum() >= 0, "Cost item unit cost cannot be negative");
         this.request = request;
         this.taskNo = taskNo;
         this.itemName = itemName;

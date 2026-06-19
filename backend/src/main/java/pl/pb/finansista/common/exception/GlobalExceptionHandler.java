@@ -59,6 +59,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(ex.getHttpStatus()).body(pd);
     }
 
+    // Precondition failures from Assert / entity-constructor guards are deliberate input
+    // rejections, so they map to 400 rather than the catch-all 500.
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ProblemDetail> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Invalid request argument: {}", ex.getMessage());
+
+        var pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        pd.setTitle("Invalid Request");
+        pd.setProperty("code", codeFor(ex));
+        pd.setProperty("traceId", getTraceId());
+
+        return ResponseEntity.badRequest().body(pd);
+    }
+
     @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
     public ResponseEntity<ProblemDetail> handleAccessDeniedException(Exception ex) {
         log.warn("Access denied: {}", ex.getMessage());
