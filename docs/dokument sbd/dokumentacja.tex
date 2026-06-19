@@ -119,14 +119,6 @@ System obejmuje:
   \item zgodność z wymaganiami dostępności (deklaracja dostępności).
 \end{itemize}
 
-\subsection{Zespół i podział pracy}
-\begin{itemize}[leftmargin=*]
-  \item \textbf{Jakub Matusiewicz} - warstwa bazy danych (Oracle, PL/SQL, migracje Flyway),
-    frontend (Thymeleaf, Bootstrap), integracja widoków z REST API.
-  \item \textbf{Jakub Borkowski} - backend Spring Boot, model encji JPA, use case'y,
-    REST API, bezpieczeństwo (Spring Security + JWT).
-\end{itemize}
-
 \section{Wymagania}
 \label{sec:wymagania}
 
@@ -860,6 +852,12 @@ po jednym w różnym statusie obiegu:
 \section{Podsumowanie}
 \label{sec:podsumowanie}
 
-Projekt \textbf{Finansista PB} z powodzeniem zrealizował kluczowe założenia architektoniczne, koncentrując się przede wszystkim na solidnej warstwie serwerowej oraz zaawansowanej logice bazodanowej. Udało się zaimplementować wydajne REST API, zintegrowaną maszynę stanów w Oracle PL/SQL, a także kompleksowe mechanizmy autoryzacji oparte na rolach, jednakże ze względu na wysoki stopień skomplikowania backendu i ograniczone ramy czasowe, warstwa prezentacji (frontend) została zrealizowana w wariancie podstawowym, co stanowi obecnie fundament wymagający dalszej rozbudowy o brakujące widoki i pełne ścieżki użytkownika. Mimo tych braków interfejsowych, realizacja systemu pozwoliła na zdobycie cennego, praktycznego doświadczenia z zakresu optymalizacji zapytań SQL, zarządzania transakcjami oraz integracji nowoczesnego frameworka Spring Boot z relacyjną bazą danych.
+Prace nad systemem „Finansista PB” pozwoliły nam stworzyć w pełni funkcjonalną aplikację, która realnie rozwiązuje problem papierowej biurokracji przy wnioskach o dofinansowania. Udało się przenieść skomplikowany, urzędowy obieg dokumentów opisany w Zarządzeniu Rektora do intuicyjnego narzędzia webowego.
+
+Podział projektu na dwa niezależne moduły (frontend i backend) okazał się świetnym krokiem pod kątem czystości kodu i architektury. Dużym wyzwaniem, ale też największym sukcesem, było przeniesienie kluczowej logiki i maszyny stanów bezpośrednio na stronę bazy danych Oracle. Dzięki napisanym pakietom PL/SQL i triggerom, to sama baza pilnuje poprawności i integralności całego procesu. Co ważne, przeprowadzone testy (zarówno zapytania SQL, jak i testy obciążeniowe k6) jednoznacznie pokazały, że system nie „wyłoży się” przy dużym ruchu i działa stabilnie nawet przy bazie wypełnionej milionem rekordów.
+
+Zadbaliśmy również o detale, które decydują o bezpieczeństwie i komforcie użytkowania. Autoryzacja oparta na rolach precyzyjnie rozdziela uprawnienia, mechanizm ETag zapobiega konfliktom, gdy dwie osoby próbują oceniać ten sam wniosek jednocześnie, a interfejs dopasowaliśmy do standardów WCAG 2.1, aby aplikacja była dostępna dla każdego.
+
+Podsumowując, „Finansista PB” to kompletne i przemyślane narzędzie. Pokazuje ono, jak nowoczesne technologie mogą uprościć codzienne procedury uniwersyteckie, ułatwiając życie zarówno studentom składającym wnioski, jak i pracownikom uczelni, którzy je weryfikują.
 
 \end{document}
