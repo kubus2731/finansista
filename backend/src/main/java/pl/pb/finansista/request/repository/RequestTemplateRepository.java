@@ -1,20 +1,19 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.RequestTemplate;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import pl.pb.finansista.request.RequestTemplate;
 
 public interface RequestTemplateRepository {
 
-    Optional<RequestTemplate> findByExternalId(UUID externalId);
+  Optional<RequestTemplate> findByExternalId(UUID externalId);
 
-    List<RequestTemplate> findActiveTemplates();
+  List<RequestTemplate> findActiveTemplates();
 
-    List<RequestTemplate> findAll();
+  List<RequestTemplate> findAll();
 
-    RequestTemplate save(RequestTemplate requestTemplate);
+  RequestTemplate save(RequestTemplate requestTemplate);
 
-    void delete(RequestTemplate requestTemplate);
+  void delete(RequestTemplate requestTemplate);
 }

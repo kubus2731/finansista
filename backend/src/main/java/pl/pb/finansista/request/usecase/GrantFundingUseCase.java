@@ -21,40 +21,47 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class GrantFundingUseCase {
 
-    private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecFactory;
-    private final RequestFundingAuthorization fundingAuthorization;
+  private final RequestRepository requestRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecFactory;
+  private final RequestFundingAuthorization fundingAuthorization;
 
-    @Transactional
-    public void execute(GrantFundingCommand command) {
-        User actor = userRepository.findByExternalId(command.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional
+  public void execute(GrantFundingCommand command) {
+    User actor =
+        userRepository
+            .findByExternalId(command.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = Specification.allOf(
-                RequestSpecifications.hasExternalId(command.requestExternalId()),
-                accessSpecFactory.createForUser(actor, command.userAuthorities())
-        );
+    Specification<Request> spec =
+        Specification.allOf(
+            RequestSpecifications.hasExternalId(command.requestExternalId()),
+            accessSpecFactory.createForUser(actor, command.userAuthorities()));
 
-        Request request = requestRepository.findOne(spec)
-                .orElseThrow(RequestNotFoundException::new);
+    Request request = requestRepository.findOne(spec).orElseThrow(RequestNotFoundException::new);
 
-        if (!request.getStatus().getName().equals(RequestStatusName.UNDER_REVIEW.name())) {
-            throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
-        }
-
-        RequestFunding row = request.fundingFor(command.fundingSourceId())
-                .orElseThrow(RequestFundingNotFoundException::new);
-
-        boolean deanServesFaculty = actor.getDepartment() != null
-                && actor.getDepartment().getParent() != null
-                && actor.getDepartment().getParent().getId().equals(request.getDepartment().getId());
-        if (!fundingAuthorization.canGrantSource(command.userAuthorities(),
-                FundingSourceName.valueOf(row.getSource().getName()), deanServesFaculty)) {
-            throw UnauthorizedRequestAccessException.forAction("grant funding from " + row.getSource().getName());
-        }
-
-        row.grant(command.amountGranted(), actor);
-        requestRepository.save(request);
+    if (!request.getStatus().getName().equals(RequestStatusName.UNDER_REVIEW.name())) {
+      throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
     }
+
+    RequestFunding row =
+        request
+            .fundingFor(command.fundingSourceId())
+            .orElseThrow(RequestFundingNotFoundException::new);
+
+    boolean deanServesFaculty =
+        actor.getDepartment() != null
+            && actor.getDepartment().getParent() != null
+            && actor.getDepartment().getParent().getId().equals(request.getDepartment().getId());
+    if (!fundingAuthorization.canGrantSource(
+        command.userAuthorities(),
+        FundingSourceName.valueOf(row.getSource().getName()),
+        deanServesFaculty)) {
+      throw UnauthorizedRequestAccessException.forAction(
+          "grant funding from " + row.getSource().getName());
+    }
+
+    row.grant(command.amountGranted(), actor);
+    requestRepository.save(request);
+  }
 }

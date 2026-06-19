@@ -22,45 +22,51 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class ChangeRequestStatusUseCase {
 
-    private final RequestRepository requestRepository;
-    private final RequestStatusRepository requestStatusRepository;
-    private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecFactory;
-    private final RequestTransitionValidator transitionValidator;
+  private final RequestRepository requestRepository;
+  private final RequestStatusRepository requestStatusRepository;
+  private final CommentRepository commentRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecFactory;
+  private final RequestTransitionValidator transitionValidator;
 
-    @Transactional
-    public void execute(ChangeRequestStatusCommand command) {
-        User actor = userRepository.findByExternalId(command.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional
+  public void execute(ChangeRequestStatusCommand command) {
+    User actor =
+        userRepository
+            .findByExternalId(command.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = Specification.allOf(
-                RequestSpecifications.hasExternalId(command.externalId()),
-                accessSpecFactory.createForUser(actor, command.userAuthorities())
-        );
+    Specification<Request> spec =
+        Specification.allOf(
+            RequestSpecifications.hasExternalId(command.externalId()),
+            accessSpecFactory.createForUser(actor, command.userAuthorities()));
 
-        Request request = requestRepository.findOne(spec)
-                .orElseThrow(RequestNotFoundException::new);
+    Request request = requestRepository.findOne(spec).orElseThrow(RequestNotFoundException::new);
 
-        request.assertVersion(command.version());
+    request.assertVersion(command.version());
 
-        RequestStatus newStatus = requestStatusRepository.findByName(command.newStatusName())
-                .orElseThrow(() -> InvalidRequestStateException.withStatusName(command.newStatusName()));
+    RequestStatus newStatus =
+        requestStatusRepository
+            .findByName(command.newStatusName())
+            .orElseThrow(
+                () -> InvalidRequestStateException.withStatusName(command.newStatusName()));
 
-        if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name()) && request.getFundings().isEmpty()) {
-            throw new MissingFundingSourceException();
-        }
-
-        transitionValidator.validateTransition(request, actor, command.userAuthorities(), RequestStatusName.valueOf(newStatus.getName()));
-
-        requestRepository.setActor(actor.getId());
-
-        request.changeStatus(newStatus);
-        requestRepository.save(request);
-
-        if (command.description() != null && !command.description().isBlank()) {
-            Comment comment = new Comment(request, actor, command.description());
-            commentRepository.save(comment);
-        }
+    if (newStatus.getName().equals(RequestStatusName.SUBMITTED.name())
+        && request.getFundings().isEmpty()) {
+      throw new MissingFundingSourceException();
     }
+
+    transitionValidator.validateTransition(
+        request, actor, command.userAuthorities(), RequestStatusName.valueOf(newStatus.getName()));
+
+    requestRepository.setActor(actor.getId());
+
+    request.changeStatus(newStatus);
+    requestRepository.save(request);
+
+    if (command.description() != null && !command.description().isBlank()) {
+      Comment comment = new Comment(request, actor, command.description());
+      commentRepository.save(comment);
+    }
+  }
 }

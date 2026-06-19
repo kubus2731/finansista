@@ -15,14 +15,13 @@ import pl.pb.finansista.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CostCategory extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String name;
+  @Column(nullable = false, unique = true, length = 50)
+  private String name;
 
-    @Lob
-    private String description;
+  @Lob private String description;
 
-    public CostCategory(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+  public CostCategory(String name, String description) {
+    this.name = name;
+    this.description = description;
+  }
 }

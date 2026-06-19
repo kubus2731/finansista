@@ -70,4 +70,32 @@ public class WebExceptionHandler {
         modelAndView.setStatus(status);
         return modelAndView;
     }
+    return "redirect:/requests";
+  }
+
+  @ExceptionHandler(BusinessException.class)
+  public ModelAndView handleBusiness(BusinessException ex) {
+    return errorView(ex.getHttpStatus());
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ModelAndView handleAccessDenied(AccessDeniedException ex) {
+    return errorView(HttpStatus.FORBIDDEN);
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ModelAndView handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+    return errorView(HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(Exception.class)
+  public ModelAndView handleUnexpected(Exception ex) {
+    return errorView(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+
+  private ModelAndView errorView(HttpStatus status) {
+    ModelAndView modelAndView = new ModelAndView("error/" + status.value());
+    modelAndView.setStatus(status);
+    return modelAndView;
+  }
 }

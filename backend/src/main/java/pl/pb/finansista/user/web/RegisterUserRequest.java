@@ -8,7 +8,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import pl.pb.finansista.user.usecase.RegisterUserCommand;
 
-
 public record RegisterUserRequest(
         @NotBlank
         String name,

@@ -1,17 +1,16 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.Comment;
-
 import java.util.List;
 import java.util.Optional;
+import pl.pb.finansista.request.Comment;
 
 public interface CommentRepository {
 
-    Optional<Comment> findById(Long id);
+  Optional<Comment> findById(Long id);
 
-    Comment save(Comment comment);
+  Comment save(Comment comment);
 
-    List<Comment> findByRequestId(Long requestId);
+  List<Comment> findByRequestId(Long requestId);
 
-    void deleteById(Long id);
+  void deleteById(Long id);
 }

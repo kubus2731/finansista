@@ -5,7 +5,7 @@ import pl.pb.finansista.common.exception.BusinessException;
 
 public class FundingSourceNotFoundException extends BusinessException {
 
-    public FundingSourceNotFoundException() {
-        super("Funding Source not found.", HttpStatus.NOT_FOUND);
-    }
+  public FundingSourceNotFoundException() {
+    super("Funding Source not found.", HttpStatus.NOT_FOUND);
+  }
 }

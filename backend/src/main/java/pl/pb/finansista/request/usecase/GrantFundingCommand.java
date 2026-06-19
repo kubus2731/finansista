@@ -5,10 +5,8 @@ import java.util.Collection;
 import java.util.UUID;
 
 public record GrantFundingCommand(
-        UUID requestExternalId,
-        Long fundingSourceId,
-        BigDecimal amountGranted,
-        UUID userExternalId,
-        Collection<String> userAuthorities
-) {
-}
+    UUID requestExternalId,
+    Long fundingSourceId,
+    BigDecimal amountGranted,
+    UUID userExternalId,
+    Collection<String> userAuthorities) {}

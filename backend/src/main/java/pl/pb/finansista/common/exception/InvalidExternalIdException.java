@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class InvalidExternalIdException extends BusinessException {
 
-    public InvalidExternalIdException() {
-        super("Invalid identifier format.", HttpStatus.BAD_REQUEST);
-    }
+  public InvalidExternalIdException() {
+    super("Invalid identifier format.", HttpStatus.BAD_REQUEST);
+  }
 }

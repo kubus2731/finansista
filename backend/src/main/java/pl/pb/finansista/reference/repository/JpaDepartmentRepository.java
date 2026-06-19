@@ -1,42 +1,41 @@
 package pl.pb.finansista.reference.repository;
 
-import org.springframework.stereotype.Repository;
-import pl.pb.finansista.reference.Department;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
+import pl.pb.finansista.reference.Department;
 
 @Repository
 class JpaDepartmentRepository implements DepartmentRepository {
 
-    private final SpringDataJpaDepartmentRepository repository;
+  private final SpringDataJpaDepartmentRepository repository;
 
-    public JpaDepartmentRepository(SpringDataJpaDepartmentRepository repository) {
-        this.repository = repository;
-    }
+  public JpaDepartmentRepository(SpringDataJpaDepartmentRepository repository) {
+    this.repository = repository;
+  }
 
-    @Override
-    public Optional<Department> findById(Long id) {
-        return repository.findById(id);
-    }
+  @Override
+  public Optional<Department> findById(Long id) {
+    return repository.findById(id);
+  }
 
-    @Override
-    public Department save(Department department) {
-        return repository.save(department);
-    }
+  @Override
+  public Department save(Department department) {
+    return repository.save(department);
+  }
 
-    @Override
-    public List<Department> findAll() {
-        return repository.findAll();
-    }
+  @Override
+  public List<Department> findAll() {
+    return repository.findAll();
+  }
 
-    @Override
-    public void delete(Department department) {
-        repository.delete(department);
-    }
+  @Override
+  public void delete(Department department) {
+    repository.delete(department);
+  }
 
-    @Override
-    public boolean existsByName(String name) {
-        return repository.existsByName(name);
-    }
+  @Override
+  public boolean existsByName(String name) {
+    return repository.existsByName(name);
+  }
 }

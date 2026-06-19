@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
+import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,25 +12,23 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
-import java.time.ZonedDateTime;
-
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ModificationAuditedEntity extends CreationAuditedEntity {
 
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private ZonedDateTime updatedAt;
+  @LastModifiedDate
+  @Column(name = "updated_at", nullable = false)
+  private ZonedDateTime updatedAt;
 
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version = 0L;
+  @Version
+  @Column(name = "version", nullable = false)
+  private Long version = 0L;
 
-    public void assertVersion(Long expectedVersion) {
-        if (!version.equals(expectedVersion)) {
-            throw new ObjectOptimisticLockingFailureException(getClass(), getId());
-        }
+  public void assertVersion(Long expectedVersion) {
+    if (!version.equals(expectedVersion)) {
+      throw new ObjectOptimisticLockingFailureException(getClass(), getId());
     }
+  }
 }

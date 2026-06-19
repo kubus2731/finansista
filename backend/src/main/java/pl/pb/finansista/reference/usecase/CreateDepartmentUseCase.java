@@ -11,13 +11,13 @@ import pl.pb.finansista.reference.repository.DepartmentRepository;
 @RequiredArgsConstructor
 public class CreateDepartmentUseCase {
 
-    private final DepartmentRepository departmentRepository;
+  private final DepartmentRepository departmentRepository;
 
-    @Transactional
-    public Department execute(String name) {
-        if (departmentRepository.existsByName(name)) {
-            throw new DepartmentAlreadyExistsException(name);
-        }
-        return departmentRepository.save(new Department(name));
+  @Transactional
+  public Department execute(String name) {
+    if (departmentRepository.existsByName(name)) {
+      throw new DepartmentAlreadyExistsException(name);
     }
+    return departmentRepository.save(new Department(name));
+  }
 }

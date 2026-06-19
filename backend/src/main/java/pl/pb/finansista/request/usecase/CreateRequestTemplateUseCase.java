@@ -10,11 +10,11 @@ import pl.pb.finansista.request.repository.RequestTemplateRepository;
 @RequiredArgsConstructor
 public class CreateRequestTemplateUseCase {
 
-    private final RequestTemplateRepository requestTemplateRepository;
+  private final RequestTemplateRepository requestTemplateRepository;
 
-    @Transactional
-    public RequestTemplate execute(String title, String description) {
-        RequestTemplate template = new RequestTemplate(title, description);
-        return requestTemplateRepository.save(template);
-    }
+  @Transactional
+  public RequestTemplate execute(String title, String description) {
+    RequestTemplate template = new RequestTemplate(title, description);
+    return requestTemplateRepository.save(template);
+  }
 }
