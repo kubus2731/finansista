@@ -1,8 +1,7 @@
 package pl.pb.finansista.request.web;
 
-import pl.pb.finansista.request.DepartmentRequestsSummary;
-
 import java.math.BigDecimal;
+import pl.pb.finansista.request.DepartmentRequestsSummary;
 
 public record DepartmentRequestsSummaryResponse(
     Long departmentId,

@@ -1,9 +1,8 @@
 package pl.pb.finansista.request.web;
 
+import java.time.ZonedDateTime;
 import pl.pb.finansista.common.web.ExternalIdEncoder;
 import pl.pb.finansista.request.Comment;
-
-import java.time.ZonedDateTime;
 
 public record CommentResponse(
     String id, String content, String userFullName, String userEmail, ZonedDateTime createdAt) {

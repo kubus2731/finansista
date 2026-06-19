@@ -1,8 +1,7 @@
 package pl.pb.finansista.request.web;
 
-import pl.pb.finansista.request.ActivityLog;
-
 import java.time.ZonedDateTime;
+import pl.pb.finansista.request.ActivityLog;
 
 public record ActivityLogResponse(
     String newStatus,

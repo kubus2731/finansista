@@ -12,24 +12,24 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class LoginUserUseCase {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    @Transactional(readOnly = true)
-    public User execute(LoginUserCommand command) {
-        User user = userRepository.findByEmail(command.email())
-                .orElseThrow(InvalidCredentialsException::new);
+  @Transactional(readOnly = true)
+  public User execute(LoginUserCommand command) {
+    User user =
+        userRepository.findByEmail(command.email()).orElseThrow(InvalidCredentialsException::new);
 
-        if (!passwordEncoder.matches(command.password(), user.getPassword())) {
-            throw new InvalidCredentialsException();
-        }
-
-        // Konto dezaktywowane (soft delete) - traktujemy jak błędne dane logowania,
-        // żeby nie ujawniać, czy konto o danym e-mailu istnieje.
-        if (!user.isActive()) {
-            throw new InvalidCredentialsException();
-        }
-
-        return user;
+    if (!passwordEncoder.matches(command.password(), user.getPassword())) {
+      throw new InvalidCredentialsException();
     }
+
+    // Konto dezaktywowane (soft delete) - traktujemy jak błędne dane logowania,
+    // żeby nie ujawniać, czy konto o danym e-mailu istnieje.
+    if (!user.isActive()) {
+      throw new InvalidCredentialsException();
+    }
+
+    return user;
+  }
 }

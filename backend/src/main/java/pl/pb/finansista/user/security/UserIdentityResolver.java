@@ -1,14 +1,13 @@
 package pl.pb.finansista.user.security;
 
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.common.security.Identity;
 import pl.pb.finansista.common.security.IdentityResolver;
 import pl.pb.finansista.user.repository.UserRepository;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor

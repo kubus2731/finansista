@@ -21,34 +21,37 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class GetAttachmentContentUseCase {
 
-    private final AttachmentRepository attachmentRepository;
-    private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecFactory;
-    private final FileStorage fileStorage;
+  private final AttachmentRepository attachmentRepository;
+  private final RequestRepository requestRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecFactory;
+  private final FileStorage fileStorage;
 
-    @Transactional(readOnly = true)
-    public AttachmentDownload execute(GetSingleRequestQuery query, UUID attachmentExternalId) {
-        User user = userRepository.findByExternalId(query.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional(readOnly = true)
+  public AttachmentDownload execute(GetSingleRequestQuery query, UUID attachmentExternalId) {
+    User user =
+        userRepository
+            .findByExternalId(query.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = Specification.allOf(
-                RequestSpecifications.hasExternalId(query.externalId()),
-                accessSpecFactory.createForUser(user, query.userAuthorities())
-        );
+    Specification<Request> spec =
+        Specification.allOf(
+            RequestSpecifications.hasExternalId(query.externalId()),
+            accessSpecFactory.createForUser(user, query.userAuthorities()));
 
-        Request request = requestRepository.findOne(spec)
-                .orElseThrow(RequestNotFoundException::new);
+    Request request = requestRepository.findOne(spec).orElseThrow(RequestNotFoundException::new);
 
-        Attachment attachment = attachmentRepository.findByExternalId(attachmentExternalId)
-                .orElseThrow(AttachmentNotFoundException::new);
+    Attachment attachment =
+        attachmentRepository
+            .findByExternalId(attachmentExternalId)
+            .orElseThrow(AttachmentNotFoundException::new);
 
-        if (!attachment.getRequest().getId().equals(request.getId())) {
-            throw new AttachmentNotFoundException();
-        }
-
-        Resource content = fileStorage.load(attachment.getStorageKey());
-        return new AttachmentDownload(
-                attachment.getFileName(), attachment.getContentType(), attachment.getSizeBytes(), content);
+    if (!attachment.getRequest().getId().equals(request.getId())) {
+      throw new AttachmentNotFoundException();
     }
+
+    Resource content = fileStorage.load(attachment.getStorageKey());
+    return new AttachmentDownload(
+        attachment.getFileName(), attachment.getContentType(), attachment.getSizeBytes(), content);
+  }
 }

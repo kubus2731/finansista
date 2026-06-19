@@ -18,48 +18,36 @@ import pl.pb.finansista.user.usecase.GetAllRolesUseCase;
 @Slf4j
 public class RoleController {
 
-    private final GetAllRolesUseCase getAllRolesUseCase;
-    private final CreateRoleUseCase createRoleUseCase;
-    private final DeleteRoleUseCase deleteRoleUseCase;
-    private final EditRoleUseCase editRoleUseCase;
+  private final GetAllRolesUseCase getAllRolesUseCase;
+  private final CreateRoleUseCase createRoleUseCase;
+  private final DeleteRoleUseCase deleteRoleUseCase;
+  private final EditRoleUseCase editRoleUseCase;
 
-    @GetMapping
-    public ResponseEntity<List<RoleResponse>> getRoles() {
-        return ResponseEntity.ok(
-                getAllRolesUseCase.execute().stream()
-                        .map(RoleResponse::of)
-                        .toList()
-        );
-    }
+  @GetMapping
+  public ResponseEntity<List<RoleResponse>> getRoles() {
+    return ResponseEntity.ok(getAllRolesUseCase.execute().stream().map(RoleResponse::of).toList());
+  }
 
-    @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RoleResponse> createRole(
-            @Valid @RequestBody RoleRequest request
-    ) {
-        log.info("Admin user is creating role: {}", request.name());
-        return ResponseEntity.ok(
-                RoleResponse.of(createRoleUseCase.execute(request.name()))
-        );
-    }
+  @PostMapping
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  public ResponseEntity<RoleResponse> createRole(@Valid @RequestBody RoleRequest request) {
+    log.info("Admin user is creating role: {}", request.name());
+    return ResponseEntity.ok(RoleResponse.of(createRoleUseCase.execute(request.name())));
+  }
 
-    @DeleteMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
-        log.info("Admin user is deleting role ID: {}", id);
-        deleteRoleUseCase.execute(id);
-        return ResponseEntity.noContent().build();
-    }
+  @DeleteMapping("{id}")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
+    log.info("Admin user is deleting role ID: {}", id);
+    deleteRoleUseCase.execute(id);
+    return ResponseEntity.noContent().build();
+  }
 
-    @PutMapping("{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<RoleResponse> editRole(
-            @PathVariable Long id,
-            @Valid @RequestBody RoleRequest request
-    ) {
-        log.info("Admin user is editing role ID: {}", id);
-        return ResponseEntity.ok(
-                RoleResponse.of(editRoleUseCase.execute(id, request.name()))
-        );
-    }
+  @PutMapping("{id}")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+  public ResponseEntity<RoleResponse> editRole(
+      @PathVariable Long id, @Valid @RequestBody RoleRequest request) {
+    log.info("Admin user is editing role ID: {}", id);
+    return ResponseEntity.ok(RoleResponse.of(editRoleUseCase.execute(id, request.name())));
+  }
 }

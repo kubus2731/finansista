@@ -1,6 +1,8 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +10,6 @@ import org.springframework.util.Assert;
 import pl.pb.finansista.common.BaseEntity;
 import pl.pb.finansista.reference.FundingSource;
 import pl.pb.finansista.user.User;
-
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 
 /**
  * Załącznik 1, sekcja VI: jeden wiersz tabeli źródeł finansowania. Kwotę wnioskowaną wypełnia

@@ -12,12 +12,14 @@ import pl.pb.finansista.request.repository.RequestTemplateRepository;
 @RequiredArgsConstructor
 public class DeleteRequestTemplateUseCase {
 
-    private final RequestTemplateRepository requestTemplateRepository;
+  private final RequestTemplateRepository requestTemplateRepository;
 
-    @Transactional
-    public void execute(UUID id) {
-        RequestTemplate template = requestTemplateRepository.findByExternalId(id)
-                .orElseThrow(RequestTemplateNotFoundException::new);
-        requestTemplateRepository.delete(template);
-    }
+  @Transactional
+  public void execute(UUID id) {
+    RequestTemplate template =
+        requestTemplateRepository
+            .findByExternalId(id)
+            .orElseThrow(RequestTemplateNotFoundException::new);
+    requestTemplateRepository.delete(template);
+  }
 }

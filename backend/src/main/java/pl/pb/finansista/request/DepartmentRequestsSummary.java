@@ -16,15 +16,13 @@ import org.hibernate.annotations.Immutable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DepartmentRequestsSummary {
 
-    @Id
-    private Long id;
+  @Id private Long id;
 
-    private String departmentName;
-    private Long totalRequestsCount;
-    private BigDecimal totalRequestsAmount;
-    private Long acceptedRequestsCount;
-    private BigDecimal acceptedRequestsAmount;
-    private Long rejectedRequestsCount;
-    private BigDecimal rejectedRequestsAmount;
-
+  private String departmentName;
+  private Long totalRequestsCount;
+  private BigDecimal totalRequestsAmount;
+  private Long acceptedRequestsCount;
+  private BigDecimal acceptedRequestsAmount;
+  private Long rejectedRequestsCount;
+  private BigDecimal rejectedRequestsAmount;
 }

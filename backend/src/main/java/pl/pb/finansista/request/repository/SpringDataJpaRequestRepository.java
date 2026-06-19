@@ -12,14 +12,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.query.Procedure;
 import pl.pb.finansista.request.Request;
 
-interface SpringDataJpaRequestRepository extends JpaRepository<Request, Long>, JpaSpecificationExecutor<Request> {
+interface SpringDataJpaRequestRepository
+    extends JpaRepository<Request, Long>, JpaSpecificationExecutor<Request> {
 
-    @Procedure(procedureName = "finansista_pkg.set_actor")
-    void setActor(Long userId);
+  @Procedure(procedureName = "finansista_pkg.set_actor")
+  void setActor(Long userId);
 
-    @NonNull
-    @EntityGraph(attributePaths = {"status", "department", "costCategory", "template"})
-    List<Request> findAll(@Nullable Specification<Request> spec);
+  @NonNull
+  @EntityGraph(attributePaths = {"status", "department", "costCategory", "template"})
+  List<Request> findAll(@Nullable Specification<Request> spec);
 
-    Optional<Request> findByExternalId(UUID externalId);
+  Optional<Request> findByExternalId(UUID externalId);
 }

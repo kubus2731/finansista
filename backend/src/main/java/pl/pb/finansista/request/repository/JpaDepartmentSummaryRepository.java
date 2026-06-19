@@ -1,10 +1,9 @@
 package pl.pb.finansista.request.repository;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import pl.pb.finansista.request.DepartmentRequestsSummary;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor

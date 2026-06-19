@@ -1,8 +1,7 @@
 package pl.pb.finansista.request.usecase;
 
-import pl.pb.finansista.request.ProjectDetails;
-
 import java.time.LocalDate;
+import pl.pb.finansista.request.ProjectDetails;
 
 public record ProjectDetailsData(
     String realizerType,

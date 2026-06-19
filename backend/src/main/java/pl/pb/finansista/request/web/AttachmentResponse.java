@@ -1,9 +1,8 @@
 package pl.pb.finansista.request.web;
 
+import java.time.ZonedDateTime;
 import pl.pb.finansista.common.web.ExternalIdEncoder;
 import pl.pb.finansista.request.Attachment;
-
-import java.time.ZonedDateTime;
 
 public record AttachmentResponse(
     String id, String fileName, String contentType, long sizeBytes, ZonedDateTime createdAt) {

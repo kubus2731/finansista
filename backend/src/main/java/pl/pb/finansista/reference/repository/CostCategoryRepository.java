@@ -6,9 +6,9 @@ import pl.pb.finansista.reference.CostCategory;
 
 public interface CostCategoryRepository {
 
-    Optional<CostCategory> findById(Long id);
+  Optional<CostCategory> findById(Long id);
 
-    CostCategory save(CostCategory costCategory);
+  CostCategory save(CostCategory costCategory);
 
-    List<CostCategory> findAll();
+  List<CostCategory> findAll();
 }

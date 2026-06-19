@@ -1,11 +1,9 @@
 package pl.pb.finansista.user.repository;
 
-import org.springframework.stereotype.Repository;
-import pl.pb.finansista.user.Role;
-
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import org.springframework.stereotype.Repository;
+import pl.pb.finansista.user.Role;
 
 @Repository
 class JpaRoleRepository implements RoleRepository {

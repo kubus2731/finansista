@@ -11,10 +11,10 @@ import pl.pb.finansista.request.repository.RequestTemplateRepository;
 @RequiredArgsConstructor
 public class GetAllRequestTemplatesUseCase {
 
-    private final RequestTemplateRepository requestTemplateRepository;
+  private final RequestTemplateRepository requestTemplateRepository;
 
-    @Transactional(readOnly = true)
-    public List<RequestTemplate> execute() {
-        return requestTemplateRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<RequestTemplate> execute() {
+    return requestTemplateRepository.findAll();
+  }
 }

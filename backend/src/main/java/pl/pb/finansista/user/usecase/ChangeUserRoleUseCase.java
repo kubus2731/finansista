@@ -14,18 +14,20 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class ChangeUserRoleUseCase {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+  private final UserRepository userRepository;
+  private final RoleRepository roleRepository;
 
-    @Transactional
-    public void execute(ChangeUserRoleCommand command) {
-        User user = userRepository.findByExternalId(command.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional
+  public void execute(ChangeUserRoleCommand command) {
+    User user =
+        userRepository
+            .findByExternalId(command.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Role newRole = roleRepository.findById(command.newRoleId())
-                .orElseThrow(RoleNotFoundException::new);
+    Role newRole =
+        roleRepository.findById(command.newRoleId()).orElseThrow(RoleNotFoundException::new);
 
-        user.changeRole(newRole);
-        userRepository.save(user);
-    }
+    user.changeRole(newRole);
+    userRepository.save(user);
+  }
 }

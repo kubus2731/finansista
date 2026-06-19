@@ -1,11 +1,10 @@
 package pl.pb.finansista.request;
 
 import jakarta.persistence.Embeddable;
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 /** Załącznik 1, sekcja I: dane przedsięwzięcia. */
 @Embeddable

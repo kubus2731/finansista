@@ -1,16 +1,14 @@
 package pl.pb.finansista.user;
 
 import jakarta.persistence.*;
+import java.util.Arrays;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import pl.pb.finansista.common.BaseEntity;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Entity
 @Table(name = "roles")

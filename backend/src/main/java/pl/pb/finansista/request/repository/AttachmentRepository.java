@@ -1,10 +1,9 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.Attachment;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import pl.pb.finansista.request.Attachment;
 
 public interface AttachmentRepository {
 

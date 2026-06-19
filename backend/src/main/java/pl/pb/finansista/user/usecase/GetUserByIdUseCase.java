@@ -1,13 +1,12 @@
 package pl.pb.finansista.user.usecase;
 
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.user.User;
 import pl.pb.finansista.user.exception.UserNotFoundException;
 import pl.pb.finansista.user.repository.UserRepository;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor

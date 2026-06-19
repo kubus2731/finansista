@@ -1,12 +1,11 @@
 package pl.pb.finansista.user.usecase;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.pb.finansista.user.Role;
 import pl.pb.finansista.user.repository.RoleRepository;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CreationAuditedEntity extends BaseEntity {
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false)
-    private ZonedDateTime createdAt;
+  @CreatedDate
+  @Column(name = "created_at", nullable = false)
+  private ZonedDateTime createdAt;
 }

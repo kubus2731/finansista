@@ -2,12 +2,11 @@ package pl.pb.finansista.request.usecase;
 
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.data.jpa.domain.Specification;
 import pl.pb.finansista.request.Request;
 import pl.pb.finansista.request.RequestFunding;
-
-import java.util.List;
-import java.util.UUID;
 
 public class RequestSpecifications {
 

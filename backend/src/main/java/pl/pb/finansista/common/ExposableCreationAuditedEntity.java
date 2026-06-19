@@ -11,9 +11,8 @@ import org.hibernate.annotations.UuidGenerator;
 @Getter
 public abstract class ExposableCreationAuditedEntity extends CreationAuditedEntity {
 
-    @NaturalId
-    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
-    @Column(name = "external_id", updatable = false, nullable = false, unique = true)
-    private UUID externalId;
-
+  @NaturalId
+  @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+  @Column(name = "external_id", updatable = false, nullable = false, unique = true)
+  private UUID externalId;
 }

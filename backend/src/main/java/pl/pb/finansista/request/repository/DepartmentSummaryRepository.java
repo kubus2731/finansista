@@ -1,8 +1,7 @@
 package pl.pb.finansista.request.repository;
 
-import pl.pb.finansista.request.DepartmentRequestsSummary;
-
 import java.util.List;
+import pl.pb.finansista.request.DepartmentRequestsSummary;
 
 public interface DepartmentSummaryRepository {
 

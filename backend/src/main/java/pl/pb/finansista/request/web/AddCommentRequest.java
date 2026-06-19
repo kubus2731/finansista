@@ -5,15 +5,9 @@ import java.util.List;
 import java.util.UUID;
 import pl.pb.finansista.request.usecase.AddCommentCommand;
 
-public record AddCommentRequest(
-        @NotBlank String content
-) {
-    public AddCommentCommand toCommand(UUID requestExternalId, UUID userExternalId, List<String> userAuthorities) {
-        return new AddCommentCommand(
-                requestExternalId,
-                userExternalId,
-                content,
-                userAuthorities
-        );
-    }
+public record AddCommentRequest(@NotBlank String content) {
+  public AddCommentCommand toCommand(
+      UUID requestExternalId, UUID userExternalId, List<String> userAuthorities) {
+    return new AddCommentCommand(requestExternalId, userExternalId, content, userAuthorities);
+  }
 }

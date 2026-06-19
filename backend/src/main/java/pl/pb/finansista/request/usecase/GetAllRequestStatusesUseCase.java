@@ -11,10 +11,10 @@ import pl.pb.finansista.request.repository.RequestStatusRepository;
 @RequiredArgsConstructor
 public class GetAllRequestStatusesUseCase {
 
-    private final RequestStatusRepository requestStatusRepository;
+  private final RequestStatusRepository requestStatusRepository;
 
-    @Transactional(readOnly = true)
-    public List<RequestStatus> execute() {
-        return requestStatusRepository.findAll();
-    }
+  @Transactional(readOnly = true)
+  public List<RequestStatus> execute() {
+    return requestStatusRepository.findAll();
+  }
 }

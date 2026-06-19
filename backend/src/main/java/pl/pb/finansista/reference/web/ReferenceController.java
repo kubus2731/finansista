@@ -1,14 +1,13 @@
 package pl.pb.finansista.reference.web;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.pb.finansista.reference.usecase.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reference")

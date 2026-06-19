@@ -25,112 +25,129 @@ import pl.pb.finansista.frontend.viewmodel.RoleResponse;
 import pl.pb.finansista.frontend.viewmodel.UserResponse;
 
 /**
- * Panel administratora - zarządzanie użytkownikami (zmiana roli i działu).
- * Cała komunikacja idzie przez REST backendu. Dostęp ograniczony do ROLE_ADMIN
- * na poziomie metody (EnableMethodSecurity), niezależnie od backendowego
- * @PreAuthorize - dzięki temu nie-admin dostaje stronę 403 zamiast błędu 500
- * z odrzuconego wywołania REST.
+ * Panel administratora - zarządzanie użytkownikami (zmiana roli i działu). Cała komunikacja idzie
+ * przez REST backendu. Dostęp ograniczony do ROLE_ADMIN na poziomie metody (EnableMethodSecurity),
+ * niezależnie od backendowego @PreAuthorize - dzięki temu nie-admin dostaje stronę 403 zamiast
+ * błędu 500 z odrzuconego wywołania REST.
  */
 @Controller
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminViewController {
 
-    private final RestClient backendRestClient;
+  private final RestClient backendRestClient;
 
-    @Value("${app.security.jwt.cookie-name:jwt}")
-    private String jwtCookieName;
+  @Value("${app.security.jwt.cookie-name:jwt}")
+  private String jwtCookieName;
 
-    @GetMapping("/admin/users")
-    public String users(HttpServletRequest httpRequest, Model model) {
-        String auth = bearer(httpRequest);
+  @GetMapping("/admin/users")
+  public String users(HttpServletRequest httpRequest, Model model) {
+    String auth = bearer(httpRequest);
 
-        List<UserResponse> users = backendRestClient.get()
-                .uri("/api/v1/users")
-                .header("Authorization", auth)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<UserResponse>>() {});
+    List<UserResponse> users =
+        backendRestClient
+            .get()
+            .uri("/api/v1/users")
+            .header("Authorization", auth)
+            .retrieve()
+            .body(new ParameterizedTypeReference<List<UserResponse>>() {});
 
-        List<RoleResponse> roles = backendRestClient.get()
-                .uri("/api/v1/roles")
-                .header("Authorization", auth)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<RoleResponse>>() {});
+    List<RoleResponse> roles =
+        backendRestClient
+            .get()
+            .uri("/api/v1/roles")
+            .header("Authorization", auth)
+            .retrieve()
+            .body(new ParameterizedTypeReference<List<RoleResponse>>() {});
 
-        List<ReferenceResponse> departments = backendRestClient.get()
-                .uri("/api/v1/reference/departments")
-                .header("Authorization", auth)
-                .retrieve()
-                .body(new ParameterizedTypeReference<List<ReferenceResponse>>() {});
+    List<ReferenceResponse> departments =
+        backendRestClient
+            .get()
+            .uri("/api/v1/reference/departments")
+            .header("Authorization", auth)
+            .retrieve()
+            .body(new ParameterizedTypeReference<List<ReferenceResponse>>() {});
 
-        model.addAttribute("users", users == null ? List.of() : users);
-        model.addAttribute("roles", roles == null ? List.of() : roles);
-        model.addAttribute("departments", departments == null ? List.of() : departments);
+    model.addAttribute("users", users == null ? List.of() : users);
+    model.addAttribute("roles", roles == null ? List.of() : roles);
+    model.addAttribute("departments", departments == null ? List.of() : departments);
 
-        return "admin/users";
+    return "admin/users";
+  }
+
+  @PostMapping("/admin/users/{id}/role")
+  public String changeRole(
+      @PathVariable("id") String userId,
+      @RequestParam Long roleId,
+      HttpServletRequest httpRequest,
+      RedirectAttributes redirectAttributes) {
+    try {
+      backendRestClient
+          .patch()
+          .uri("/api/v1/users/{id}/role", userId)
+          .header("Authorization", bearer(httpRequest))
+          .body(new ChangeUserRoleRequest(roleId))
+          .retrieve()
+          .toBodilessEntity();
+      redirectAttributes.addFlashAttribute("successMessage", "Rola użytkownika została zmieniona.");
+    } catch (RestClientResponseException e) {
+      redirectAttributes.addFlashAttribute(
+          "errorMessage", "Nie udało się zmienić roli użytkownika.");
     }
+    return "redirect:/admin/users";
+  }
 
-    @PostMapping("/admin/users/{id}/role")
-    public String changeRole(@PathVariable("id") String userId,
-                             @RequestParam Long roleId,
-                             HttpServletRequest httpRequest,
-                             RedirectAttributes redirectAttributes) {
-        try {
-            backendRestClient.patch()
-                    .uri("/api/v1/users/{id}/role", userId)
-                    .header("Authorization", bearer(httpRequest))
-                    .body(new ChangeUserRoleRequest(roleId))
-                    .retrieve()
-                    .toBodilessEntity();
-            redirectAttributes.addFlashAttribute("successMessage", "Rola użytkownika została zmieniona.");
-        } catch (RestClientResponseException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Nie udało się zmienić roli użytkownika.");
-        }
-        return "redirect:/admin/users";
+  @PostMapping("/admin/users/{id}/department")
+  public String changeDepartment(
+      @PathVariable("id") String userId,
+      @RequestParam Long departmentId,
+      HttpServletRequest httpRequest,
+      RedirectAttributes redirectAttributes) {
+    try {
+      backendRestClient
+          .patch()
+          .uri("/api/v1/users/{id}/department", userId)
+          .header("Authorization", bearer(httpRequest))
+          .body(new ChangeUserDepartmentRequest(departmentId))
+          .retrieve()
+          .toBodilessEntity();
+      redirectAttributes.addFlashAttribute("successMessage", "Dział użytkownika został zmieniony.");
+    } catch (RestClientResponseException e) {
+      redirectAttributes.addFlashAttribute(
+          "errorMessage", "Nie udało się zmienić działu użytkownika.");
     }
+    return "redirect:/admin/users";
+  }
 
-    @PostMapping("/admin/users/{id}/department")
-    public String changeDepartment(@PathVariable("id") String userId,
-                                   @RequestParam Long departmentId,
-                                   HttpServletRequest httpRequest,
-                                   RedirectAttributes redirectAttributes) {
-        try {
-            backendRestClient.patch()
-                    .uri("/api/v1/users/{id}/department", userId)
-                    .header("Authorization", bearer(httpRequest))
-                    .body(new ChangeUserDepartmentRequest(departmentId))
-                    .retrieve()
-                    .toBodilessEntity();
-            redirectAttributes.addFlashAttribute("successMessage", "Dział użytkownika został zmieniony.");
-        } catch (RestClientResponseException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Nie udało się zmienić działu użytkownika.");
-        }
-        return "redirect:/admin/users";
+  /** Soft delete: dezaktywacja / ponowna aktywacja konta użytkownika. */
+  @PostMapping("/admin/users/{id}/active")
+  public String setActive(
+      @PathVariable("id") String userId,
+      @RequestParam boolean active,
+      HttpServletRequest httpRequest,
+      RedirectAttributes redirectAttributes) {
+    try {
+      backendRestClient
+          .patch()
+          .uri("/api/v1/users/{id}/active", userId)
+          .header("Authorization", bearer(httpRequest))
+          .body(new ChangeUserActiveRequest(active))
+          .retrieve()
+          .toBodilessEntity();
+      redirectAttributes.addFlashAttribute(
+          "successMessage",
+          active
+              ? "Konto użytkownika zostało aktywowane."
+              : "Konto użytkownika zostało dezaktywowane.");
+    } catch (RestClientResponseException e) {
+      redirectAttributes.addFlashAttribute(
+          "errorMessage", "Nie udało się zmienić stanu konta użytkownika.");
     }
+    return "redirect:/admin/users";
+  }
 
-    /** Soft delete: dezaktywacja / ponowna aktywacja konta użytkownika. */
-    @PostMapping("/admin/users/{id}/active")
-    public String setActive(@PathVariable("id") String userId,
-                            @RequestParam boolean active,
-                            HttpServletRequest httpRequest,
-                            RedirectAttributes redirectAttributes) {
-        try {
-            backendRestClient.patch()
-                    .uri("/api/v1/users/{id}/active", userId)
-                    .header("Authorization", bearer(httpRequest))
-                    .body(new ChangeUserActiveRequest(active))
-                    .retrieve()
-                    .toBodilessEntity();
-            redirectAttributes.addFlashAttribute("successMessage",
-                    active ? "Konto użytkownika zostało aktywowane." : "Konto użytkownika zostało dezaktywowane.");
-        } catch (RestClientResponseException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Nie udało się zmienić stanu konta użytkownika.");
-        }
-        return "redirect:/admin/users";
-    }
-
-    private String bearer(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
-        return "Bearer " + (cookie != null ? cookie.getValue() : "");
-    }
+  private String bearer(HttpServletRequest request) {
+    Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
+    return "Bearer " + (cookie != null ? cookie.getValue() : "");
+  }
 }

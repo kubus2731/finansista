@@ -20,50 +20,52 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
 
-    private static final Set<String> PRIVILEGED_ROLES = Set.of(
-            RoleName.ROLE_ADMIN.name(),
-            RoleName.ROLE_DEAN_OFFICE.name(),
-            RoleName.ROLE_FINANCE_OFFICE.name(),
-            RoleName.ROLE_LEGAL_COMMISSION.name(),
-            RoleName.ROLE_STUDENT_COUNCIL.name(),
-            RoleName.ROLE_DOCTORAL_COUNCIL.name()
-    );
+  private static final Set<String> PRIVILEGED_ROLES =
+      Set.of(
+          RoleName.ROLE_ADMIN.name(),
+          RoleName.ROLE_DEAN_OFFICE.name(),
+          RoleName.ROLE_FINANCE_OFFICE.name(),
+          RoleName.ROLE_LEGAL_COMMISSION.name(),
+          RoleName.ROLE_STUDENT_COUNCIL.name(),
+          RoleName.ROLE_DOCTORAL_COUNCIL.name());
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final DepartmentRepository departmentRepository;
-    private final PasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
+  private final RoleRepository roleRepository;
+  private final DepartmentRepository departmentRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public User execute(RegisterUserCommand command) {
-        if (userRepository.existsByEmail(command.email())) {
-            throw new UserAlreadyExistsException(command.email());
-        }
-
-        Role role = roleRepository.findById(command.roleId())
-                .orElseThrow(RoleNotFoundException::new);
-
-        if (PRIVILEGED_ROLES.contains(role.getName())) {
-            throw new RegistrationForbiddenException(role.getName());
-        }
-
-        var department = departmentRepository.findById(command.departmentId())
-                .orElseThrow(DepartmentNotFoundException::new);
-
-        String hashedPassword = passwordEncoder.encode(command.rawPassword());
-
-        User newUser = new User(command.name(),
-                command.surname(),
-                command.email(),
-                command.phoneNumber(),
-                hashedPassword,
-                role,
-                department
-        );
-
-        // Zwracamy wynik save(): Spring Data po niepustym @Version traktuje byt jako
-        // istniejący i robi merge(), który wstawia zarządzaną KOPIĘ — to ona (a nie
-        // oryginalny newUser) ma wygenerowany externalId potrzebny do tokenu JWT.
-        return userRepository.save(newUser);
+  @Transactional
+  public User execute(RegisterUserCommand command) {
+    if (userRepository.existsByEmail(command.email())) {
+      throw new UserAlreadyExistsException(command.email());
     }
+
+    Role role = roleRepository.findById(command.roleId()).orElseThrow(RoleNotFoundException::new);
+
+    if (PRIVILEGED_ROLES.contains(role.getName())) {
+      throw new RegistrationForbiddenException(role.getName());
+    }
+
+    var department =
+        departmentRepository
+            .findById(command.departmentId())
+            .orElseThrow(DepartmentNotFoundException::new);
+
+    String hashedPassword = passwordEncoder.encode(command.rawPassword());
+
+    User newUser =
+        new User(
+            command.name(),
+            command.surname(),
+            command.email(),
+            command.phoneNumber(),
+            hashedPassword,
+            role,
+            department);
+
+    // Zwracamy wynik save(): Spring Data po niepustym @Version traktuje byt jako
+    // istniejący i robi merge(), który wstawia zarządzaną KOPIĘ — to ona (a nie
+    // oryginalny newUser) ma wygenerowany externalId potrzebny do tokenu JWT.
+    return userRepository.save(newUser);
+  }
 }
