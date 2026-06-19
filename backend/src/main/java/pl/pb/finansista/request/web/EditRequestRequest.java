@@ -1,6 +1,7 @@
 package pl.pb.finansista.request.web;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -90,7 +91,12 @@ public record EditRequestRequest(
 
     public record TaskItem(@NotNull Integer taskNo, @NotBlank String name,
                            @NotNull LocalDate dateFrom, @NotNull LocalDate dateTo,
-                           @NotNull @PositiveOrZero BigDecimal plannedCost, String actions) {}
+                           @NotNull @PositiveOrZero BigDecimal plannedCost, String actions) {
+        @AssertTrue(message = "Task end date must not be before start date")
+        private boolean isDateRangeValid() {
+            return dateFrom == null || dateTo == null || !dateTo.isBefore(dateFrom);
+        }
+    }
 
     public record CostItemEntry(@NotNull Integer taskNo, @NotBlank String itemName,
                                 @NotNull @Positive Integer quantity,
