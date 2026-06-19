@@ -44,6 +44,7 @@ public class RequestViewController {
                   "REJECTED",
                   "CORRECTION_REQUIRED");
   private final RestClient backendRestClient;
+  private final ApiErrorMessageResolver errorResolver;
 
   @Value("${app.security.jwt.cookie-name:jwt}")
   private String jwtCookieName;
@@ -182,7 +183,7 @@ public class RequestViewController {
       redirectAttributes.addFlashAttribute("successMessage", "Opinia prorektora została zapisana.");
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-              "errorMessage", "Nie udało się zapisać opinii (kod " + e.getStatusCode().value() + ").");
+              "errorMessage", errorResolver.resolve(e, "Nie udało się zapisać opinii"));
     }
     return "redirect:/requests/" + id;
   }
@@ -211,8 +212,7 @@ public class RequestViewController {
       redirectAttributes.addFlashAttribute("successMessage", "Załącznik został dodany.");
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-              "errorMessage",
-              "Nie udało się dodać załącznika (kod " + e.getStatusCode().value() + ").");
+              "errorMessage", errorResolver.resolve(e, "Nie udało się dodać załącznika"));
     }
     return "redirect:/requests/" + id;
   }
@@ -254,8 +254,7 @@ public class RequestViewController {
       redirectAttributes.addFlashAttribute("successMessage", "Załącznik został usunięty.");
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-              "errorMessage",
-              "Nie udało się usunąć załącznika (kod " + e.getStatusCode().value() + ").");
+              "errorMessage", errorResolver.resolve(e, "Nie udało się usunąć załącznika"));
     }
     return "redirect:/requests/" + id;
   }
@@ -279,7 +278,7 @@ public class RequestViewController {
               "successMessage", "Kwota z wybranego źródła została przyznana.");
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-              "errorMessage", "Nie udało się przyznać kwoty (kod " + e.getStatusCode().value() + ").");
+              "errorMessage", errorResolver.resolve(e, "Nie udało się przyznać kwoty"));
     }
     return "redirect:/requests/" + id;
   }
@@ -300,7 +299,7 @@ public class RequestViewController {
       return "redirect:/requests";
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-              "errorMessage", "Nie udało się usunąć wniosku (kod " + e.getStatusCode().value() + ").");
+              "errorMessage", errorResolver.resolve(e, "Nie udało się usunąć wniosku"));
       return "redirect:/requests/" + id;
     }
   }
@@ -325,7 +324,8 @@ public class RequestViewController {
               .toBodilessEntity();
       redirectAttributes.addFlashAttribute("successMessage", "Komentarz został dodany.");
     } catch (RestClientResponseException e) {
-      redirectAttributes.addFlashAttribute("errorMessage", "Nie udało się dodać komentarza.");
+      redirectAttributes.addFlashAttribute(
+              "errorMessage", errorResolver.resolve(e, "Nie udało się dodać komentarza"));
     }
     return "redirect:/requests/" + id;
   }
@@ -360,7 +360,7 @@ public class RequestViewController {
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
               "errorMessage",
-              "Nie udało się zmienić statusu wniosku (kod " + e.getStatusCode().value() + ").");
+              errorResolver.resolve(e, "Nie udało się zmienić statusu wniosku"));
     }
     return "redirect:/requests/" + id;
   }
@@ -540,7 +540,7 @@ public class RequestViewController {
       return "redirect:/requests/" + id;
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-              "errorMessage", "Nie udało się zapisać zmian (kod " + e.getStatusCode().value() + ").");
+              "errorMessage", errorResolver.resolve(e, "Nie udało się zapisać zmian"));
       return "redirect:/requests/" + id + "/edit";
     }
   }
@@ -645,12 +645,7 @@ public class RequestViewController {
       return "redirect:/requests";
     } catch (RestClientResponseException e) {
       model.addAttribute("departmentName", user.departmentName());
-      List<String> combinedErrors = new ArrayList<>(errors);
-      combinedErrors.add(
-              "Wystąpił błąd po stronie serwera ("
-                      + e.getStatusCode()
-                      + "): upewnij się, że wszystkie pola formularza są poprawne.");
-      model.addAttribute("validationErrors", combinedErrors);
+      model.addAttribute("validationErrors", List.of(errorResolver.resolve(e, "Nie udało się zapisać wniosku")));
       return "requests/form";
     }
   }

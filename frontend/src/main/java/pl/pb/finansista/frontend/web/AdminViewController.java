@@ -30,6 +30,7 @@ import pl.pb.finansista.frontend.viewmodel.UserResponse;
 public class AdminViewController {
 
   private final RestClient backendRestClient;
+  private final ApiErrorMessageResolver errorResolver;
 
   @Value("${app.security.jwt.cookie-name:jwt}")
   private String jwtCookieName;
@@ -86,7 +87,7 @@ public class AdminViewController {
       redirectAttributes.addFlashAttribute("successMessage", "Rola użytkownika została zmieniona.");
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-          "errorMessage", "Nie udało się zmienić roli użytkownika.");
+          "errorMessage", errorResolver.resolve(e, "Nie udało się zmienić roli użytkownika"));
     }
     return "redirect:/admin/users";
   }
@@ -108,7 +109,7 @@ public class AdminViewController {
       redirectAttributes.addFlashAttribute("successMessage", "Dział użytkownika został zmieniony.");
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-          "errorMessage", "Nie udało się zmienić działu użytkownika.");
+          "errorMessage", errorResolver.resolve(e, "Nie udało się zmienić działu użytkownika"));
     }
     return "redirect:/admin/users";
   }
@@ -135,7 +136,8 @@ public class AdminViewController {
               : "Konto użytkownika zostało dezaktywowane.");
     } catch (RestClientResponseException e) {
       redirectAttributes.addFlashAttribute(
-          "errorMessage", "Nie udało się zmienić stanu konta użytkownika.");
+          "errorMessage",
+          errorResolver.resolve(e, "Nie udało się zmienić stanu konta użytkownika"));
     }
     return "redirect:/admin/users";
   }
