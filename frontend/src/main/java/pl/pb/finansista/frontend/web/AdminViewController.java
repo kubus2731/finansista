@@ -21,6 +21,7 @@ import pl.pb.finansista.frontend.viewmodel.RoleResponse;
 import pl.pb.finansista.frontend.viewmodel.UserResponse;
 import org.springframework.web.util.WebUtils;
 import jakarta.servlet.http.Cookie;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 
@@ -37,6 +38,9 @@ import java.util.List;
 public class AdminViewController {
 
     private final RestClient backendRestClient;
+
+    @Value("${app.security.jwt.cookie-name:jwt}")
+    private String jwtCookieName;
 
     @GetMapping("/admin/users")
     public String users(HttpServletRequest httpRequest, Model model) {
@@ -127,7 +131,7 @@ public class AdminViewController {
     }
 
     private String bearer(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, "jwt");
+        Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
         return "Bearer " + (cookie != null ? cookie.getValue() : "");
     }
 }

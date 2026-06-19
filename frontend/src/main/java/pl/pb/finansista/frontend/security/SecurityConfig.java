@@ -1,5 +1,6 @@
 package pl.pb.finansista.frontend.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +12,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${app.security.jwt.cookie-name}")
+    private String jwtCookieName;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -25,7 +29,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint("/login"))
             )
             .logout(logout -> logout.disable())
-            .addFilterBefore(new JwtCookieFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtCookieFilter(jwtCookieName), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

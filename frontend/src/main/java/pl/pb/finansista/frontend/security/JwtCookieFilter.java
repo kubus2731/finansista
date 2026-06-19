@@ -21,13 +21,19 @@ import java.util.List;
 
 public class JwtCookieFilter extends OncePerRequestFilter {
 
+    private final String jwtCookieName;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public JwtCookieFilter(String jwtCookieName) {
+        this.jwtCookieName = jwtCookieName;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        Cookie cookie = WebUtils.getCookie(request, "jwt");
+        Cookie cookie = WebUtils.getCookie(request, jwtCookieName);
         if (cookie != null && cookie.getValue() != null && !cookie.getValue().isEmpty()) {
             String token = cookie.getValue();
             try {
