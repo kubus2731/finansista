@@ -74,31 +74,6 @@ public class AuthViewController {
             return "auth/register";
         }
     }
-    try {
-      RegisterUserRequest payload =
-          new RegisterUserRequest(
-              form.name(),
-              form.surname(),
-              form.email(),
-              form.phoneNumber(),
-              form.rawPassword(),
-              STUDENT_ROLE_ID,
-              form.departmentId());
-
-      ResponseEntity<Void> backendResponse =
-          backendRestClient
-              .post()
-              .uri("/api/v1/auth/register")
-              .body(payload)
-              .retrieve()
-              .toBodilessEntity();
-      relayCookies(backendResponse, response);
-      return "redirect:/requests";
-    } catch (RestClientResponseException e) {
-      model.addAttribute("errorMessage", "Konto z tym adresem e-mail lub telefonem już istnieje.");
-      return "auth/register";
-    }
-  }
 
   @GetMapping("/logout")
   public String logout(HttpServletResponse response) {

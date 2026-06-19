@@ -15,9 +15,6 @@ class UserIdentityResolver implements IdentityResolver {
 
   private final UserRepository userRepository;
 
-  // Runs from the security filter (no Open-Session-In-View yet), so the lazy role
-  // would otherwise fail to initialize — the transaction keeps the session open
-  // across the lookup and the getRole() access.
   @Override
   @Transactional(readOnly = true)
   public Optional<Identity> resolve(UUID subject) {
