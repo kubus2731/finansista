@@ -49,12 +49,5 @@ public class RecordProvostOpinionUseCase {
 
     request.recordProvostOpinion(command.opinion());
     requestRepository.save(request);
-
-    if (!request.getStatus().getName().equals(RequestStatusName.FORMAL_EVALUATION.name())) {
-      throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
-    }
-
-    request.recordProvostOpinion(command.opinion());
-    requestRepository.save(request);
   }
 }
