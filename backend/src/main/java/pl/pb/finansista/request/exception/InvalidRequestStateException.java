@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import pl.pb.finansista.common.exception.BusinessException;
 
 public class InvalidRequestStateException extends BusinessException {
+
   private InvalidRequestStateException(String message) {
     super(message, HttpStatus.CONFLICT);
   }
