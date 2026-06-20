@@ -103,8 +103,7 @@ public class RequestAccessSpecificationFactory {
       allowedSpecs.add(
           RequestSpecifications.hasStatusIn(
               List.of(
-                  RequestStatusName.UNDER_REVIEW.name(),
-                      RequestStatusName.ACCEPTED.name(),
+                  RequestStatusName.UNDER_REVIEW.name(), RequestStatusName.ACCEPTED.name(),
                   RequestStatusName.REJECTED.name(),
                       RequestStatusName.CORRECTION_REQUIRED.name())));
     }

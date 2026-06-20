@@ -30,7 +30,6 @@ public class DataSeeder implements CommandLineRunner {
   public void run(String... args) {
     log.info("Seeding users...");
 
-    // Role i działy ze słownika V2
     Role adminRole = role(1L);
     Role studentRole = role(2L);
     Role wrssRole = role(3L);
@@ -42,7 +41,6 @@ public class DataSeeder implements CommandLineRunner {
     Department mechDept = department(3L); // Wydział Mechaniczny PB
     Department samorzadDept = department(13L); // Samorząd Studentów PB
 
-    // Konta pokrywające całą ścieżkę wniosku z Zarządzenia 13
     seedUser(
         "Jakub",
         "Matusiewicz",
@@ -95,7 +93,6 @@ public class DataSeeder implements CommandLineRunner {
     log.info("Seeding completed.");
   }
 
-  /** Tworzy konto tylko, jeśli e-mail jeszcze nie istnieje (bezpieczne przy każdym starcie). */
   private void seedUser(
       String name,
       String surname,
