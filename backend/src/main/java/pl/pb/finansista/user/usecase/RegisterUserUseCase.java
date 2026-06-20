@@ -20,16 +20,16 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class RegisterUserUseCase {
 
-    private static final Set<String> PRIVILEGED_ROLES = Set.of(
-            RoleName.ROLE_ADMIN.name(),
-            RoleName.ROLE_DEAN_OFFICE.name(),
-            RoleName.ROLE_FINANCE_OFFICE.name(),
-            RoleName.ROLE_LEGAL_COMMISSION.name(),
-            RoleName.ROLE_STUDENT_COUNCIL.name(),
-            RoleName.ROLE_DOCTORAL_COUNCIL.name(),
-            RoleName.ROLE_PROVOST.name(),
-            RoleName.ROLE_STUDENT_AFFAIRS.name()
-    );
+  private static final Set<String> PRIVILEGED_ROLES =
+      Set.of(
+          RoleName.ROLE_ADMIN.name(),
+          RoleName.ROLE_DEAN_OFFICE.name(),
+          RoleName.ROLE_FINANCE_OFFICE.name(),
+          RoleName.ROLE_LEGAL_COMMISSION.name(),
+          RoleName.ROLE_STUDENT_COUNCIL.name(),
+          RoleName.ROLE_DOCTORAL_COUNCIL.name(),
+          RoleName.ROLE_PROVOST.name(),
+          RoleName.ROLE_STUDENT_AFFAIRS.name());
 
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
@@ -39,7 +39,7 @@ public class RegisterUserUseCase {
   @Transactional
   public User execute(RegisterUserCommand command) {
     if (userRepository.existsByEmail(command.email())) {
-      throw new UserAlreadyExistsException(command.email());
+      throw UserAlreadyExistsException.withEmail(command.email());
     }
 
     Role role = roleRepository.findById(command.roleId()).orElseThrow(RoleNotFoundException::new);
@@ -65,9 +65,6 @@ public class RegisterUserUseCase {
             role,
             department);
 
-    // Zwracamy wynik save(): Spring Data po niepustym @Version traktuje byt jako
-    // istniejący i robi merge(), który wstawia zarządzaną KOPIĘ — to ona (a nie
-    // oryginalny newUser) ma wygenerowany externalId potrzebny do tokenu JWT.
     return userRepository.save(newUser);
   }
 }

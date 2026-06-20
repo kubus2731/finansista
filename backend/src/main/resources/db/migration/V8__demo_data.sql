@@ -37,6 +37,28 @@ SELECT 9006, HEXTORAW('0190D1B2C3D47000A000000000009006'),
 FROM dual
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'demo-kwestura@pb.edu.pl');
 
+-- Konta demo dla pozostałych etapów obiegu (hasło: demo123).
+INSERT INTO users (id, external_id, name, surname, email, phone_number, password, role_id, department_id)
+SELECT 9007, HEXTORAW('0190D1B2C3D47000A000000000009007'),
+       'Demo', 'CSSDiR', 'demo-cssdir@pb.edu.pl', '+48500000007',
+       '{noop}demo123', 8, 15
+FROM dual
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'demo-cssdir@pb.edu.pl');
+
+INSERT INTO users (id, external_id, name, surname, email, phone_number, password, role_id, department_id)
+SELECT 9008, HEXTORAW('0190D1B2C3D47000A000000000009008'),
+       'Demo', 'Doktoranci', 'demo-doktoranci@pb.edu.pl', '+48500000008',
+       '{noop}demo123', 4, 16
+FROM dual
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'demo-doktoranci@pb.edu.pl');
+
+INSERT INTO users (id, external_id, name, surname, email, phone_number, password, role_id, department_id)
+SELECT 9009, HEXTORAW('0190D1B2C3D47000A000000000009009'),
+       'Demo', 'Prorektor', 'demo-prorektor@pb.edu.pl', '+48500000009',
+       '{noop}demo123', 9, 15
+FROM dual
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'demo-prorektor@pb.edu.pl');
+
 INSERT INTO requests (id, external_id, title, description, amount, user_id, request_status_id, request_template_id, department_id, cost_category_id)
 SELECT 9101, HEXTORAW('0190D1B2C3D47000B000000000009101'),'Demo: Juwenalia 2026','Wniosek demonstracyjny w statusie DRAFT — środki na organizację plenerowego koncertu Juwenaliów.',
        12500.00, 9002, 1, 1, 1, 1

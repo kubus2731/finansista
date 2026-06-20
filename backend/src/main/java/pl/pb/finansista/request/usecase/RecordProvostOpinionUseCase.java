@@ -19,41 +19,35 @@ import pl.pb.finansista.user.repository.UserRepository;
 @RequiredArgsConstructor
 public class RecordProvostOpinionUseCase {
 
-    private final RequestRepository requestRepository;
-    private final UserRepository userRepository;
-    private final RequestAccessSpecificationFactory accessSpecFactory;
+  private final RequestRepository requestRepository;
+  private final UserRepository userRepository;
+  private final RequestAccessSpecificationFactory accessSpecFactory;
 
-    @Transactional
-    public void execute(RecordProvostOpinionCommand command) {
-        User actor = userRepository.findByExternalId(command.userExternalId())
-                .orElseThrow(UserNotFoundException::new);
+  @Transactional
+  public void execute(RecordProvostOpinionCommand command) {
+    User actor =
+        userRepository
+            .findByExternalId(command.userExternalId())
+            .orElseThrow(UserNotFoundException::new);
 
-        Specification<Request> spec = Specification.allOf(
-                RequestSpecifications.hasExternalId(command.requestExternalId()),
-                accessSpecFactory.createForUser(actor, command.userAuthorities())
-        );
+    Specification<Request> spec =
+        Specification.allOf(
+            RequestSpecifications.hasExternalId(command.requestExternalId()),
+            accessSpecFactory.createForUser(actor, command.userAuthorities()));
 
-        Request request = requestRepository.findOne(spec)
-                .orElseThrow(RequestNotFoundException::new);
+    Request request = requestRepository.findOne(spec).orElseThrow(RequestNotFoundException::new);
 
-        boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
-        boolean isProvost = command.userAuthorities().contains(RoleName.ROLE_PROVOST.name());
-        if (!isAdmin && !isProvost) {
-            throw UnauthorizedRequestAccessException.forAction("record the provost opinion");
-        }
+    boolean isAdmin = command.userAuthorities().contains(RoleName.ROLE_ADMIN.name());
+    boolean isProvost = command.userAuthorities().contains(RoleName.ROLE_PROVOST.name());
+    if (!isAdmin && !isProvost) {
+      throw UnauthorizedRequestAccessException.forRecordingProvostOpinion();
+    }
 
-        if (!request.getStatus().getName().equals(RequestStatusName.FORMAL_EVALUATION.name())) {
-            throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
-        }
+    if (!request.getStatus().getName().equals(RequestStatusName.FORMAL_EVALUATION.name())) {
+      throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
+    }
 
-        request.recordProvostOpinion(command.opinion());
-        requestRepository.save(request);
-
-        if (!request.getStatus().getName().equals(RequestStatusName.FORMAL_EVALUATION.name())) {
-          throw InvalidRequestStateException.withStatusName(request.getStatus().getName());
-        }
-
-        request.recordProvostOpinion(command.opinion());
-        requestRepository.save(request);
+    request.recordProvostOpinion(command.opinion());
+    requestRepository.save(request);
   }
 }

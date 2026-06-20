@@ -13,11 +13,16 @@
 \usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{seqsplit}
 \usepackage{listings}
 \usepackage{hyperref}
 \usepackage{microtype}
 \usepackage[utf8]{inputenc}
 \usepackage[polish]{babel}
+
+\setlength{\emergencystretch}{3em}
+
 
 % ====== LINKI ======
 \hypersetup{
@@ -81,10 +86,12 @@
 		{\large inż. Adrian Twardowski \par}
 		\vspace{0.8cm}
 		{\small Przedmiot: Programowanie Aplikacji WWW w języku Java \par}
-		
+		\vspace{0.3cm}
+		{\small Repozytorium: \url{https://github.com/kubus2731/finansista} \par}
+
 		\vfill
 		
-		{\large Białystok, \today \par}
+		{\large Białystok, 19 czerwca 2026 \par}
 	\end{titlepage}
 	
 	\thispagestyle{empty}
@@ -185,13 +192,15 @@ wymagania ,,frontend działa niezależnie od backendu'' z deklaracji projektowej
 Root projektu (\texttt{pom.xml} w katalogu głównym) ma typ \texttt{pom}
 (\emph{parent}) i agreguje dwa moduły:
 \texttt{<module>backend</module>} i \texttt{<module>frontend</module>}.
-Frontend ma w \texttt{pom.xml} zależność na \texttt{finansista-backend}
-oznaczoną komentarzem \emph{,,TYMCZASOWE''} -- pozwala współdzielić klasy DTO
-(\texttt{CreateRequestRequest}, \texttt{RequestResponse} itp.) zamiast je
-duplikować. Docelowo planowane wydzielenie wspólnych DTO do trzeciego
-modułu \texttt{common} lub kontraktów generowanych z OpenAPI -- po
-osiągnięciu czego frontend będzie mógł stać się w pełni niezależnym
-projektem (np.\ aplikacją SPA).
+Moduł \texttt{frontend} jest w pełni niezależny -- jego \texttt{pom.xml}
+nie zawiera zależności na \texttt{finansista-backend} i korzysta wyłącznie
+ze starterów Spring Boot (web, thymeleaf, security, validation) oraz
+Jackson i Lombok. Klasy DTO używane w komunikacji HTTP
+(\texttt{CreateRequestRequest}, \texttt{RequestResponse} itp.) są
+zdefiniowane po stronie frontendu (pakiet
+\texttt{...frontend.viewmodel}), niezależnie od ich odpowiedników
+w backendzie. Dzięki temu frontend może zostać wydzielony do osobnego
+repozytorium (np.\ jako aplikacja SPA) bez zmian w kodzie.
 
 \subsection{Stos technologiczny}
 \begin{itemize}[leftmargin=*]
@@ -230,8 +239,6 @@ projektem (np.\ aplikacją SPA).
         Środki Wydziału\ldots), każde z osobną kwotą wnioskowaną
         (\texttt{amount\_requested}) i przyznaną (\texttt{amount\_granted}).
         Para (\texttt{request\_id}, \texttt{funding\_source\_id}) jest unikalna.
-        Wcześniejsze pole \texttt{funding\_source\_id} na tabeli \texttt{requests}
-        zostało usunięte na rzecz tej relacji.
   \item \texttt{request\_status} - słownik statusów wniosku.
   \item \texttt{activity\_log} - historia zmian statusu (zasilana przez trigger \texttt{T\_ACTIVITY}).
   \item \texttt{comments}, \texttt{attachments} -- komentarze i załączniki do wniosków.
@@ -248,13 +255,13 @@ semantyka), zachowując wydajność (brak dodatkowych \texttt{JOIN}-ów):
 
 \begin{itemize}[leftmargin=*]
   \item \texttt{ProjectDetails} - sekcja I Załącznika: \texttt{realizerType},
-        \texttt{projectKind}/\texttt{projectKindOther},
-        \texttt{projectScope}/\texttt{projectScopeOther},
-        \texttt{projectNature}/\texttt{projectNatureOther},
-        \texttt{plannedDateFrom}/\texttt{plannedDateTo}, \texttt{location},
+        \texttt{projectKind}\slash\texttt{projectKindOther},
+        \texttt{projectScope}\slash\texttt{projectScopeOther},
+        \texttt{projectNature}\slash\texttt{projectNatureOther},
+        \texttt{plannedDateFrom}\slash\texttt{plannedDateTo}, \texttt{location},
         \texttt{participantsInvolved}, \texttt{participantsBenefiting}.
-  \item \texttt{SupervisorInfo} -- sekcja III Załącznika: dane opiekuna
-        merytorycznego (imię i nazwisko, e-mail, telefon, jednostka).
+  \item \texttt{SupervisorInfo} -- sekcja II Załącznika: dane opiekuna
+        naukowego (imię i nazwisko, e-mail, telefon, jednostka).
 \end{itemize}
 
 Klasy te są niemutowalne (\texttt{@NoArgsConstructor(access = PROTECTED)} +
@@ -269,30 +276,29 @@ który jest jedynym identyfikatorem wystawianym w REST API i adresach URL.
 Zapobiega to wycieksowi informacji o liczności rekordów i utrudnia enumerację zasobów.
 
 \subsection{Migracje Flyway}
-Pierwotne migracje \texttt{V8} (pola Załącznika 1) oraz \texttt{V9} (jednostka
-\emph{Samorząd Doktorantów}) zostały \emph{zwinięte do baseline'u}
-(\texttt{V1}/\texttt{V2}) w ramach refaktoryzacji PR \#12. W bazie pozostaje
-spójny ciąg migracji od V1 do V8:
+Schemat bazy danych budowany jest sekwencją migracji Flyway od \texttt{V1}
+do \texttt{V8}:
 
 \begin{itemize}[leftmargin=*]
-  \item \texttt{V1} -- inicjalny schemat: 11 tabel (users, roles, department,
+  \item \texttt{V1} -- inicjalny schemat: 14 tabel (users, roles, department,
         requests z pełnym Załącznikiem nr 1, request\_task, request\_cost\_item,
         request\_funding, request\_status, request\_templates, cost\_category,
         funding\_source, comments, attachments, activity\_log).
-  \item \texttt{V2} -- wypełnienie słowników: 7 ról, 15 wydziałów (w tym
-        Samorząd Studentów i Samorząd Doktorantów), 7 statusów, 2 szablony
-        wniosków, 2 kategorie kosztów, 4 źródła finansowania.
+  \item \texttt{V2} -- wypełnienie słowników: 9 ról, 16 działów (wydziały,
+        dziekanaty powiązane z wydziałami, samorządy, kwestura, rektorat),
+        7 statusów, 2 szablony wniosków, 2 kategorie kosztów, 4 źródła
+        finansowania.
   \item \texttt{V3} -- widoki bazodanowe (\texttt{v\_department\_requests\_summary},
         \texttt{v\_request\_details}).
   \item \texttt{V4} -- wyzwalacze (\texttt{T\_REQUESTS\_UPDATE\_NOW},
         \texttt{T\_ACTIVITY} audytowy, \texttt{T\_BLOCK} blokada edycji wysłanych wniosków).
   \item \texttt{V5} -- pakiet PL/SQL \texttt{finansista\_pkg}
-        (\texttt{set\_actor}/\texttt{get\_actor}, \texttt{department\_used\_budget},
+        (\texttt{set\_actor}\slash\texttt{get\_actor}, \texttt{department\_used\_budget},
         \texttt{evaluate\_request}).
   \item \texttt{V6} -- indeksy wydajnościowe.
   \item \texttt{V7} -- maszyna stanów wniosku (funkcja walidująca + trigger
         blokujący niedozwolone przejścia, ORA-20002).
-  \item \texttt{V8} -- skrypt zasilania danymi demonstracyjnymi (6 użytkowników
+  \item \texttt{V8} -- skrypt zasilania danymi demonstracyjnymi (9 użytkowników
         z różnymi rolami, 3 przykładowe wnioski w różnych statusach, wpisy
         do \texttt{request\_funding}). Wszystkie wstawki idempotentne
         (\texttt{INSERT \ldots SELECT FROM dual WHERE NOT EXISTS}) --
@@ -306,19 +312,22 @@ spójny ciąg migracji od V1 do V8:
 \subsection{Maszyna stanów wniosku}
 Dozwolone przejścia statusów są egzekwowane na poziomie bazy (V7):
 
-\begin{center}
-\begin{tabular}{ll}
-  \toprule
-  \textbf{Status} & \textbf{Dozwolone przejścia} \\
-  \midrule
-  DRAFT & SUBMITTED \\
-  SUBMITTED & FORMAL\_EVALUATION, REJECTED, CORRECTION\_REQUIRED \\
-  FORMAL\_EVALUATION & UNDER\_REVIEW, REJECTED, CORRECTION\_REQUIRED \\
-  UNDER\_REVIEW & ACCEPTED, REJECTED, CORRECTION\_REQUIRED \\
-  CORRECTION\_REQUIRED & DRAFT, SUBMITTED \\
-  \bottomrule
-\end{tabular}
-\end{center}
+\begin{table}[H]
+  \centering
+  \resizebox{\linewidth}{!}{%
+  \begin{tabular}{l l}
+    \toprule
+    \textbf{Status} & \textbf{Dozwolone przejścia} \\
+    \midrule
+    \texttt{DRAFT} & \texttt{SUBMITTED} \\ \addlinespace
+    \texttt{SUBMITTED} & \texttt{FORMAL\_EVALUATION}, \texttt{REJECTED}, \texttt{CORRECTION\_REQUIRED} \\ \addlinespace
+    \texttt{FORMAL\_EVALUATION} & \texttt{UNDER\_REVIEW}, \texttt{REJECTED}, \texttt{CORRECTION\_REQUIRED} \\ \addlinespace
+    \texttt{UNDER\_REVIEW} & \texttt{ACCEPTED}, \texttt{REJECTED}, \texttt{CORRECTION\_REQUIRED} \\ \addlinespace
+    \texttt{CORRECTION\_REQUIRED} & \texttt{DRAFT}, \texttt{SUBMITTED} \\
+    \bottomrule
+  \end{tabular}%
+  }
+\end{table}
 
 Próba zmiany statusu na niedozwolony skutkuje błędem \texttt{ORA-20002}.
 
@@ -373,8 +382,8 @@ Na tabeli \texttt{requests} założono trzy triggery wierszowe:
 \end{itemize}
 
 \subsection{Maszyna stanów (V7)}
-Funkcja \texttt{validate\_request\_status\_change(p\_old, p\_new)} oraz trigger
-\texttt{T\_REQUESTS\_TRANSITION} blokują niedozwolone przejścia statusów
+Funkcja \texttt{is\_valid\_status\_transition(p\_old\_status, p\_new\_status)} oraz trigger
+\texttt{T\_STATUS\_TRANSITION} blokują niedozwolone przejścia statusów
 (tabela dozwolonych przejść w sekcji~\ref{sec:plsql}, podsekcja \emph{Maszyna stanów wniosku}).
 Każda nielegalna zmiana statusu kończy się błędem \texttt{ORA-20002} podnoszonym
 po stronie bazy, przez co aplikacja nie musi (i nie może) tej zasady obejść.
@@ -407,10 +416,10 @@ w filtrach i sortowaniach listingów wniosków:
         - filtrowanie po statusie (np.\ ,,wnioski do oceny''),
   \item \texttt{IDX\_REQUESTS\_USER} na \texttt{user\_id}
         - listing własnych wniosków wnioskodawcy,
-  \item \texttt{IDX\_REQUESTS\_CREATED\_AT} na \texttt{created\_at DESC}
+  \item \texttt{IDX\_REQUESTS\_CREATED\_AT} na \texttt{created\_at}
         - domyślne sortowanie listingu od najnowszych,
   \item \texttt{IDX\_REQUESTS\_DEPT\_CREATED} na \texttt{(department\_id,
-        created\_at DESC)} - indeks złożony pod najczęstsze zapytanie:
+        created\_at)} - indeks złożony pod najczęstsze zapytanie:
         ,,wnioski mojego wydziału, posortowane od najnowszych''.
 \end{itemize}
 
@@ -512,35 +521,72 @@ Frontend Thymeleaf komunikuje się z backendem wyłącznie poprzez REST API, co
 wymusza poprawną architekturę klient--serwer. Token JWT z ciasteczka przeglądarki
 jest przekazywany jako nagłówek \texttt{Authorization: Bearer}.
 
-\subsection{Najważniejsze endpointy}
-\begin{tabularx}{\textwidth}{l l X}
+\subsection{Endpointy REST API}
+Pełna lista endpointów. Oznaczenia dostępu: \emph{(publiczne)} -- \texttt{permitAll}
+w \texttt{SecurityConfig}; \emph{(admin)} -- \texttt{@PreAuthorize} na rolę
+\texttt{ROLE\_ADMIN}; pozostałe wymagają zalogowania, przy czym endpointy wniosków
+są dodatkowo autoryzowane kontekstowo (rola/własność) w warstwie use case.
+
+
+\begin{longtable}{@{}l >{\raggedright\arraybackslash}p{0.50\textwidth} >{\raggedright\arraybackslash}p{0.36\textwidth}@{}}
   \toprule
   \textbf{Metoda} & \textbf{Ścieżka} & \textbf{Opis} \\
   \midrule
-  POST & /api/v1/auth/register & rejestracja konta \\
-  POST & /api/v1/auth/login & logowanie (ustawia ciasteczko JWT) \\
-  POST & /api/v1/auth/logout & wylogowanie (kasuje ciasteczko) \\
-  GET  & /api/v1/requests & lista wniosków (filtr, paginacja \texttt{Pageable}) \\
-  POST & /api/v1/requests & utworzenie wniosku (pełny Załącznik nr 1) \\
-  GET  & /api/v1/requests/\{id\} & szczegóły wniosku (zwraca ETag z wersją) \\
-  PUT  & /api/v1/requests/\{id\} & edycja wniosku (wymaga \texttt{If-Match}) \\
-  DELETE & /api/v1/requests/\{id\} & usunięcie wniosku (admin) \\
-  PATCH & /api/v1/requests/\{id\}/status & zmiana statusu \\
-  POST & /api/v1/requests/\{id\}/funding & przyznanie kwoty per źródło finansowania \\
-  GET  & /api/v1/requests/\{id\}/history & historia zmian statusu \\
-  POST & /api/v1/requests/\{id\}/comments & dodanie komentarza \\
-  GET  & /api/v1/requests/\{id\}/comments & komentarze \\
-  GET  & /api/v1/request-templates & lista aktywnych szablonów (publiczne) \\
-  POST/PUT/DELETE & /api/v1/request-templates/\{id\} & CRUD szablonów (admin) \\
-  GET  & /api/v1/request-statuses & słownik statusów (publiczne) \\
-  GET  & /api/v1/reference/departments & lista wydziałów (publiczne) \\
-  POST/PUT/DELETE & /api/v1/reference/departments/\{id\} & CRUD wydziałów (admin) \\
-  GET  & /api/v1/reference/cost-categories & kategorie kosztów (publiczne) \\
-  GET  & /api/v1/reference/funding-sources & źródła finansowania (publiczne) \\
-  GET  & /api/v1/user/roles & słownik ról (publiczne) \\
-  POST/PUT/DELETE & /api/v1/user/roles/\{id\} & CRUD ról (admin) \\
+  \endhead
   \bottomrule
-\end{tabularx}
+  \endlastfoot
+  POST & \nolinkurl{/api/v1/auth/register} & \small{rejestracja konta (publiczne)} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/auth/login} & \small{logowanie, ustawia ciasteczko JWT (publiczne)} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/auth/logout} & \small{wylogowanie, kasuje ciasteczko (publiczne)} \\
+  \midrule
+  GET & \nolinkurl{/api/v1/requests} & \small{lista wniosków (filtry, paginacja, nagłówki \texttt{X-Total-*})} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/requests} & \small{utworzenie wniosku (pełny Załącznik nr 1)} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/{id}} & \small{szczegóły wniosku (zwraca ETag z wersją)} \\ \addlinespace
+  PUT & \nolinkurl{/api/v1/requests/{id}} & \small{edycja wniosku (wymaga \texttt{If-Match})} \\ \addlinespace
+  DELETE & \nolinkurl{/api/v1/requests/{id}} & \small{usunięcie wniosku} \\ \addlinespace
+  PATCH & \nolinkurl{/api/v1/requests/{id}/status} & \small{zmiana statusu wniosku} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/{id}/status/available-transitions} & \small{dozwolone przejścia statusu dla aktora} \\ \addlinespace
+  PUT & \nolinkurl{/api/v1/requests/{id}/fundings/{sourceId}/grant} & \small{przyznanie kwoty per źródło finansowania} \\ \addlinespace
+  PUT & \nolinkurl{/api/v1/requests/{id}/provost-opinion} & \small{zapis opinii prorektora} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/{id}/history} & \small{historia zmian statusu} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/requests/{id}/comments} & \small{dodanie komentarza} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/{id}/comments} & \small{lista komentarzy} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/requests/{id}/attachments} & \small{dodanie załącznika (multipart)} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/{id}/attachments} & \small{lista załączników} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/{id}/attachments/{aid}/content} & \small{pobranie treści załącznika} \\ \addlinespace
+  DELETE & \nolinkurl{/api/v1/requests/{id}/attachments/{aid}} & \small{usunięcie załącznika} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/statuses} & \small{słownik statusów wniosku} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/requests/statistics/departments} & \small{podsumowanie wniosków per wydział (admin)} \\
+  \midrule
+  GET & \nolinkurl{/api/v1/request-templates} & \small{lista aktywnych szablonów} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/request-templates/all} & \small{wszystkie szablony, też nieaktywne (admin)} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/request-templates/{id}} & \small{szczegóły szablonu} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/request-templates} & \small{utworzenie szablonu (admin)} \\ \addlinespace
+  PUT & \nolinkurl{/api/v1/request-templates/{id}} & \small{edycja szablonu (admin)} \\ \addlinespace
+  DELETE & \nolinkurl{/api/v1/request-templates/{id}} & \small{usunięcie szablonu (admin)} \\
+  \midrule
+  GET & \nolinkurl{/api/v1/reference/departments} & \small{lista działów (publiczne)} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/reference/departments} & \small{utworzenie działu (admin)} \\ \addlinespace
+  PUT & \nolinkurl{/api/v1/reference/departments/{id}} & \small{edycja działu (admin)} \\ \addlinespace
+  DELETE & \nolinkurl{/api/v1/reference/departments/{id}} & \small{usunięcie działu (admin)} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/reference/cost-categories} & \small{kategorie kosztów (publiczne)} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/reference/funding-sources} & \small{źródła finansowania (publiczne)} \\
+  \midrule
+  GET & \nolinkurl{/api/v1/roles} & \small{słownik ról (publiczne)} \\ \addlinespace
+  POST & \nolinkurl{/api/v1/roles} & \small{utworzenie roli (admin)} \\ \addlinespace
+  PUT & \nolinkurl{/api/v1/roles/{id}} & \small{edycja roli (admin)} \\ \addlinespace
+  DELETE & \nolinkurl{/api/v1/roles/{id}} & \small{usunięcie roli (admin)} \\
+  \midrule
+  GET & \nolinkurl{/api/v1/users} & \small{lista użytkowników (admin)} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/users/me} & \small{dane zalogowanego użytkownika} \\ \addlinespace
+  GET & \nolinkurl{/api/v1/users/{id}} & \small{szczegóły użytkownika (admin)} \\ \addlinespace
+  PATCH & \nolinkurl{/api/v1/users/{id}/role} & \small{zmiana roli użytkownika (admin)} \\ \addlinespace
+  PATCH & \nolinkurl{/api/v1/users/{id}/department} & \small{zmiana działu użytkownika (admin)} \\ \addlinespace
+  PATCH & \nolinkurl{/api/v1/users/{id}/active} & \small{aktywacja/dezaktywacja konta (admin)} \\
+  \midrule
+  GET & \nolinkurl{/api/v1/attachments/constraints} & \small{dozwolone typy i maks.\ rozmiar załączników} \\
+\end{longtable}
+
 
 \subsection{Specyfikacja OpenAPI (Swagger UI)}
 W celu spełnienia wymagania \emph{,,Aplikacja typu Web API z obsługą Open API''}
@@ -551,7 +597,7 @@ Biblioteka automatycznie skanuje wszystkie kontrolery oznaczone adnotacją
 \texttt{@RestController}, generuje specyfikację OpenAPI~3.1 i udostępnia
 interaktywne UI Swaggera bez dodatkowej konfiguracji.
 
-Publiczne punkty dostępu (dodane do listy \texttt{permitAll} w klasie
+\paragraph{Publiczne punkty dostępu (dodane do listy \texttt{permitAll} w klasie}
 \texttt{SecurityConfig}):
 \begin{itemize}[leftmargin=*]
   \item \url{http://localhost:8080/swagger-ui.html} - interaktywna konsola
@@ -576,16 +622,17 @@ mechanizmu \texttt{Pageable} z biblioteki Spring Data. Parametry zapytania:
   \item \texttt{sort} - pole sortowania (domyślnie \texttt{createdAt,desc}).
 \end{itemize}
 
-Repozytorium \texttt{SpringDataJpaRequestRepository} implementuje interfejs
-\texttt{JpaSpecificationExecutor<Request>}, dzięki czemu paginacja działa
-łącznie ze specyfikacją autoryzacyjną \texttt{RequestAccessSpecificationFactory}.
+Repozytorium \texttt{\seqsplit{SpringDataJpaRequestRepository}} implementuje interfejs
+\texttt{\seqsplit{JpaSpecificationExecutor<Request>}}, dzięki czemu paginacja działa
+łącznie ze specyfikacją autoryzacyjną \texttt{\seqsplit{RequestAccessSpecificationFactory}}.
 Użytkownik nigdy nie zobaczy wniosków poza zakresem swoich uprawnień,
 niezależnie od żądanej strony, przez co specyfikacja autoryzacyjna jest dołączana
 do każdego zapytania jako pierwszy warunek \texttt{WHERE}.
 
 Adnotacja \texttt{@EntityGraph} (z atrybutami \texttt{status}, \texttt{department},
-\texttt{costCategory}, \texttt{fundingSource}, \texttt{template}) jest powielona
-na obu wariantach \texttt{findAll}, co eliminuje problem N+1 na obu ścieżkach.
+\texttt{costCategory}, \texttt{template}) jest powielona na obu wariantach
+\texttt{findAll} (z paginacją i bez), co eliminuje problem N+1 na słownikach
+\emph{to-one} na obu ścieżkach.
 
 W odpowiedzi HTTP zwracane są dodatkowe nagłówki:
 \begin{itemize}[leftmargin=*]
@@ -602,38 +649,39 @@ kontraktu REST z istniejącą warstwą frontową.
 \subsection{Uwierzytelnianie}
 Po poprawnym zalogowaniu backend wystawia token JWT podpisany kluczem HMAC SHA-256
 i zwraca go w bezpiecznym ciasteczku z atrybutami \texttt{HttpOnly}, \texttt{SameSite=Strict}.
-Token zawiera identyfikator użytkownika (e-mail) oraz jego rolę.
+Token zawiera identyfikator użytkownika (zewnętrzny UUID) oraz jego rolę i nazwę.
 
 \subsection{Autoryzacja oparta na rolach}
-Słownik ról (dziewięć ról):
+Słownik ról:
 \begin{itemize}[leftmargin=*]
   \item \texttt{ROLE\_ADMIN} -- decyzja Rektora, zarządzanie systemem (CRUD słowników, ról, departamentów);
   \item \texttt{ROLE\_STUDENT} -- składa wnioski, widzi i edytuje własne (w fazie DRAFT / CORRECTION\_REQUIRED);
   \item \texttt{ROLE\_STUDENT\_COUNCIL} -- Samorząd Studentów, ocena merytoryczna i opinia ws.\ finansowania ze źródła studenckiego;
   \item \texttt{ROLE\_DOCTORAL\_COUNCIL} -- Samorząd Doktorantów, analogicznie do Samorządu Studentów dla wniosków doktoranckich;
   \item \texttt{ROLE\_LEGAL\_COMMISSION} -- komisja prawno-organizacyjna Rektora, ocena formalno-prawna;
-  \item \texttt{ROLE\_DEAN\_OFFICE} -- Dziekanat / CSSDiR, ocena formalna na poziomie wydziału;
+  \item \texttt{ROLE\_DEAN\_OFFICE} -- Dziekanat, ocena wniosków finansowanych ze środków wydziału (\texttt{FACULTY\_FUNDS});
   \item \texttt{ROLE\_FINANCE\_OFFICE} -- Kwestura, kontrola finansowa i rozliczenie środków;
-  \item \texttt{ROLE\_STUDENT\_AFFAIRS} -- Centrum Spraw Studenckich i Doktoranckich, koordynacja obiegu między jednostkami;
+  \item \texttt{ROLE\_STUDENT\_AFFAIRS} -- Centrum Spraw Studenckich i Doktoranckich (CSSDiR), ocena formalna wniosków i prowadzenie ich obiegu;
   \item \texttt{ROLE\_PROVOST} -- Prorektor, wydawanie opinii merytorycznej na etapie oceny formalnej wniosku.
 \end{itemize}
 
 \subsection{Zabezpieczenia formularzy}
-Rola użytkownika \emph{nigdy} nie jest pobierana z formularza rejestracji, tzn.
-każde nowe konto otrzymuje rolę bazową \texttt{ROLE\_STUDENT} wymuszoną po stronie
-serwera. Przypisanie wyższej roli jest wyłącznie aktem administracyjnym.
+Przy rejestracji można wskazać jedynie rolę \texttt{ROLE\_STUDENT} -- wskazanie
+którejkolwiek z ról uprzywilejowanych jest odrzucane po stronie serwera
+(\texttt{\seqsplit{RegistrationForbiddenException}}), więc każde nowe konto powstaje jako
+zwykły wnioskodawca. Przypisanie wyższej roli jest wyłącznie aktem administracyjnym.
 Podobnie wydział wnioskodawcy nie jest wybierany przy składaniu wniosku, a
 pobierany jest z konta zalogowanego użytkownika.
 
 \subsection{Dostęp publiczny do słowników}
-Po refaktoryzacji PR \#12 endpointy \texttt{GET} dla danych referencyjnych
+Endpointy \texttt{GET} dla danych referencyjnych
 (\texttt{/api/v1/reference/departments}, \texttt{/api/v1/reference/cost-categories},
-\texttt{/api/v1/reference/funding-sources}, \texttt{/api/v1/user/roles},
-\texttt{/api/v1/request-templates}, \texttt{/api/v1/request-statuses})
-są dostępne anonimowo. Umożliwia to zasilenie list rozwijanych w formularzu
-rejestracji (np.\ wybór wydziału) bez konieczności wcześniejszego logowania.
-Operacje modyfikujące (\texttt{POST}/\texttt{PUT}/\texttt{DELETE}) na tych samych
-zasobach wymagają roli \texttt{ROLE\_ADMIN} (egzekwowane przez \texttt{@PreAuthorize}).
+\texttt{/api/v1/reference/funding-sources}, \texttt{/api/v1/roles})
+są dostępne anonimowo (\texttt{permitAll} w \texttt{SecurityConfig}).
+Umożliwia to zasilenie list rozwijanych w formularzu rejestracji
+(np.\ wybór wydziału) bez konieczności wcześniejszego logowania.
+Operacje modyfikujące (\texttt{POST}/\texttt{PUT}/\texttt{DELETE}) na działach
+i rolach wymagają roli \texttt{ROLE\_ADMIN} (egzekwowane przez \texttt{@PreAuthorize}).
 
 \subsection{Optymistyczna kontrola współbieżności}
 Edycja wniosku oraz zmiana statusu wymagają nagłówka
@@ -644,7 +692,7 @@ poprzedniego \texttt{GET}). Mechanizm jest realizowany przez:
         \texttt{Request} i \texttt{User},
   \item helper \texttt{ETags} parsujący/formatujący wartość ETag,
   \item \texttt{assertVersion} guard w use case'ach \texttt{EditRequestUseCase}
-        i \texttt{ChangeRequestStatusUseCase} -- niezgodność wersji kończy
+        i \texttt{\seqsplit{ChangeRequestStatusUseCase}} -- niezgodność wersji kończy
         się odpowiedzią HTTP \texttt{412 Precondition Failed}, zły format
         nagłówka -- \texttt{400 Bad Request} przez
         \texttt{InvalidIfMatchHeaderException}.
@@ -755,41 +803,71 @@ Test powtórzono dla czterech wartości parametru zapytania \texttt{size},
 \end{enumerate}
 
 Szczegółowy raport (czterokrotny przebieg, pełne podsumowania w JSON oraz
-przepis odtworzenia) znajduje się w pliku \texttt{docs/testy-wydajnosciowe.md}
-oraz \texttt{docs/k6/get-requests.summary.json}.
+przepis odtworzenia) znajduje się w pliku \nolinkurl{docs/testy-wydajnosciowe.md}
+oraz \nolinkurl{docs/k6/get-requests.summary.json}.
 
 \section{Uruchomienie systemu}
 \label{sec:uruchomienie}
 
 \subsection{Wymagania}
 \begin{itemize}[leftmargin=*]
-  \item Java 25, Maven 3.9+
-  \item Docker (do uruchomienia Oracle Database 23 Free)
+  \item \textbf{Docker} oraz \textbf{Docker Compose} -- jedyny wymóg do
+        uruchomienia całości (build obu modułów odbywa się w kontenerach).
+  \item Opcjonalnie, do pracy lokalnej bez kontenerów: Java 25 i Maven 3.9+.
 \end{itemize}
 
-\subsection{Krok po kroku}
-\begin{lstlisting}[language=bash, caption={Uruchomienie aplikacji (multi-module)}]
-# 1. Uruchomienie bazy Oracle w Dockerze
-docker run -d --name oracle-pb -p 1521:1521 \
-  -e ORACLE_PASSWORD=paw1ewjav1e \
-  gvenzl/oracle-free:23-slim
+\subsection{Uruchomienie w Dockerze}
+Cały system -- baza Oracle, backend i frontend -- uruchamia się na podstawie
+pliku \texttt{docker-compose.yml}. Compose buduje obrazy obu modułów i startuje
+usługi w odpowiedniej kolejności: Oracle, następnie backend (Flyway tworzy
+schemat i wczytuje dane demo), a po jego gotowości -- frontend. Gotowość każdej
+usługi pilnują healthchecki.
 
-# 2. Utworzenie schematu admin_pb (z hasłem zgodnym z application.yaml)
-#    - skrypt w docs/install/create_schema.sql lub recznie w SQL Developer
 
-# 3. Zbudowanie obu modułów (uruchamia Flyway na backendzie)
-./mvnw clean install -DskipTests
+\paragraph{Konfiguracja zmiennych (plik \texttt{.env})} Bez pliku \texttt{.env} Compose użyje
+wartości domyślnych zaszytych w \texttt{docker-compose.yml} i aplikacja wstanie
+poprawnie. Zaleca się jednak utworzenie własnego \texttt{.env} (przykładowy zestaw
+zmiennych z domyślnymi wartościami znajduje się w \texttt{.env.example}), aby
+dostosować porty, hasła czy klucz JWT.
 
-# 4. Uruchomienie BACKENDU (REST API, port 8080) - w osobnym terminalu
-cd backend && ../mvnw spring-boot:run
+\paragraph{Uruchomienie} Całość uruchamia jedno polecenie:
+\begin{lstlisting}[language=bash, numbers=none]
+docker compose up --build
+\end{lstlisting}
+Po starcie aplikacja jest dostępna pod portami ustawionymi w \texttt{.env}
+(domyślnie):
+\begin{itemize}[leftmargin=*]
+  \item frontend (UI): \url{http://localhost:8081}
+  \item backend (REST API): \url{http://localhost:8080/api/v1/}
+  \item Swagger UI: \url{http://localhost:8080/swagger-ui.html}
+\end{itemize}
 
-# 5. Uruchomienie FRONTENDU (Thymeleaf, port 8081) - w drugim terminalu
-cd frontend && ../mvnw spring-boot:run
+\paragraph{Uruchomienie pojedynczego modułu} Compose pozwala wskazać konkretną
+usługę -- jej zależności startują automatycznie:
+\begin{lstlisting}[language=bash, numbers=none]
+docker compose up --build oracle-db   # sama baza
+docker compose up --build backend     # baza + backend (REST API)
+docker compose up --build frontend    # cały stos (frontend wymaga backendu)
+\end{lstlisting}
 
-# 6. Aplikacja dostępna pod:
-#    - frontend (UI):        http://localhost:8081
-#    - backend (REST API):   http://localhost:8080/api/v1/...
-#    - Swagger UI:           http://localhost:8080/swagger-ui.html
+\paragraph{Zatrzymanie} Kontenery zatrzymuje jedno polecenie:
+\begin{lstlisting}[language=bash, numbers=none]
+docker compose down       # zatrzymanie kontenerów
+docker compose down -v    # dodatkowo usuwa wolumeny (czysta baza)
+\end{lstlisting}
+
+\paragraph{Schemat i dane} Schemat bazy (\texttt{admin\_pb}) tworzy automatycznie
+obraz \texttt{gvenzl/oracle-free} na podstawie zmiennych \texttt{APP\_USER} /
+\texttt{APP\_USER\_PASSWORD}; migracje Flyway oraz dane demonstracyjne wykonują
+się przy starcie backendu -- ręczne tworzenie schematu nie jest potrzebne.
+
+\subsection{Uruchomienie lokalne (bez Dockera)}
+Do developmentu można uruchomić moduły bezpośrednio (wymaga działającej bazy
+Oracle ze schematem \texttt{admin\_pb}):
+\begin{lstlisting}[language=bash, caption={Uruchomienie lokalne w dwóch terminalach}]
+./mvnw clean install -DskipTests        # build obu modułów
+cd backend  && ../mvnw spring-boot:run  # REST API, port 8080
+cd frontend && ../mvnw spring-boot:run  # Thymeleaf, port 8081 (drugi terminal)
 \end{lstlisting}
 
 \subsection{Konta testowe}
@@ -800,40 +878,63 @@ warunku \texttt{WHERE NOT EXISTS} -- każde uruchomienie jest idempotentne.
 
 \paragraph{Konta z \texttt{DataSeeder.java} (warstwa aplikacji)}
 Tworzone w runtime przy starcie aplikacji, hasła hashowane BCryptem
-przez \texttt{PasswordEncoder}.
+przez \texttt{PasswordEncoder}. Seeder działa warunkowo -- steruje nim
+właściwość \texttt{app.demo-data.enabled} (zmienna \texttt{DEMO\_DATA\_ENABLED}
+w \texttt{.env}, domyślnie \texttt{true}); ustawienie jej na \texttt{false}
+pomija tworzenie tych kont. Nie wpływa to na konta z migracji \texttt{V8} --
+Flyway uruchamia się niezależnie od tej flagi.
 
-\begin{tabularx}{\textwidth}{l l X}
-  \toprule
-  \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
-  \midrule
-  j.wnioskodawca@student.pb.edu.pl & student123 & STUDENT / Wydział Informatyki \\
-  k.samorzad@pb.edu.pl & wrss123 & STUDENT\_COUNCIL / Samorząd Studentów \\
-  a.zgodna@pb.edu.pl & komisja123 & LEGAL\_COMMISSION / Wydział Mechaniczny \\
-  e.dziekan@pb.edu.pl & dziekanat123 & DEAN\_OFFICE / Dziekanat WI \\
-  j.matusiewicz@student.pb.edu.pl & admin123 & ADMIN / Wydział Mechaniczny \\
-  j.borkowski@student.pb.edu.pl & admin123 & ADMIN / Wydział Informatyki \\
-  \bottomrule
-\end{tabularx}
+
+\begin{table}[H]
+  \centering
+  \small
+  \resizebox{\textwidth}{!}{
+  \begin{tabular}{l l l}
+    \toprule
+    \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
+    \midrule
+    j.wnioskodawca@student.pb.edu.pl & student123 & STUDENT / Wydział Informatyki \\
+    k.samorzad@pb.edu.pl & wrss123 & STUDENT\_COUNCIL / Samorząd Studentów \\
+    a.zgodna@pb.edu.pl & komisja123 & LEGAL\_COMMISSION / Wydział Mechaniczny \\
+    e.dziekan@pb.edu.pl & dziekanat123 & DEAN\_OFFICE / Dziekanat WI \\
+    j.matusiewicz@student.pb.edu.pl & admin123 & ADMIN / Wydział Mechaniczny \\
+    j.borkowski@student.pb.edu.pl & admin123 & ADMIN / Wydział Informatyki \\
+    \bottomrule
+  \end{tabular}
+  }
+\end{table}
 
 \paragraph{Konta z migracji \texttt{V8\_\_demo\_data.sql} (warstwa bazy)}
 Wstawiane przez Flyway w ramach skryptu zasilania danymi demo. Hasła zapisane
 w formacie \texttt{\{noop\}} (rozpoznawany przez \texttt{DelegatingPasswordEncoder}
 jako plain text -- świadoma decyzja, by nie liczyć BCryptu po stronie SQL).
-Identyfikatory wewnętrzne (\texttt{id}) zaczynają się od \texttt{9001}, aby
-nie kolidować z auto-inkrementacją kont z \texttt{DataSeeder}.
+Identyfikatory wewnętrzne (\texttt{id}) są tu wpisane na stałe (od \texttt{9001}),
+aby nie kolidować z sekwencją auto-inkrementacji kolumny \texttt{id}
+(\texttt{GENERATED BY DEFAULT AS IDENTITY}), z której korzystają wszystkie konta
+tworzone normalnie -- zarówno przez \texttt{DataSeeder}, jak i przy rejestracji
+użytkownika w aplikacji.
 
-\begin{tabularx}{\textwidth}{l l X}
-  \toprule
-  \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
-  \midrule
-  demo-admin@pb.edu.pl     & demo123 & ADMIN / Wydział Informatyki \\
-  demo-student@pb.edu.pl   & demo123 & STUDENT / Wydział Informatyki \\
-  demo-wrss@pb.edu.pl      & demo123 & STUDENT\_COUNCIL / Samorząd Studentów \\
-  demo-komisja@pb.edu.pl   & demo123 & LEGAL\_COMMISSION / Rektorat \\
-  demo-dziekanat@pb.edu.pl & demo123 & DEAN\_OFFICE / Dziekanat WI \\
-  demo-kwestura@pb.edu.pl  & demo123 & FINANCE\_OFFICE / Kwestura \\
-  \bottomrule
-\end{tabularx}
+\begin{table}[H]
+  \centering
+  \small
+  \resizebox{\textwidth}{!}{
+  \begin{tabular}{l l l}
+    \toprule
+    \textbf{E-mail} & \textbf{Hasło} & \textbf{Rola / jednostka} \\
+    \midrule
+    demo-admin@pb.edu.pl     & demo123 & ADMIN / Wydział Informatyki \\
+    demo-student@pb.edu.pl   & demo123 & STUDENT / Wydział Informatyki \\
+    demo-wrss@pb.edu.pl      & demo123 & STUDENT\_COUNCIL / Samorząd Studentów \\
+    demo-komisja@pb.edu.pl   & demo123 & LEGAL\_COMMISSION / Rektorat \\
+    demo-dziekanat@pb.edu.pl & demo123 & DEAN\_OFFICE / Dziekanat WI \\
+    demo-kwestura@pb.edu.pl  & demo123 & FINANCE\_OFFICE / Kwestura \\
+    demo-cssdir@pb.edu.pl    & demo123 & STUDENT\_AFFAIRS / Rektorat \\
+    demo-doktoranci@pb.edu.pl & demo123 & DOCTORAL\_COUNCIL / Samorząd Doktorantów \\
+    demo-prorektor@pb.edu.pl & demo123 & PROVOST / Rektorat \\
+    \bottomrule
+  \end{tabular}
+  }
+\end{table}
 
 \paragraph{Przykładowe wnioski z \texttt{V8}}
 Razem z kontami migracja \texttt{V8} wstawia trzy wnioski demonstracyjne

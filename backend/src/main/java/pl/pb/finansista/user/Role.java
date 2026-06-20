@@ -27,7 +27,6 @@ public class Role extends BaseEntity {
     this.name = name;
   }
 
-  /** Built-in roles back the authorization logic ({@link RoleName}) and must stay immutable. */
   public boolean isBuiltIn() {
     return Arrays.stream(RoleName.values()).anyMatch(r -> r.name().equals(name));
   }

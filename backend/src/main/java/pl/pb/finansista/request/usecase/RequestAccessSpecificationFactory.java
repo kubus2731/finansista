@@ -24,25 +24,16 @@ public class RequestAccessSpecificationFactory {
 
     allowedSpecs.add(RequestSpecifications.hasUserEmail(user.getEmail()));
 
-        if (userAuthorities.contains(RoleName.ROLE_PROVOST.name())) {
-            allowedSpecs.add(RequestSpecifications.hasStatusIn(List.of(
-                    RequestStatusName.FORMAL_EVALUATION.name(), RequestStatusName.UNDER_REVIEW.name(),
-                    RequestStatusName.ACCEPTED.name(), RequestStatusName.REJECTED.name(),
-                    RequestStatusName.CORRECTION_REQUIRED.name())));
-        }
-
-        if (userAuthorities.contains(RoleName.ROLE_DEAN_OFFICE.name())) {
-            Department deanDepartment = user.getDepartment();
-            Long facultyId = (deanDepartment != null && deanDepartment.getParent() != null)
-                    ? deanDepartment.getParent().getId() : null;
-            if (facultyId != null) {
-                allowedSpecs.add(RequestSpecifications.hasDepartment(facultyId)
-                        .and(RequestSpecifications.hasFundingSource(FundingSourceName.FACULTY_FUNDS.name()))
-                        .and(RequestSpecifications.hasStatusIn(List.of(
-                                RequestStatusName.UNDER_REVIEW.name(), RequestStatusName.ACCEPTED.name(),
-                                RequestStatusName.REJECTED.name(), RequestStatusName.CORRECTION_REQUIRED.name()))));
-            }
-        }
+    if (userAuthorities.contains(RoleName.ROLE_PROVOST.name())) {
+      allowedSpecs.add(
+          RequestSpecifications.hasStatusIn(
+              List.of(
+                  RequestStatusName.FORMAL_EVALUATION.name(),
+                  RequestStatusName.UNDER_REVIEW.name(),
+                  RequestStatusName.ACCEPTED.name(),
+                  RequestStatusName.REJECTED.name(),
+                  RequestStatusName.CORRECTION_REQUIRED.name())));
+    }
 
     if (userAuthorities.contains(RoleName.ROLE_DEAN_OFFICE.name())) {
       Department deanDepartment = user.getDepartment();
@@ -58,9 +49,9 @@ public class RequestAccessSpecificationFactory {
                     RequestSpecifications.hasStatusIn(
                         List.of(
                             RequestStatusName.UNDER_REVIEW.name(),
-                                RequestStatusName.ACCEPTED.name(),
+                            RequestStatusName.ACCEPTED.name(),
                             RequestStatusName.REJECTED.name(),
-                                RequestStatusName.CORRECTION_REQUIRED.name()))));
+                            RequestStatusName.CORRECTION_REQUIRED.name()))));
       }
     }
 
@@ -115,6 +106,22 @@ public class RequestAccessSpecificationFactory {
                   RequestStatusName.UNDER_REVIEW.name(), RequestStatusName.ACCEPTED.name(),
                   RequestStatusName.REJECTED.name(),
                       RequestStatusName.CORRECTION_REQUIRED.name())));
+    }
+
+    /*
+     * TO ZOSTALO USUNIETE PRZEZ BLEDNY MERGE, CSSDiR WIDZI WNIOSKI DO KTORYCH STRACIL DOSTEP
+     * TERAZ JEST PONOWNIE ZGODNE Z INSTRUKCJA :)
+     */
+    if (userAuthorities.contains(RoleName.ROLE_STUDENT_AFFAIRS.name())) {
+      allowedSpecs.add(
+          RequestSpecifications.hasStatusIn(
+              List.of(
+                  RequestStatusName.SUBMITTED.name(),
+                  RequestStatusName.FORMAL_EVALUATION.name(),
+                  RequestStatusName.UNDER_REVIEW.name(),
+                  RequestStatusName.ACCEPTED.name(),
+                  RequestStatusName.REJECTED.name(),
+                  RequestStatusName.CORRECTION_REQUIRED.name())));
     }
 
     return Specification.anyOf(allowedSpecs);

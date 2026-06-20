@@ -5,6 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +23,10 @@ interface SpringDataJpaRequestRepository
   @NonNull
   @EntityGraph(attributePaths = {"status", "department", "costCategory", "template"})
   List<Request> findAll(@Nullable Specification<Request> spec);
+
+  @NonNull
+  @EntityGraph(attributePaths = {"status", "department", "costCategory", "template"})
+  Page<Request> findAll(@Nullable Specification<Request> spec, @NonNull Pageable pageable);
 
   Optional<Request> findByExternalId(UUID externalId);
 }

@@ -1,11 +1,12 @@
 package pl.pb.finansista.user.exception;
 
+import org.springframework.http.HttpStatus;
 import pl.pb.finansista.common.exception.BusinessException;
 
 public class UserAlreadyExistsException extends BusinessException {
 
-  public UserAlreadyExistsException(String message) {
-    super(message, org.springframework.http.HttpStatus.CONFLICT);
+  private UserAlreadyExistsException(String message) {
+    super(message, HttpStatus.CONFLICT);
   }
 
   public static UserAlreadyExistsException withEmail(String email) {

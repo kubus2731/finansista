@@ -7,6 +7,7 @@ INSERT INTO roles (id, name) VALUES (5, 'ROLE_LEGAL_COMMISSION');
 INSERT INTO roles (id, name) VALUES (6, 'ROLE_DEAN_OFFICE');
 INSERT INTO roles (id, name) VALUES (7, 'ROLE_FINANCE_OFFICE');
 INSERT INTO roles (id, name) VALUES (8, 'ROLE_STUDENT_AFFAIRS');
+INSERT INTO roles (id, name) VALUES (9, 'ROLE_PROVOST');
 
 -- 2. Domyślne departamenty
 INSERT INTO department (id, name) VALUES (1, 'Wydział Informatyki PB');
@@ -25,6 +26,14 @@ INSERT INTO department (id, name) VALUES (13, 'Samorząd Studentów PB');
 INSERT INTO department (id, name) VALUES (14, 'Kwestura');
 INSERT INTO department (id, name) VALUES (15, 'Rektorat');
 INSERT INTO department (id, name) VALUES (16, 'Samorząd Doktorantów PB');
+
+-- Dziekanat -> wydział (parent). Działy bez nadrzędnego (samorządy, kwestura, rektorat) zostają NULL.
+UPDATE department SET parent_department_id = 1  WHERE id = 2;   -- Dziekanat WI -> Wydział Informatyki
+UPDATE department SET parent_department_id = 3  WHERE id = 4;   -- Dziekanat WM -> Wydział Mechaniczny
+UPDATE department SET parent_department_id = 5  WHERE id = 6;   -- Dziekanat WE -> Wydział Elektryczny
+UPDATE department SET parent_department_id = 7  WHERE id = 8;   -- Dziekanat WA -> Wydział Architektury
+UPDATE department SET parent_department_id = 9  WHERE id = 10;  -- Dziekanat WIZ -> Wydział Inżynierii Zarządzania
+UPDATE department SET parent_department_id = 11 WHERE id = 12;  -- Dziekanat WBiNŚ -> Wydział Budownictwa i Nauk o Środowisku
 
 -- 3. Statusy wniosków
 INSERT INTO request_status (id, name) VALUES (1, 'DRAFT');

@@ -35,7 +35,6 @@ public class User extends ExposableModificationAuditedEntity {
   @JoinColumn(name = "department_id", nullable = false)
   private Department department;
 
-  /** Soft delete: false = konto dezaktywowane (nie loguje się, ukryte na listach). */
   @Column(nullable = false)
   private boolean active = true;
 

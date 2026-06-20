@@ -44,36 +44,47 @@ public class AuthViewController {
     }
   }
 
-    @PostMapping("/register")
-    public String register(@Valid @ModelAttribute RegisterForm form,
-                           BindingResult bindingResult,
-                           HttpServletResponse response,
-                           Model model) {
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("errorMessage", "Sprawdź poprawność wprowadzonych danych (np. telefon musi mieć 9 cyfr, hasło minimum 8 znaków).");
-            return "auth/register";
-        }
-        if (!form.rawPassword().equals(form.passwordConfirm())) {
-            model.addAttribute("errorMessage", "Podane hasła nie są identyczne.");
-            return "auth/register";
-        }
-        try {
-            RegisterUserRequest payload = new RegisterUserRequest(
-                    form.name(), form.surname(), form.email(), form.phoneNumber(),
-                    form.rawPassword(), STUDENT_ROLE_ID, form.departmentId());
-
-            ResponseEntity<Void> backendResponse = backendRestClient.post()
-                    .uri("/api/v1/auth/register")
-                    .body(payload)
-                    .retrieve()
-                    .toBodilessEntity();
-            relayCookies(backendResponse, response);
-            return "redirect:/requests";
-        } catch (RestClientResponseException e) {
-            model.addAttribute("errorMessage", "Konto z tym adresem e-mail lub telefonem już istnieje.");
-            return "auth/register";
-        }
+  @PostMapping("/register")
+  public String register(
+      @Valid @ModelAttribute RegisterForm form,
+      BindingResult bindingResult,
+      HttpServletResponse response,
+      Model model) {
+    if (bindingResult.hasErrors()) {
+      model.addAttribute(
+          "errorMessage",
+          "Sprawdź poprawność wprowadzonych danych (np. telefon musi mieć 9 cyfr, hasło minimum 8 znaków).");
+      return "auth/register";
     }
+    if (!form.rawPassword().equals(form.passwordConfirm())) {
+      model.addAttribute("errorMessage", "Podane hasła nie są identyczne.");
+      return "auth/register";
+    }
+    try {
+      RegisterUserRequest payload =
+          new RegisterUserRequest(
+              form.name(),
+              form.surname(),
+              form.email(),
+              form.phoneNumber(),
+              form.rawPassword(),
+              STUDENT_ROLE_ID,
+              form.departmentId());
+
+      ResponseEntity<Void> backendResponse =
+          backendRestClient
+              .post()
+              .uri("/api/v1/auth/register")
+              .body(payload)
+              .retrieve()
+              .toBodilessEntity();
+      relayCookies(backendResponse, response);
+      return "redirect:/requests";
+    } catch (RestClientResponseException e) {
+      model.addAttribute("errorMessage", "Konto z tym adresem e-mail lub telefonem już istnieje.");
+      return "auth/register";
+    }
+  }
 
   @GetMapping("/logout")
   public String logout(HttpServletResponse response) {
